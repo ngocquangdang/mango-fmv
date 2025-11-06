@@ -1,0 +1,22 @@
+export {};
+
+declare global {
+  interface Window {
+    MgApi?: {
+      login?: (cb: (mgUserInfo: MgUserInfo) => void) => void;
+    };
+    VideoPlayer?: {
+      onInit?: (params?: unknown, done?: () => void) => void;
+      onPlay?: (cb: (clipId: string) => void) => () => void;
+      onPause?: (cb: (data: Record<string, any>) => void) => () => void;
+      onStopAt?: (cb: (sceneId: string, time: number) => void) => () => void;
+      onChoiceSelected?: (cb: (sceneId: string, nextClipId: string) => void) => () => void;
+      play?: () => void;
+      pause?: () => void;
+      destroy?: () => void;
+      seek?: (time: number) => void;
+      setAutoplayEnabled?: (enabled: boolean) => void;
+      setCurrentClipId?: (clipId: string) => void;
+    };
+  }
+}
