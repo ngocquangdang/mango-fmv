@@ -18,7 +18,7 @@ const API_BASE_URL = "https://elearning-api-stg.onidservice.cloud/api/v1";
 
 const getAuthToken = (): string | null => {
   if (typeof window !== "undefined") {
-    return getAccessToken();
+    return getAccessToken() ?? null;
   }
   return null;
 };

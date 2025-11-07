@@ -7,8 +7,12 @@ export type Clip = {
   title: string
   videoUrl: string
   isDecisionPoint: boolean
+  subtitleUrl?: string
   isCompleted?: boolean
   decisionTime?: number
+  defaultChoice?: string
+  triggerType?: "branch" | "hotspot"
+  countdown?: number
   hotspots?: any[]
   choices?: Choice[]
   nextClipId?: string | null
@@ -23,7 +27,7 @@ export type StoryData = {
 export const storyData = (): StoryData => {
   return {
     projectTitle: "Chapter 1: Wanna See You Again",
-    startClipId: "clip_home",
+    startClipId: "clip_sweet_girl",
     clips: {
       clip_home: {
         id: "clip_home",
@@ -33,6 +37,7 @@ export const storyData = (): StoryData => {
         isDecisionPoint: true,
         decisionTime: 5,
         isCompleted: true,
+        triggerType: "hotspot",
         hotspots: [
           {
             id: "hs1",
@@ -87,7 +92,10 @@ export const storyData = (): StoryData => {
         videoUrl:
           "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
         isDecisionPoint: true,
-        decisionTime: 5.5,
+        decisionTime: 3,
+        defaultChoice: "clip_hold",
+        countdown: 10,  
+        triggerType: "branch",
         choices: [
           { text: "Hold Her", nextClipId: "clip_hold" },
           { text: "Jump with Her", nextClipId: "clip_jump" },

@@ -11,15 +11,12 @@ import ReactFlow, {
 } from "reactflow";
 import CustomNode from "./custom-node";
 import { useFlowChart } from "./context";
-import { useUserContext } from "../user/context";
 import { FlowChartContextProvider } from "./context/flow-chart-provider";
 
 const nodeTypes = { customNode: CustomNode };
 
 const FlowChartInner: React.FC = () => {
   const { nodes = [], edges = [], data } = useFlowChart();
-
-  const { story, currentClipId, setCurrentClipId } = useUserContext();
 
   const layout = React.useMemo(() => {
     const startId = data?.startClipId;
@@ -72,13 +69,11 @@ const FlowChartInner: React.FC = () => {
       ...node,
       width: 180,
       height: 80,
-      className: `${node.className ?? ""} ${
-        node.id === currentClipId ? "ring-2 ring-indigo-400" : ""
-      }`.trim(),
-      data: { ...node.data, isActive: node.id === currentClipId },
+      className: "",
+      data: { ...node.data, isActive: false },
       type: node.type ?? "customNode",
     }));
-  }, [layout, nodes, currentClipId]);
+  }, [layout, nodes]);
 
   return (
     <div className="h-full w-full">
@@ -95,7 +90,7 @@ const FlowChartInner: React.FC = () => {
           type: "smoothstep",
         }}
         fitView
-        onNodeClick={(_, node) => setCurrentClipId(node.id as string)}
+        onNodeClick={() => {}}
         proOptions={{ hideAttribution: true }}
       >
         <Panel

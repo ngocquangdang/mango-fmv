@@ -87,3 +87,16 @@ export interface Chapter {
   description: string;
   clips: Record<string, Clip>;
 }
+
+
+export enum PausedActionName {
+  HOTSPOT_NO_NEXT = "HOTSPOT_NO_NEXT",
+  DECISION_POINT_REACHED = "DECISION_POINT_REACHED",
+  VIDEO_ENDED = "VIDEO_ENDED",
+  USER_PAUSED_VIDEO = "USER_PAUSED_VIDEO",
+}
+
+export enum SceneType {
+  HOTSPOT = "HOTSPOT",
+  BRANCH = "BRANCH",
+}

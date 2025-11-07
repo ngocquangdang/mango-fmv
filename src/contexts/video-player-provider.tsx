@@ -2,6 +2,7 @@ import React from "react";
 import { useVideoPlayer } from "../hooks/useVideoPlayer";
 import { VideoPlayerContext } from ".";
 import { storyData } from "../data/storyData";
+import { PausedActionName } from "../types/chapter";
 
 export interface VideoPlayerContextType {
   type: "intro" | "interactive";
@@ -13,7 +14,6 @@ export interface VideoPlayerContextType {
   ready: boolean;
   onAutoplay: () => void;
   onSetCurrentClipId: (clipId: string) => void;
-  onDestroy: () => void;
   onPlay: () => void;
 }
 
@@ -31,35 +31,13 @@ export const VideoPlayerProvider = ({
     string,
     any
   > | null>(null);
+  const [previousClipId, setPreviousClipId] = React.useState<string | null>(
+    null
+  );
 
   // Ensure we only initialize the VideoPlayer SDK once per api instance
   const initializedRef = React.useRef(false);
   const unsubRef = React.useRef<Array<() => void>>([]);
-
-  const handleStart = React.useCallback((clipId: string) => {
-    setPauseType(null);
-  }, []);
-
-  const handleStop = React.useCallback(
-    (data: Record<string, any>) => {
-      setCurrentStatus(data);
-      if (data.actionName === "USER_PAUSED_VIDEO" && !pauseType) return;
-      setPauseType(data.actionName);
-    },
-    [pauseType]
-  );
-
-  const handleChoiceSelected = React.useCallback(
-    (clipId: string, nextClipId: string) => {
-      setPauseType(null);
-      setCurrentStatus(null);
-    },
-    []
-  );
-
-  const handleStopAt = React.useCallback((clipId: string, time: number) => {
-    console.log("onStopAt", clipId, time);
-  }, []);
 
   const play = React.useCallback(() => {
     if (!api) return;
@@ -96,16 +74,60 @@ export const VideoPlayerProvider = ({
       onSetCurrentClipId(currentStatus?.currentClipId);
       setTimeout(() => {
         seekTo(currentStatus?.time);
-      }, 100);
-    } else {
-      onSetCurrentClipId("clip_sweet_girl");
+      }, 50);
     }
+    if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
     play();
-  }, [currentStatus, onSetCurrentClipId, seekTo, play, api]);
+  }, [currentStatus, onSetCurrentClipId, seekTo, play, api, pauseType]);
+
+  const handleStart = React.useCallback((clipId: string) => {
+    console.log("🚀 ~ VideoPlayerProvider ~ handleStart clipId:", clipId);
+    setPauseType(null);
+  }, []);
+
+  const handleStop = React.useCallback(
+    (payload: Record<string, any>) => {
+      console.log("🚀 ~ VideoPlayerProvider ~ payload:", payload);
+      setCurrentStatus(payload);
+
+      if (payload.actionName === PausedActionName.DECISION_POINT_REACHED)
+        setPauseType(payload.actionName);
+      if (
+        payload.actionName === PausedActionName.HOTSPOT_NO_NEXT &&
+        previousClipId &&
+        payload.triggerType === "hotspot"
+      ) {
+        const hotspot = data.clips[previousClipId].hotspots?.find(
+          (hotspot: any) => hotspot.nextClipId === payload.currentClipId
+        );
+
+        onSetCurrentClipId(previousClipId);
+        setTimeout(() => {
+          seekTo(hotspot.start);
+          play();
+        }, 100);
+        setPreviousClipId(null);
+      }
+    },
+    [data, onSetCurrentClipId, seekTo, play, previousClipId]
+  );
+
+  const handleChoiceSelected = React.useCallback(
+    (clipId: string, nextClipId: string) => {
+      console.log(
+        "🚀 ~ VideoPlayerProvider ~ handleChoiceSelected clipId:",
+        clipId
+      );
+      setPreviousClipId(clipId);
+      setPauseType(null);
+      setCurrentStatus(null);
+    },
+    []
+  );
 
   const onInit = React.useCallback(() => {
     if (!api?.play) return;
-    console.log("Re-init player");
+    console.log("Init player");
     api.onInit?.({
       container: "#interactive-video",
       config: {
@@ -119,62 +141,36 @@ export const VideoPlayerProvider = ({
     });
   }, [api, data]);
 
-  const onDestroy = React.useCallback(() => {
-    if (!api) return;
-    initializedRef.current = false;
-    unsubRef.current.forEach((fn) => fn?.());
-    unsubRef.current = [];
-    api.destroy?.();
-    onInit();
-    onPlay();
-  }, [api, initializedRef, unsubRef, onInit, onPlay]);
-
   // One-time initialization when api is ready (only re-run when api/data change)
   React.useEffect(() => {
     if (!ready || !api || initializedRef.current) return;
-
-    const offStart = api.onPlay?.(handleStart);
-    const offStop = api.onPause?.(handleStop);
-    const offChoice = api.onChoiceSelected?.(handleChoiceSelected);
-    const offStopAt = api.onStopAt?.(handleStopAt);
-
-    unsubRef.current.push(
-      offStart ?? (() => {}),
-      offStop ?? (() => {}),
-      offChoice ?? (() => {}),
-      offStopAt ?? (() => {})
-    );
-
     onInit();
-
     initializedRef.current = true;
 
     return () => {
       // Cleanup if api instance changes or component unmounts
-      unsubRef.current.forEach((fn) => fn?.());
-      unsubRef.current = [];
       api.destroy?.();
       initializedRef.current = false;
     };
-  }, [ready, api, data]);
+  }, [ready, api, onInit]);
 
-  // // Watch currentStatus changes and handle playback state
-  // React.useEffect(() => {
-  //   if (
-  //     !api ||
-  //     !initializedRef.current ||
-  //     pauseType === "DECISION_POINT_REACHED"
-  //   )
-  //     return;
+  React.useEffect(() => {
+    if (!api) return;
+    const offStart = api.onPlay?.(handleStart);
+    const offStop = api.onPause?.(handleStop);
+    const offChoice = api.onChoiceSelected?.(handleChoiceSelected);
 
-  //   // Handle currentStatus changes (e.g., resume from pause)
-  //   if (currentStatus) {
-  //     console.log("Current status changed:", currentStatus);
-  //     onSetCurrentClipId(currentStatus.currentClipId);
-  //     seekTo(currentStatus.time);
-  //     play()
-  //   }
-  // }, [currentStatus, api, onSetCurrentClipId, seekTo, pauseType, play]);
+    unsubRef.current.push(
+      offStart ?? (() => {}),
+      offStop ?? (() => {}),
+      offChoice ?? (() => {})
+    );
+
+    return () => {
+      unsubRef.current.forEach((fn) => fn?.());
+      unsubRef.current = [];
+    };
+  }, [api, handleStart, handleStop, handleChoiceSelected]);
 
   const value: VideoPlayerContextType = {
     type,
@@ -186,7 +182,6 @@ export const VideoPlayerProvider = ({
     ready,
     onAutoplay: autoplay,
     onSetCurrentClipId,
-    onDestroy,
     onPlay,
   };
   return (

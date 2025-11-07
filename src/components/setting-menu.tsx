@@ -7,11 +7,11 @@ type Props = {
 };
 
 export default function SettingMenu({ onOpenChapter, onClose }: Props) {
-  const { setType, play, pauseType, onDestroy } = useVideoPlayerContext();
+  const { setType, play, pauseType } = useVideoPlayerContext();
 
   const handlePlayAgain = React.useCallback(() => {
     // TODO: Implement play again
-  }, [setType, play]);
+  }, []);
 
   const handleContinue = React.useCallback(() => {
     onClose?.();
@@ -28,7 +28,7 @@ export default function SettingMenu({ onOpenChapter, onClose }: Props) {
   }, []);
 
   const handleExit = () => {
-    onDestroy();
+    // onDestroy();
     setType("intro");
     onClose?.();
   };
