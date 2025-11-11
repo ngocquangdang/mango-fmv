@@ -141,7 +141,7 @@ const mockProject = {
       id: "scene_intro_001",
       name: "Intro 1",
       videoUrl:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
       thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
       duration: 90.0,
       previousSceneId: "clip_home",
@@ -151,7 +151,7 @@ const mockProject = {
       id: "scene_intro_002",
       name: "Intro 1",
       videoUrl:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
       thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
       duration: 90.0,
       previousSceneId: "clip_home",
@@ -161,7 +161,7 @@ const mockProject = {
       id: "scene_intro_003",
       name: "Intro 1",
       videoUrl:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+        "https://cdn.pixabay.com/video/2024/06/20/217490_large.mp4",
       thumbnail:
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
       duration: 90.0,
