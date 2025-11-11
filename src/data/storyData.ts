@@ -107,7 +107,7 @@ export const storyData = (): StoryData => {
         id: "pot_clip_hold",
         title: "PotHold Her",
         videoUrl:
-          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
         isDecisionPoint: false,
         previousSceneId: "clip_home",
         triggerType: "hotspot",
@@ -116,7 +116,7 @@ export const storyData = (): StoryData => {
         id: "pot_clip_jump",
         title: "Pot Jump with Her",
         videoUrl:
-          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
         isDecisionPoint: false,
         previousSceneId: "clip_home",
         triggerType: "hotspot",
@@ -125,7 +125,7 @@ export const storyData = (): StoryData => {
         id: "pot_clip_exploring",
         title: "Pot Exploring Home",
         videoUrl:
-          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
         isDecisionPoint: false,
         previousSceneId: "clip_home",
         triggerType: "hotspot",
@@ -134,7 +134,7 @@ export const storyData = (): StoryData => {
         id: "clip_exploring",
         title: "Exploring Home",
         videoUrl:
-          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
         isDecisionPoint: false,
         triggerType: "branch",
         nextSceneId: "clip_sweet_girl",
@@ -143,7 +143,7 @@ export const storyData = (): StoryData => {
         id: "clip_sweet_girl",
         title: "The Sweet Girl",
         videoUrl:
-          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
         isDecisionPoint: true,
         decisionTime: 3,
         defaultChoice: "clip_hold",
@@ -160,7 +160,7 @@ export const storyData = (): StoryData => {
         id: "clip_hold",
         title: "Hold Her",
         videoUrl:
-          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
         isDecisionPoint: false,
         triggerType: "branch",
         nextSceneId: "clip_sympathy",
@@ -169,7 +169,7 @@ export const storyData = (): StoryData => {
         id: "clip_jump",
         title: "Jump with Her",
         videoUrl:
-          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
         isDecisionPoint: false,
         triggerType: "branch",
         nextSceneId: "clip_sympathy",
@@ -178,7 +178,7 @@ export const storyData = (): StoryData => {
         id: "clip_sympathy",
         title: "A Mutual Sympathy",
         videoUrl:
-          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
         isDecisionPoint: false,
         triggerType: "branch",
         nextSceneId: null,
