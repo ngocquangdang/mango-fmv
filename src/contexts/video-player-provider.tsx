@@ -30,7 +30,6 @@ export const VideoPlayerProvider = ({
   children: React.ReactNode;
 }) => {
   const { api, ready } = useVideoPlayer();
-
   const { chapter: data } = useUserContext();
   const { mutate: updateStatus } = useUpdateStatus();
   const [type, setType] = React.useState<"intro" | "interactive">("intro");
@@ -252,12 +251,14 @@ export const VideoPlayerProvider = ({
   const onInit = React.useCallback(() => {
     if (!api?.play || !data?.id) return;
     console.log("Init player");
+    const params = new URLSearchParams(window.location.search);
+
     api.onInit?.({
       container: "#interactive-video",
       config: {
         chapter: data,
         video: {
-          controls: true,
+          controls: params.get("controls") === "true",
           muted: false,
           autoplay: false,
         },
