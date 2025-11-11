@@ -7,19 +7,21 @@ import ReactFlow, {
   ReactFlowProvider,
   type Node,
   type Edge,
-  MarkerType,
 } from "reactflow";
 import CustomNode from "./custom-node";
 import { useFlowChart } from "./context";
 import { FlowChartContextProvider } from "./context/flow-chart-provider";
+import { useVideoPlayerContext } from "../../contexts";
 
 const nodeTypes = { customNode: CustomNode };
 
-const FlowChartInner: React.FC = () => {
+const FlowChartInner: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { nodes = [], edges = [], data } = useFlowChart();
+  const { currentSceneId, onSetCurrentSceneId, setCurrentStatus, setPauseType } =
+    useVideoPlayerContext();
 
   const layout = React.useMemo(() => {
-    const startId = data?.startClipId;
+    const startId = data?.startSceneId;
     const idToNode = new Map(nodes.map((n: Node) => [n.id, { ...n }]));
     const outMap = new Map(nodes.map((n: Node) => [n.id, [] as string[]]));
     edges.forEach((e: Edge) => {
@@ -54,11 +56,11 @@ const FlowChartInner: React.FC = () => {
     const positioned = nodes.map((n: Node) => {
       const d = depth.get(n.id as string) ?? 0;
       const laneIndex = (laneOffsets[d] = (laneOffsets[d] ?? 0) + 1);
-      const stepY = 150;
+      const stepY = 200;
       const sign = laneIndex % 2 === 0 ? -1 : 1;
       const magnitude = Math.floor(laneIndex / 2);
       const y = sign * magnitude * stepY;
-      const x = 240 * d;
+      const x = 500 * d;
       return { ...n, position: { x, y } };
     });
     return { positioned };
@@ -69,11 +71,14 @@ const FlowChartInner: React.FC = () => {
       ...node,
       width: 180,
       height: 80,
-      className: "",
-      data: { ...node.data, isActive: false },
+      data: {
+        ...node.data,
+        isActive: currentSceneId == node.id,
+        selected: currentSceneId == node.id,
+      },
       type: node.type ?? "customNode",
     }));
-  }, [layout, nodes]);
+  }, [layout, nodes, currentSceneId]);
 
   return (
     <div className="h-full w-full">
@@ -86,18 +91,22 @@ const FlowChartInner: React.FC = () => {
         }))}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={{
-          markerEnd: { type: MarkerType.Arrow },
           type: "smoothstep",
         }}
         fitView
-        onNodeClick={() => {}}
+        onNodeClick={(_, node) => {
+          setCurrentStatus(null);
+          setPauseType(null);
+          onSetCurrentSceneId(node.id);
+          onClose();
+        }}
         proOptions={{ hideAttribution: true }}
       >
         <Panel
           position="top-left"
           className="rounded-md bg-white/80 px-2 py-1 text-[11px] shadow"
         >
-          {data?.projectTitle || "Story Flow"}
+          {data?.title || "Story Flow"}
         </Panel>
         <MiniMap pannable zoomable className="bg-gray-50!" />
         <Controls position="bottom-right" />
@@ -107,11 +116,11 @@ const FlowChartInner: React.FC = () => {
   );
 };
 
-const FlowChart: React.FC = () => {
+const FlowChart: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   return (
     <FlowChartContextProvider>
       <ReactFlowProvider>
-        <FlowChartInner />
+        <FlowChartInner onClose={onClose} />
       </ReactFlowProvider>
     </FlowChartContextProvider>
   );

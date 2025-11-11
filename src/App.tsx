@@ -32,6 +32,7 @@ function App() {
 
   const handleCloseChapter = React.useCallback(() => {
     setIsChapterOpen(false);
+    setIsSetting(false);
   }, []);
 
   return (
@@ -52,7 +53,7 @@ function App() {
       )}
       {type === "interactive" && (
         <div className="relative">
-          <div className="absolute top-0 left-0 p-4 bg-black/50 z-10">
+          {/* <div className="absolute top-0 left-0 p-4 bg-black/50 z-10">
             <button
               className="text-white text-2xl font-bold cursor-pointer"
               onClick={() => {
@@ -61,7 +62,7 @@ function App() {
             >
               Back
             </button>
-          </div>
+          </div> */}
           {!ready && (
             <div className="mb-2 text-sm text-gray-500">Loading player...</div>
           )}

@@ -1,19 +1,26 @@
 import React from "react";
 import { UserContext } from ".";
-import { useUserInfo } from "../hooks";
+import { useChapter, useUserProgress, useVideos } from "../hooks";
 import { useMgSdk } from "../../../hooks/useMgSdk";
-import type { MgUserInfo, UserInfo } from "../../../types/user";
+import type { MgUserInfo } from "../../../types/user";
+import type { Chapter } from "../../../types/chapter";
 
 export interface UserContextType {
-  userInfo: UserInfo;
+  chapter: Chapter;
 }
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mgApi } = useMgSdk();
 
-  const [userId, setUserId] = React.useState<string | null>(null);
+  const [userId, setUserId] = React.useState<string>("abc");
 
-  const { data: userInfo } = useUserInfo(userId);
+  const { data: progress } = useUserProgress({ userId });
+  console.log("🚀 ~ UserProvider ~ progress:", progress)
+  const { data: chapter } = useChapter("chapter_1", progress?.videos || {});
+  const { data: videos } = useVideos(
+    Object.values(chapter?.scenes || {})?.map((scene: any) => scene.id) || []
+  );
+  console.log("🚀 ~ UserProvider ~ videos:", videos);
 
   const onLogin = React.useCallback((mgUserInfo: MgUserInfo) => {
     setUserId(mgUserInfo.userId);
@@ -25,7 +32,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     mgApi.login?.(onLogin);
   }, [mgApi, onLogin]);
 
-  const value: UserContextType = { userInfo: userInfo as UserInfo };
+  const value: UserContextType = {
+    chapter: { ...chapter, progress } as Chapter,
+  };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

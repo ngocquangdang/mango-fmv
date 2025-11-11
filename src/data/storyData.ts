@@ -1,81 +1,134 @@
+export type Choice = { text: string; nextSceneId: string };
 
-
-export type Choice = { text: string; nextClipId: string }
-
-export type Clip = {
-  id: string
-  title: string
-  videoUrl: string
-  isDecisionPoint: boolean
-  subtitleUrl?: string
-  isCompleted?: boolean
-  decisionTime?: number
-  defaultChoice?: string
-  triggerType?: "branch" | "hotspot"
-  countdown?: number
-  hotspots?: any[]
-  choices?: Choice[]
-  nextClipId?: string | null
-}
+export type Scene = {
+  id: string;
+  title: string;
+  videoUrl: string;
+  isDecisionPoint: boolean;
+  subtitleUrl?: string;
+  decisionTime?: number;
+  defaultChoice?: string;
+  triggerType?: "branch" | "hotspot";
+  questionTitle?: string;
+  questionDescription?: string;
+  countdown?: number;
+  hotspots?: any[];
+  choices?: Choice[];
+  nextSceneId?: string | null;
+  status?: string;
+  watchingSecond?: number;
+  totalDuration?: number;
+  completedAt?: string | null;
+  previousSceneId?: string | null;
+};
 
 export type StoryData = {
-  projectTitle: string
-  startClipId: string
-  clips: Record<string, Clip>
-}
+  id: string;
+  title: string;
+  description: string;
+  startSceneId: string;
+  scenes: Record<string, Scene>;
+};
 
 export const storyData = (): StoryData => {
   return {
-    projectTitle: "Chapter 1: Wanna See You Again",
-    startClipId: "clip_sweet_girl",
-    clips: {
+    id: "chapter_1",
+    title: "Chapter 1: Wanna See You Again",
+    description:
+      "You are a detective trying to solve a case. You are given a list of suspects and you need to find the one who is guilty.",
+    startSceneId: "clip_sweet_girl",
+    scenes: {
       clip_home: {
         id: "clip_home",
         title: "My Home",
-        videoUrl:
-          "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+        videoUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
         isDecisionPoint: true,
         decisionTime: 5,
-        isCompleted: true,
         triggerType: "hotspot",
+        status: "IN_PROGRESS",
         hotspots: [
           {
-            id: "hs1",
+            id: "pot_clip_hold",
             type: "single",
             x: 0.32,
             y: 0.58,
-            r: 20,
+            r: 40,
             label: "Investigate",
             start: 5,
             end: 40,
-            nextClipId: "clip_hold",
+            nextSceneId: "pot_clip_hold",
+            config: {
+              title: "Investigate",
+              description: "Investigate the home",
+              link: "https://www.google.com",
+              icon: "https://www.google.com/favicon.ico",
+            },
           },
           {
-            id: "hs2",
+            id: "pot_clip_jump",
             type: "single",
             x: 0.41,
             y: 0.62,
-            r: 20,
+            r: 40,
             label: "Investigate",
             start: 10,
             end: 40,
-            nextClipId: "clip_jump",
+            nextSceneId: "pot_clip_jump",
+            config: {
+              title: "Investigate",
+              description: "Investigate the home",
+              link: "https://www.google.com",
+              icon: "https://www.google.com/favicon.ico",
+            },
           },
           {
-            id: "hs3",
+            id: "pot_clip_exploring",
             type: "dynamic",
             start: 15,
             end: 35,
-            nextClipId: "clip_exploring",
+            nextSceneId: "pot_clip_exploring",
             easing: "linear",
             keyframes: [
-              { t: 15.0, x: 0.15, y: 0.30, r: 18 },
-              { t: 25.0, x: 0.20, y: 0.33, r: 18 },
-              { t: 35.0, x: 0.27, y: 0.36, r: 18 },
+              { t: 15.0, x: 0.15, y: 0.3, r: 40 },
+              { t: 25.0, x: 0.2, y: 0.33, r: 40 },
+              { t: 35.0, x: 0.27, y: 0.36, r: 40 },
             ],
+            config: {
+              title: "Investigate",
+              description: "Investigate the home",
+              link: "https://www.google.com",
+              icon: "https://www.google.com/favicon.ico",
+            },
           },
         ],
-        nextClipId: "clip_exploring",
+        nextSceneId: "clip_exploring",
+      },
+      pot_clip_hold: {
+        id: "pot_clip_hold",
+        title: "PotHold Her",
+        videoUrl:
+          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        isDecisionPoint: false,
+        previousSceneId: "clip_home",
+        triggerType: "hotspot",
+      },
+      pot_clip_jump: {
+        id: "pot_clip_jump",
+        title: "Pot Jump with Her",
+        videoUrl:
+          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        isDecisionPoint: false,
+        previousSceneId: "clip_home",
+        triggerType: "hotspot",
+      },
+      pot_clip_exploring: {
+        id: "pot_clip_exploring",
+        title: "Pot Exploring Home",
+        videoUrl:
+          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+        isDecisionPoint: false,
+        previousSceneId: "clip_home",
+        triggerType: "hotspot",
       },
       clip_exploring: {
         id: "clip_exploring",
@@ -83,8 +136,8 @@ export const storyData = (): StoryData => {
         videoUrl:
           "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
         isDecisionPoint: false,
-        isCompleted: true,
-        nextClipId: "clip_sweet_girl",
+        triggerType: "branch",
+        nextSceneId: "clip_sweet_girl",
       },
       clip_sweet_girl: {
         id: "clip_sweet_girl",
@@ -94,11 +147,13 @@ export const storyData = (): StoryData => {
         isDecisionPoint: true,
         decisionTime: 3,
         defaultChoice: "clip_hold",
-        countdown: 10,  
+        countdown: 10,
         triggerType: "branch",
+        questionTitle: "What do you want to do?",
+        questionDescription: "Choose an option to continue",
         choices: [
-          { text: "Hold Her", nextClipId: "clip_hold" },
-          { text: "Jump with Her", nextClipId: "clip_jump" },
+          { text: "Hold Her", nextSceneId: "clip_hold" },
+          { text: "Jump with Her", nextSceneId: "clip_jump" },
         ],
       },
       clip_hold: {
@@ -107,7 +162,8 @@ export const storyData = (): StoryData => {
         videoUrl:
           "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
         isDecisionPoint: false,
-        // nextClipId: "clip_sympathy",
+        triggerType: "branch",
+        nextSceneId: "clip_sympathy",
       },
       clip_jump: {
         id: "clip_jump",
@@ -115,7 +171,8 @@ export const storyData = (): StoryData => {
         videoUrl:
           "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
         isDecisionPoint: false,
-        nextClipId: "clip_sympathy",
+        triggerType: "branch",
+        nextSceneId: "clip_sympathy",
       },
       clip_sympathy: {
         id: "clip_sympathy",
@@ -123,8 +180,9 @@ export const storyData = (): StoryData => {
         videoUrl:
           "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
         isDecisionPoint: false,
-        nextClipId: null,
+        triggerType: "branch",
+        nextSceneId: null,
       },
     },
   };
-}
+};

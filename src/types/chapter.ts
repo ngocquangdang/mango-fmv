@@ -1,7 +1,7 @@
 // Các kiểu con cho phần config của interactions
 // ------------------------------------------------
 
-import type { Clip } from '../data/storyData';
+import type { Scene as StoryScene } from '../data/storyData';
 
 /** Vị trí cho hotspot */
 export interface Position {
@@ -85,7 +85,7 @@ export interface Chapter {
   id: string;
   title: string;
   description: string;
-  clips: Record<string, Clip>;
+  scenes: Record<string, StoryScene>;
 }
 
 

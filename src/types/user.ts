@@ -10,3 +10,19 @@ export interface MgUserInfo {
   userName: string;
   userAvatar: string;
 }
+
+export interface UserProgress {
+  chapterId: string;
+  projectId: string;
+  userId?: string;
+  startSceneId: string;
+  startAt: number;
+  videos: {
+    sceneId: string;
+    status: string;
+    watchingSecond: number;
+    totalDuration: number;
+    completedAt: string | null;
+    updatedAt: string;
+  }[];
+}

@@ -1,13 +1,202 @@
-import { apiClient } from "../../../lib/api/api-client";
+import {
+  apiClient,
+  apiClientInteractiveLicense,
+} from "../../../lib/api/api-client";
+import {
+  getUserProgressFromStorage,
+  updateVideoProgressInStorage,
+} from "../../../lib/user-progress-storage";
 
-export const getUserInfo = async (id?: string | null) => {
-  const response = await apiClient.get(`/users/${id}`);
-  return response;
+const mockProject = {
+  id: "proj_abc123",
+  chapterId: "chapter_1",
+  title: "Product Launch Interactive Video",
+  description: "Interactive product demonstration with branching storylines",
+  startSceneId: "clip_home",
+  scenes: [
+    {
+      id: "clip_home",
+      name: "My Home",
+      videoUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+      duration: 120.5,
+      hotspots: [
+        {
+          id: "880e8400-e29b-41d4-a716-446655440003",
+          sceneId: "clip_home",
+          type: "collection",
+          minCollectionItems: 2,
+          startTime: 5,
+          items: [
+            {
+              title: "Secret Document",
+              previousSceneId: "clip_home",
+              description: "A hidden document found in the scene",
+              targetSceneId: "scene_intro_001",
+              iconUrl: "https://example.com/icons/document.png",
+              x: 0.23,
+              y: 0.43,
+              r: 40,
+            },
+            {
+              title: "Hidden Key",
+              previousSceneId: "clip_home",
+              description: "A key hidden under the table",
+              targetSceneId: "scene_intro_002",
+              iconUrl: "https://example.com/icons/key.png",
+              x: 0.15,
+              y: 0.2,
+              r: 30,
+            },
+          ],
+        },
+        {
+          id: "880e8400-e29b-41d4-a716-446655440004",
+          sceneId: "clip_home",
+          type: "hotspot",
+          startTime: 10,
+          minCollectionItems: 1,
+          items: [
+            {
+              title: "Investigate Room",
+              previousSceneId: "clip_home",
+              description: "Look around the room for clues",
+              targetSceneId: "clip_sympathy",
+              iconUrl: "https://example.com/icons/investigate.png",
+              x: 0.4,
+              y: 0.3,
+              r: 50,
+            },
+          ],
+        },
+      ],
+      branch: {
+        question: "What do you want to do?",
+        description: "Choose an option to continue",
+        startTime: 14,
+        config: {
+          question: "What do you want to do?",
+          defaultChoice: "clip_hold",
+          options: [
+            { id: "branch_a", text: "Hold Her", targetSceneId: "clip_hold" },
+            {
+              id: "branch_b",
+              text: "Jump with Her",
+              targetSceneId: "clip_jump",
+            },
+          ],
+          countdown: 3,
+        },
+      },
+    },
+    {
+      id: "clip_sweet_girl",
+      name: "Introduction",
+      videoUrl:
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      thumbnail: "https://storage.example.com/thumbnails/intro-video.jpg",
+      duration: 120.5,
+    },
+    {
+      id: "clip_hold",
+      name: "Hold Her",
+      videoUrl:
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+      duration: 90.0,
+      branch: {
+        question: "What do you want to do?",
+        description: "Choose an option to continue",
+        startTime: 4,
+        config: {
+          options: [
+            {
+              id: "branch_a",
+              text: "Hold Her",
+              targetSceneId: "scene_intro_003",
+            },
+          ],
+        },
+      },
+    },
+    {
+      id: "clip_jump",
+      name: "Jump with Her",
+      videoUrl:
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+      duration: 90.0,
+    },
+    {
+      id: "clip_sympathy",
+      name: "A Mutual Sympathy",
+      videoUrl:
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+      duration: 90.0,
+      previousSceneId: "clip_home",
+      type: "hotspot",
+    },
+    {
+      id: "scene_intro_001",
+      name: "Intro 1",
+      videoUrl:
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+      duration: 90.0,
+      previousSceneId: "clip_home",
+      type: "hotspot",
+    },
+    {
+      id: "scene_intro_002",
+      name: "Intro 1",
+      videoUrl:
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+      duration: 90.0,
+      previousSceneId: "clip_home",
+      type: "hotspot",
+    },
+    {
+      id: "scene_intro_003",
+      name: "Intro 1",
+      videoUrl:
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+      thumbnail:
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+      duration: 90.0,
+    },
+  ],
 };
 
-export const updateStatus = async (payload: Record<string, any>) => {
-  const response = await apiClient.put(`/users/status`, payload);
-  return response;
+export interface UpdateStatusPayload {
+  projectId: string;
+  sceneId: string;
+  chapterId: string;
+  watchingSecond: number;
+  totalDuration: number;
+  status: string;
+}
+
+export const getUserProgress = async (queryParams: Record<string, string>) => {
+  console.log("🚀 ~ getUserProgress ~ queryParams:", queryParams)
+  // const params = new URLSearchParams(queryParams);
+
+  // const response = await apiClientVideoProgress.get(`/interactive-scene?${params.toString()}`);
+  // return response;
+  return getUserProgressFromStorage("proj_abc123");
+};
+
+export const updateStatus = async (payload: UpdateStatusPayload) => {
+  // Comment lại call API, thay vào đó lưu vào localStorage
+  // const response = await apiClientVideoProgress.put(`api/v1/video-progress`, payload);
+  // return response;
+
+  // Lưu vào localStorage với logic kiểm tra sceneId
+  updateVideoProgressInStorage(payload);
+
+  // Return giả lập để không break code hiện tại
+  return Promise.resolve({ success: true, data: payload });
 };
 
 export const getChapters = async () => {
@@ -16,6 +205,18 @@ export const getChapters = async () => {
 };
 
 export const getChapter = async (id: string) => {
-  const response = await apiClient.get(`/chapters/${id}`);
+  console.log("🚀 ~ getChapter ~ id:", id);
+  // const response = await apiClient.get(`/chapters/${id}`);
+  // return response;
+  return mockProject;
+};
+
+export const getVideos = async (ids: string[]) => {
+  const response = await apiClientInteractiveLicense.get(
+    `/video-interactions/tokens?ids=${ids.join(",")}`,
+    {
+      "X-Ticket": "1234567890",
+    }
+  );
   return response;
 };
