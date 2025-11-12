@@ -1,4 +1,4 @@
-import { Play } from "lucide-react";
+// import { Play } from "lucide-react";
 import type { EdgeProps } from "@xyflow/react";
 import {
   BaseEdge,
@@ -42,13 +42,13 @@ export default function CustomEdge({
           }}
           onClick={onEdgeClick}
         >
-          {id === "unlocked" && (
+          {/* {id?.includes("unlocked") && (
             <div className="w-4 h-4 rounded-full bg-gray-500 relative">
               <button className="absolute -top-6 left-1/2 -translate-x-1/2">
                 <Play className="w-4 h-4 text-black" onClick={onEdgeClick} />
               </button>
             </div>
-          )}
+          )} */}
         </div>
       </EdgeLabelRenderer>
     </>

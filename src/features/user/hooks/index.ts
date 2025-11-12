@@ -1,3 +1,4 @@
+import React from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   getChapter,
@@ -12,9 +13,22 @@ import type { Scene as StoryScene } from "../../../data/storyData";
 
 const mapScene = (
   scene: Scene[] = [],
-
   videosProgress: Record<string, any>
 ): Record<string, StoryScene> => {
+  // const hotspots = scene
+  //   .map((scene) => {
+  //     return scene.hotspots?.map((hotspot) => hotspot.items).flat();
+  //   })
+  //   .flat()
+  //   .reduce((acc, item) => {
+  //     if (!item) return acc;
+  //     acc = {
+  //       ...acc,
+  //       [item.targetSceneId]: item,
+  //     };
+  //     return acc;
+  //   }, {});
+
   return scene.reduce((acc, scene) => {
     acc = {
       ...acc,
@@ -35,6 +49,7 @@ export const mapChapter = (
 ): Chapter => {
   return {
     ...chapter,
+    startSceneId: chapter.first_scene_id,
     scenes: mapScene(chapter.scenes as Scene[], videosProgress),
   };
 };
@@ -75,12 +90,31 @@ export const useChapters = () => {
   });
 };
 
-export const useChapter = (id: string) => {
-  return useQuery({
-    queryKey: ["chapter", id],
-    queryFn: () => getChapter(id),
-    enabled: !!id,
+export const useChapter = (
+  projectId = "546d7eec-d52b-49f9-957e-cf3c7e67e6b5",
+  chapterId = "39982da1-4af7-40c2-8e28-241a7041f7a9"
+) => {
+  const { data, ...rest } = useQuery({
+    queryKey: ["chapter", projectId, chapterId],
+    queryFn: () => getChapter(projectId, chapterId),
+    // enabled: !!chapterId,
   });
+  
+  // Memoize the transformed data to prevent creating new objects on every render
+  const transformedData = React.useMemo(() => {
+    if (!data?.data) return undefined;
+    return {
+      ...data.data,
+      startSceneId: data.data.first_scene_id,
+      chapterId,
+      id: projectId,
+    };
+  }, [data?.data, chapterId, projectId]);
+  
+  return {
+    data: transformedData,
+    ...rest,
+  };
 };
 
 const mapVideos = (videos: any[]): Record<string, any> => {

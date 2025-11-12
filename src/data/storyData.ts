@@ -1,3 +1,5 @@
+import type { BranchOption } from '../types/chapter';
+
 export type Choice = { text: string; nextSceneId: string };
 
 export type Scene = {
@@ -20,6 +22,9 @@ export type Scene = {
   duration?: number;
   completedAt?: string | null;
   previousSceneId?: string | null;
+  branch?: {
+    options: BranchOption[];
+  };
 };
 
 export type StoryData = {

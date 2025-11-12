@@ -31,36 +31,74 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [userId, setUserId] = React.useState<string | null>(null);
 
-  const { data: chapter } = useChapter("6ba7b812-9dad-11d1-80b4-00c04fd430c9");
-  const { data: progress, refetch } = useUserProgress({
-    userId: userId || "",
-    chapterId: chapter?.chapterId || "",
-  });
-
-  const { data: videos } = useVideos(
-    Object.values(chapter?.scenes || {})?.map((scene: any) => scene.id) || []
+  const { data: chapter } = useChapter(undefined, undefined);
+  console.log("🚀 ~ UserProvider ~ chapter:", chapter)
+  
+  // Only log when chapter actually changes (by ID, not just reference)
+  const prevChapterIdRef = React.useRef<string | undefined>(undefined);
+  React.useEffect(() => {
+    const currentChapterId = chapter?.id;
+    if (currentChapterId !== prevChapterIdRef.current) {
+      console.log("🚀 ~ UserProvider ~ chapter:", chapter);
+      prevChapterIdRef.current = currentChapterId;
+    }
+  }, [chapter]);
+  
+  // Memoize chapterId to prevent unnecessary refetches
+  const chapterId = React.useMemo(() => chapter?.chapterId || "", [chapter?.chapterId]);
+  
+  // Memoize query params to prevent unnecessary refetches
+  const progressParams = React.useMemo(
+    () => ({
+      userId: userId || "",
+      chapterId: chapterId,
+    }),
+    [userId, chapterId]
   );
+  
+  const { data: progress, refetch } = useUserProgress(progressParams);
+
+  // Memoize scene IDs array to prevent unnecessary refetches
+  const sceneIds = React.useMemo(
+    () => Object.values(chapter?.scenes || {})?.map((scene: any) => scene.id) || [],
+    [chapter?.scenes]
+  );
+  
+  const { data: videos } = useVideos(sceneIds);
 
   const chapterMapped = React.useMemo(() => {
     if (!chapter) return null;
     return mapChapter(chapter, progress?.scenes || {});
-  }, [chapter, progress]);
+  }, [chapter, progress?.scenes]);
 
+  // Only run once on mount to get userId from URL
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const userId = params.get("userId");
-    if (userId) {
-      setUserId(userId);
+    const userIdFromUrl = params.get("userId");
+    if (userIdFromUrl && !userId) {
+      setUserId(userIdFromUrl);
     }
-  }, [progress]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
+
+  // Memoize chapter values to prevent unnecessary effect triggers
+  const chapterValues = React.useMemo(
+    () => ({
+      chapterId: chapter?.chapterId,
+      id: chapter?.id,
+      startSceneId: chapter?.startSceneId,
+      exists: !!chapter,
+    }),
+    [chapter]
+  );
 
   React.useEffect(() => {
-    if (chapter && !progress?.currentScene) {
+    if (chapterValues.exists && !progress?.currentScene && userId) {
       updateStatus(
         {
-          chapterId: chapter.chapterId,
-          projectId: chapter.id,
-          sceneId: chapter.startSceneId,
+          chapterId: chapterValues.chapterId || "",
+          projectId: chapterValues.id || "",
+          sceneId: chapterValues.startSceneId || "",
           watchingSecond: 0,
           totalDuration: 10,
           status: "INPROGRESS",
@@ -73,7 +111,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
       );
     }
-  }, [chapter, updateStatus, refetch]);
+  }, [
+    chapterValues,
+    updateStatus,
+    refetch,
+    progress?.currentScene,
+    userId,
+  ]);
 
   React.useEffect(() => {
     // if (videos && chapter) {
@@ -125,13 +169,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     mgApi.login?.(onLogin);
   }, [mgApi, onLogin]);
 
-  const value: UserContextType = {
-    chapter: { ...chapterMapped, progress } as Chapter,
-    loading,
-    userId,
-    refetch,
-    updateSceneStatus,
-  };
+  // Memoize value object to prevent unnecessary re-renders
+  const value: UserContextType = React.useMemo(
+    () => ({
+      chapter: chapterMapped ? { ...chapterMapped, progress } as Chapter : ({} as Chapter),
+      loading,
+      userId,
+      refetch,
+      updateSceneStatus,
+    }),
+    [chapterMapped, progress, loading, userId, refetch, updateSceneStatus]
+  );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

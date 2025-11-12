@@ -41,7 +41,7 @@ const CustomNode = memo(({ data }: CustomNodeProps) => {
             <UnlockIcon className="w-6 h-6 text-gray-500" />
           </div>
         ) : (
-          <div className="h-10 w-16 rounded bg-gray-100" />
+          <div className="h-[140px] w-[140px] rounded-xl bg-gray-100" />
         )}
         <div className="flex flex-col flex-1 items-center justify-center h-auto">
           <p className="line-clamp-2 text-sm font-medium text-gray-900">

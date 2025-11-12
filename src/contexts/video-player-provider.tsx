@@ -4,6 +4,11 @@ import { VideoPlayerContext } from ".";
 import type { Scene } from "../data/storyData";
 import { PausedActionName } from "../types/chapter";
 import { useUserContext } from "../features/user/context";
+import {
+  clearLocalStorage,
+  getLocalParam,
+  saveLocalParams,
+} from "../lib/api/storage";
 
 export interface VideoPlayerContextType {
   type: "intro" | "interactive";
@@ -155,12 +160,12 @@ export const VideoPlayerProvider = ({
           "INPROGRESS"
         );
       }
-
+      const previousSceneId = getLocalParam("previousSceneId");
       if (
         payload.actionName === PausedActionName.HOTSPOT_NO_NEXT &&
-        currentClip.previousSceneId
+        previousSceneId
       ) {
-        const previousClip = data.scenes[currentClip.previousSceneId];
+        const previousClip = data.scenes[previousSceneId];
         const hotspot = previousClip?.hotspots?.find((h: any) =>
           h.items.some(
             (item: any) => item.targetSceneId === payload.currentSceneId
@@ -184,9 +189,9 @@ export const VideoPlayerProvider = ({
           handleCollectionItems(hotspot, payload.currentSceneId);
         }
 
-        // TODO: update hotspot with currentSceneId completed
         console.log("🚀 ~ [PLAY BACK]");
-        onSetCurrentSceneId(currentClip.previousSceneId);
+        onSetCurrentSceneId(previousSceneId);
+        clearLocalStorage();
         setTimeout(() => {
           seekTo(hotspot.startTime);
           play();
@@ -206,12 +211,17 @@ export const VideoPlayerProvider = ({
 
   const handleChoiceSelected = React.useCallback(
     (sceneId: string, nextSceneId: string) => {
-      console.log("🚀 ~ [CHOICE SELECTED]", sceneId, nextSceneId);
+      const isHotspot = (data.scenes[sceneId]?.hotspots?.length || 0) > 0;
+      if (isHotspot) {
+        saveLocalParams({ previousSceneId: sceneId });
+      } else {
+        clearLocalStorage();
+      }
       setCurrentSceneId(nextSceneId);
       setPauseType(null);
       setCurrentStatus(null);
     },
-    []
+    [data.scenes]
   );
 
   const handleEnded = React.useCallback(

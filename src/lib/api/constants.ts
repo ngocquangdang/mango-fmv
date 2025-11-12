@@ -41,4 +41,4 @@ export const TOKEN_IAT = 'token_iat'
 /**
  * Storage prefix
  */
-export const STORAGE_PREFIX = 'ai-course-'
+export const STORAGE_PREFIX = 'vp-'

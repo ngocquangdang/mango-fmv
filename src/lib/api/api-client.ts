@@ -158,7 +158,11 @@ export const apiClientInteractiveLicense = new FetchApiClient(
   "https://interactive-license-api-stg.onidservice.cloud/api/v1"
 );
 export const apiClientVideoProgress = new FetchApiClient(
-    "https://video-progress-api-jsgjs7nrvq-as.a.run.app/api/v1"
-  );
+  "https://video-progress-api-jsgjs7nrvq-as.a.run.app/api/v1"
+);
+
+export const apiClienProject = new FetchApiClient(
+  "https://them-earrings-properties-initially.trycloudflare.com/api/v1"
+);
 
 export type { ApiResponse as ApiResponseType };
