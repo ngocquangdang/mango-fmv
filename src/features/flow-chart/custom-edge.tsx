@@ -1,32 +1,59 @@
-import React from "react";
+import { Play } from "lucide-react";
 import type { EdgeProps } from "reactflow";
-import { BaseEdge } from "reactflow";
+import {
+  BaseEdge,
+  EdgeLabelRenderer,
+  getBezierPath,
+  getSmoothStepPath,
+  useReactFlow,
+} from "reactflow";
 
-// Hotspot edge: vertical down from parent, then horizontal to child (L-shaped)
-const HotspotEdge: React.FC<EdgeProps> = ({
+export default function CustomEdge({
+  id,
   sourceX,
   sourceY,
   targetX,
   targetY,
+  sourcePosition,
+  targetPosition,
+  style = {},
   markerEnd,
-  style,
-}) => {
-  // L-shaped path: vertical first, then horizontal
-  const path = `M ${sourceX} ${sourceY} L ${sourceX} ${targetY} L ${targetX} ${targetY}`;
+}: EdgeProps) {
+  const { setEdges } = useReactFlow();
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
+
+  const onEdgeClick = () => {
+    // setEdges((edges) => edges.filter((edge) => edge.id !== id));
+    console.log("🚀 ~ onEdgeClick ~ id:", id);
+  };
 
   return (
-    <BaseEdge
-      path={path}
-      markerEnd={markerEnd}
-      style={{
-        stroke: "#94a3b8",
-        strokeWidth: 1.5,
-        strokeDasharray: 6,
-        ...(style as any),
-      }}
-    />
+    <>
+      <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
+      <EdgeLabelRenderer>
+        <div
+          className="button-edge__label nodrag nopan absolute"
+          style={{
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+          }}
+          onClick={onEdgeClick}
+        >
+          {id === "unlocked" && (
+            <div className="w-4 h-4 rounded-full bg-gray-500 relative">
+              <button className="absolute -top-6 left-1/2 -translate-x-1/2">
+                <Play className="w-4 h-4 text-black" onClick={onEdgeClick} />
+              </button>
+            </div>
+          )}
+        </div>
+      </EdgeLabelRenderer>
+    </>
   );
-};
-
-export default HotspotEdge;
-
+}

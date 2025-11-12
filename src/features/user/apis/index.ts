@@ -1,24 +1,23 @@
 import {
   apiClient,
   apiClientInteractiveLicense,
+  apiClientVideoProgress,
 } from "../../../lib/api/api-client";
-import {
-  getUserProgressFromStorage,
-  updateVideoProgressInStorage,
-} from "../../../lib/user-progress-storage";
 
 const mockProject = {
   id: "proj_abc123",
-  chapterId: "chapter_1",
+  chapterId: "6ba7b812-9dad-11d1-80b4-00c04fd430c9",
   title: "Product Launch Interactive Video",
   description: "Interactive product demonstration with branching storylines",
   startSceneId: "clip_home",
+  endSceneId: "scene_intro_004",
   scenes: [
     {
       id: "clip_home",
       name: "My Home",
-      videoUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+      videoUrl:
+        "https://www.shutterstock.com/shutterstock/videos/3815928771/preview/stock-footage-a-close-up-high-angle-shot-captures-a-document-displaying-lorem-ipsum-placeholder-text-resting.webm",
+      thumbnail: "https://picsum.photos/seed/picsum/200/300",
       duration: 120.5,
       hotspots: [
         {
@@ -26,7 +25,7 @@ const mockProject = {
           sceneId: "clip_home",
           type: "collection",
           minCollectionItems: 2,
-          startTime: 5,
+          startTime: 3,
           items: [
             {
               title: "Secret Document",
@@ -36,7 +35,7 @@ const mockProject = {
               iconUrl: "https://example.com/icons/document.png",
               x: 0.23,
               y: 0.43,
-              r: 40,
+              r: 20,
             },
             {
               title: "Hidden Key",
@@ -46,7 +45,7 @@ const mockProject = {
               iconUrl: "https://example.com/icons/key.png",
               x: 0.15,
               y: 0.2,
-              r: 30,
+              r: 10,
             },
           ],
         },
@@ -54,7 +53,7 @@ const mockProject = {
           id: "880e8400-e29b-41d4-a716-446655440004",
           sceneId: "clip_home",
           type: "hotspot",
-          startTime: 10,
+          startTime: 6,
           minCollectionItems: 1,
           items: [
             {
@@ -65,7 +64,7 @@ const mockProject = {
               iconUrl: "https://example.com/icons/investigate.png",
               x: 0.4,
               y: 0.3,
-              r: 50,
+              r: 10,
             },
           ],
         },
@@ -73,7 +72,7 @@ const mockProject = {
       branch: {
         question: "What do you want to do?",
         description: "Choose an option to continue",
-        startTime: 14,
+        startTime: 9,
         config: {
           question: "What do you want to do?",
           defaultChoice: "clip_hold",
@@ -93,16 +92,18 @@ const mockProject = {
       id: "clip_sweet_girl",
       name: "Introduction",
       videoUrl:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-      thumbnail: "https://storage.example.com/thumbnails/intro-video.jpg",
+        "https://www.shutterstock.com/shutterstock/videos/1096287725/preview/stock-footage-lorem-ipsum-underwater-placeholder-clip.webm",
+      thumbnail:
+        "https://www.shutterstock.com/shutterstock/videos/1096287725/thumb/1.jpg?ip=x480",
       duration: 120.5,
     },
     {
       id: "clip_hold",
       name: "Hold Her",
       videoUrl:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+        "https://www.shutterstock.com/shutterstock/videos/3621426311/preview/stock-footage-sky-view-from-space-orbit-over-rotating-planet-earth-horizon-concept-d-animation-loop-background.mp4",
+      thumbnail:
+        "https://www.shutterstock.com/shutterstock/videos/3621426311/thumb/10.jpg?ip=x480",
       duration: 90.0,
       branch: {
         question: "What do you want to do?",
@@ -113,7 +114,7 @@ const mockProject = {
             {
               id: "branch_a",
               text: "Hold Her",
-              targetSceneId: "scene_intro_003",
+              targetSceneId: "scene_intro_004",
             },
           ],
         },
@@ -123,16 +124,35 @@ const mockProject = {
       id: "clip_jump",
       name: "Jump with Her",
       videoUrl:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+        "https://www.shutterstock.com/shutterstock/videos/3646485485/preview/stock-footage-close-up-view-of-flickering-ocean-waves-in-slow-motion-seamless-loop-background-sunlights.mp4",
+      thumbnail:
+        "https://www.shutterstock.com/shutterstock/videos/3646485485/thumb/1.jpg?ip=x480",
       duration: 90.0,
+      branch: {
+        question: "What do you want to do?",
+        description: "Choose an option to continue",
+        startTime: 9,
+        config: {
+          question: "What do you want to do?",
+          defaultChoice: "clip_hold",
+          options: [
+            {
+              id: "branch_a",
+              text: "Hold Her 1",
+              targetSceneId: "scene_intro_004",
+            },
+          ],
+          countdown: 3,
+        },
+      },
     },
     {
       id: "clip_sympathy",
       name: "A Mutual Sympathy",
       videoUrl:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+        "https://www.shutterstock.com/shutterstock/videos/3798898873/preview/stock-footage-seamless-loop-animation-of-an-old-spiral-clock-with-grunge-texture-symbolic-seamless-loop-of-aging.mp4",
+      thumbnail:
+        "https://www.shutterstock.com/shutterstock/videos/3798898873/thumb/1.jpg?ip=x480",
       duration: 90.0,
       previousSceneId: "clip_home",
       type: "hotspot",
@@ -141,29 +161,39 @@ const mockProject = {
       id: "scene_intro_001",
       name: "Intro 1",
       videoUrl:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+        "https://www.shutterstock.com/shutterstock/videos/3441030099/preview/stock-footage-scene-of-beautiful-sea-waves-aerial-view-of-drone-beach-sand-and-sea-copy-space-area-summer.mp4",
+      thumbnail:
+        "https://www.shutterstock.com/shutterstock/videos/3441030099/thumb/1.jpg?ip=x480",
       duration: 90.0,
       previousSceneId: "clip_home",
       type: "hotspot",
     },
     {
       id: "scene_intro_002",
-      name: "Intro 1",
+      name: "Intro 2",
       videoUrl:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-      thumbnail: "https://storage.example.com/thumbnails/feature-a.jpg",
+        "https://www.shutterstock.com/shutterstock/videos/3483705751/preview/stock-footage--d-animation-of-a-vibrant-multicolored-lights-and-particles-leaving-visible-trails-glowing-neon.mp4",
+      thumbnail: "https://picsum.photos/seed/picsum/200/300",
       duration: 90.0,
       previousSceneId: "clip_home",
       type: "hotspot",
     },
     {
       id: "scene_intro_003",
-      name: "Intro 1",
+      name: "Intro 3",
       videoUrl:
-        "https://cdn.pixabay.com/video/2024/06/20/217490_large.mp4",
+        "https://www.shutterstock.com/shutterstock/videos/3851198779/preview/stock-footage-futuristic-microchip-with-glowing-neon-circuits-frame-digital-technology-and-ai-in-a-high-tech.mp4",
       thumbnail:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+        "https://www.shutterstock.com/shutterstock/videos/3851198779/thumb/1.jpg?ip=x480",
+      duration: 90.0,
+    },
+    {
+      id: "scene_intro_004",
+      name: "Intro 4",
+      videoUrl:
+        "https://www.shutterstock.com/shutterstock/videos/3851198779/preview/stock-footage-futuristic-microchip-with-glowing-neon-circuits-frame-digital-technology-and-ai-in-a-high-tech.mp4",
+      thumbnail:
+        "https://www.shutterstock.com/shutterstock/videos/3851198779/thumb/1.jpg?ip=x480",
       duration: 90.0,
     },
   ],
@@ -176,27 +206,37 @@ export interface UpdateStatusPayload {
   watchingSecond: number;
   totalDuration: number;
   status: string;
+  userId: string;
 }
 
 export const getUserProgress = async (queryParams: Record<string, string>) => {
-  console.log("🚀 ~ getUserProgress ~ queryParams:", queryParams)
-  // const params = new URLSearchParams(queryParams);
+  const params = new URLSearchParams(queryParams);
 
-  // const response = await apiClientVideoProgress.get(`/interactive-scene?${params.toString()}`);
-  // return response;
-  return getUserProgressFromStorage("proj_abc123");
+  const response = await apiClientVideoProgress.get(
+    `/interactive-scene?${params.toString()}`,
+    {
+      "X-Ticket": "1234567890",
+    }
+  );
+  return response;
 };
 
 export const updateStatus = async (payload: UpdateStatusPayload) => {
   // Comment lại call API, thay vào đó lưu vào localStorage
-  // const response = await apiClientVideoProgress.put(`api/v1/video-progress`, payload);
-  // return response;
+  const response = await apiClientVideoProgress.post(
+    `/interactive-scene`,
+    payload,
+    {
+      "X-Ticket": "1234567890",
+    }
+  );
+  return response;
 
   // Lưu vào localStorage với logic kiểm tra sceneId
-  updateVideoProgressInStorage(payload);
+  // updateVideoProgressInStorage(payload);
 
   // Return giả lập để không break code hiện tại
-  return Promise.resolve({ success: true, data: payload });
+  // return Promise.resolve({ success: true, data: payload });
 };
 
 export const getChapters = async () => {

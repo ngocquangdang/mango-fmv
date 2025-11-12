@@ -1,7 +1,8 @@
 // Các kiểu con cho phần config của interactions
 // ------------------------------------------------
 
-import type { Scene as StoryScene } from '../data/storyData';
+import type { Scene as StoryScene } from "../data/storyData";
+import type { UserProgress } from "./user";
 
 /** Vị trí cho hotspot */
 export interface Position {
@@ -78,16 +79,18 @@ export interface ChapterMetadata {
   title: string;
   description: string;
   scenes: Scene[];
-  interactions: Interaction[];
 }
 
 export interface Chapter {
   id: string;
+  chapterId: string;
   title: string;
   description: string;
+  startSceneId: string;
+  endSceneId: string;
+  progress?: UserProgress;
   scenes: Record<string, StoryScene>;
 }
-
 
 export enum PausedActionName {
   HOTSPOT_NO_NEXT = "HOTSPOT_NO_NEXT",

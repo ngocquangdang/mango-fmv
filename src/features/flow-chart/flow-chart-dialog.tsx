@@ -25,7 +25,7 @@ export default function FlowChartDialog({ open, onClose }: Props) {
         Close
       </button>
       <div className="h-full w-full">
-        <FlowChart onClose={onClose} />
+        <FlowChart />
       </div>
     </div>
   );

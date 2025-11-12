@@ -17,7 +17,7 @@ export const FlowChartContextProvider = ({
   const { chapter: data } = useUserContext();
 
   const scenes = React.useMemo(() => {
-    return data?.scenes || {} as Scene;
+    return data?.scenes || ({} as Scene);
   }, [data]);
 
   const { nodes = [], edges = [] } = React.useMemo(() => {
@@ -27,21 +27,19 @@ export const FlowChartContextProvider = ({
 
     ids.forEach((id, index) => {
       const scene: any = scenes[id];
-      const isScene =
-        !!scene &&
-        !!scene?.status &&
-        (!!scene?.branch || !!scene?.hotspots?.length);
+      const isNodeScene = (scene && !scene?.status) || scene.type === "hotspot";
 
-      if (!isScene) return;
+      if (isNodeScene) return;
 
       nodeList.push({
         id,
         position: { x: (index % 4) * 220, y: Math.floor(index / 4) * 260 },
-        data: { id, title: scene.title, status: scene.status },
+        data: { ...scene },
         type: "customNode",
         sourcePosition: "right",
         targetPosition: "left",
       });
+
       if (scene.branch) {
         scene.branch.config.options.forEach((c: any, cIdx: number) => {
           if (c.targetSceneId)
@@ -50,16 +48,42 @@ export const FlowChartContextProvider = ({
               source: id,
               target: c.targetSceneId,
               animated: false,
+              type: "customEdge",
             });
         });
-      } else if (scene.nextSceneId) {
+      } else if (scene.targetSceneId) {
         edgeList.push({
-          id: `${id}->${scene.nextSceneId}`,
+          id: `${id}->${scene.targetSceneId}`,
           source: id,
-          target: scene.nextSceneId,
+          target: scene.targetSceneId,
+          type: "customEdge",
         });
       }
     });
+    console.log("🚀 ~ React.useMemo ~ edgeList:", edgeList);
+    if (
+      edgeList.length &&
+      edgeList[edgeList.length - 1].target !== data?.endSceneId
+    ) {
+      edgeList[edgeList.length - 1].target = "unlocked";
+      edgeList[edgeList.length - 1].id = "unlocked";
+    }
+    if (
+      edgeList.length &&
+      edgeList[edgeList.length - 1].target !== data?.endSceneId
+    ) {
+      nodeList.push({
+        id: "unlocked",
+        position: {
+          x: (nodeList.length % 4) * 220,
+          y: Math.floor(nodeList.length / 4) * 260,
+        },
+        data: {},
+        type: "customNode",
+        sourcePosition: "right",
+        targetPosition: "left",
+      });
+    }
     return { nodes: nodeList, edges: edgeList };
   }, [scenes]);
 

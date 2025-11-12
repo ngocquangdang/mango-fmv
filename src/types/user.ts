@@ -14,10 +14,14 @@ export interface MgUserInfo {
 export interface UserProgress {
   chapterId: string;
   projectId: string;
-  userId?: string;
-  startSceneId: string;
-  startAt: number;
-  videos: {
+  userId: string;
+  currentScene: {
+    sceneId: string;
+    status: string;
+    watchingSecond: number;
+    totalDuration: number;
+  };
+  scenes: {
     sceneId: string;
     status: string;
     watchingSecond: number;

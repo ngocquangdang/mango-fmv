@@ -17,7 +17,7 @@ export type Scene = {
   nextSceneId?: string | null;
   status?: string;
   watchingSecond?: number;
-  totalDuration?: number;
+  duration?: number;
   completedAt?: string | null;
   previousSceneId?: string | null;
 };

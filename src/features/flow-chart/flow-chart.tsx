@@ -12,12 +12,14 @@ import CustomNode from "./custom-node";
 import { useFlowChart } from "./context";
 import { FlowChartContextProvider } from "./context/flow-chart-provider";
 import { useVideoPlayerContext } from "../../contexts";
+import CustomEdge from "./custom-edge";
 
 const nodeTypes = { customNode: CustomNode };
+const edgeTypes = { customEdge: CustomEdge };
 
-const FlowChartInner: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+const FlowChartInner: React.FC = () => {
   const { nodes = [], edges = [], data } = useFlowChart();
-  const { currentSceneId, onSetCurrentSceneId, setCurrentStatus, setPauseType } =
+  const { currentSceneId, setCurrentStatus, setPauseType, onPlayPlayer } =
     useVideoPlayerContext();
 
   const layout = React.useMemo(() => {
@@ -79,26 +81,31 @@ const FlowChartInner: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       type: node.type ?? "customNode",
     }));
   }, [layout, nodes, currentSceneId]);
-
   return (
     <div className="h-full w-full">
       <ReactFlow
+        colorMode="dark"
         nodes={decoratedNodes}
         edges={edges.map((e: any) => ({
           ...e,
-          type: "smoothstep",
           style: { stroke: "#c7d2fe" },
         }))}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         defaultEdgeOptions={{
           type: "smoothstep",
         }}
-        fitView
+        minZoom={0.5}
+        maxZoom={1.25}
+        defaultViewport={{
+          x: 100,
+          y: 350,
+          zoom: 1.25,
+        }}
         onNodeClick={(_, node) => {
           setCurrentStatus(null);
           setPauseType(null);
-          onSetCurrentSceneId(node.id);
-          onClose();
+          onPlayPlayer(node.id);
         }}
         proOptions={{ hideAttribution: true }}
       >
@@ -108,7 +115,7 @@ const FlowChartInner: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         >
           {data?.title || "Story Flow"}
         </Panel>
-        <MiniMap pannable zoomable className="bg-gray-50!" />
+        {/* <MiniMap pannable zoomable className="bg-gray-50!" /> */}
         <Controls position="bottom-right" />
         <Background gap={24} size={1} color="#e5e7eb" />
       </ReactFlow>
@@ -116,11 +123,11 @@ const FlowChartInner: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   );
 };
 
-const FlowChart: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+const FlowChart: React.FC = () => {
   return (
     <FlowChartContextProvider>
       <ReactFlowProvider>
-        <FlowChartInner onClose={onClose} />
+        <FlowChartInner />
       </ReactFlowProvider>
     </FlowChartContextProvider>
   );

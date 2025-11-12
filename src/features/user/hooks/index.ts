@@ -7,10 +7,7 @@ import {
   updateStatus,
 } from "../apis";
 import type { UpdateStatusPayload } from "../apis";
-import type {
-  Chapter,
-  Scene,
-} from "../../../types/chapter";
+import type { Chapter, Scene } from "../../../types/chapter";
 import type { Scene as StoryScene } from "../../../data/storyData";
 
 const mapScene = (
@@ -32,7 +29,7 @@ const mapScene = (
   }, {});
 };
 
-const mapChapter = (
+export const mapChapter = (
   chapter: any,
   videosProgress: Record<string, any>
 ): Chapter => {
@@ -52,17 +49,16 @@ const mapVideoProgress = (videosProgress: any[]): Record<string, any> => {
   }, {});
 };
 export const useUserProgress = (queryParams: Record<string, string>) => {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["user-progress", queryParams],
     queryFn: () => getUserProgress(queryParams),
-    enabled: !!queryParams,
+    enabled: !!queryParams.userId && !!queryParams.chapterId,
   });
   return {
-    data: data
-      ? { ...data, videos: mapVideoProgress(data?.videos || []) }
-      : undefined,
+    data: { ...data?.data, scenes: mapVideoProgress(data?.data?.scenes || []) },
     isLoading,
     error,
+    refetch,
   };
 };
 
@@ -79,18 +75,12 @@ export const useChapters = () => {
   });
 };
 
-export const useChapter = (id: string, videosProgress: Record<string, any>) => {
-  const { data, isLoading, error } = useQuery({
+export const useChapter = (id: string) => {
+  return useQuery({
     queryKey: ["chapter", id],
     queryFn: () => getChapter(id),
     enabled: !!id,
   });
-
-  return {
-    data: data ? mapChapter(data, videosProgress) : undefined,
-    isLoading,
-    error,
-  };
 };
 
 const mapVideos = (videos: any[]): Record<string, any> => {
@@ -107,6 +97,7 @@ export const useVideos = (ids: string[]) => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["videos", ids],
     queryFn: () => getVideos(ids),
+    enabled: !!ids.length,
   });
   return {
     data: data ? mapVideos(data) : undefined,
