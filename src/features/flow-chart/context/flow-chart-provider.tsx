@@ -8,6 +8,7 @@ export interface FlowChartContextType {
   nodes: ReactFlowNode[];
   edges: Edge[];
   data: any;
+  thumbnailUrls: string[];
 }
 export const FlowChartContextProvider = ({
   children,
@@ -19,6 +20,10 @@ export const FlowChartContextProvider = ({
   const scenes = React.useMemo(() => {
     return data?.scenes || ({} as Scene);
   }, [data]);
+
+  const thumbnailUrls = React.useMemo(() => {
+    return Object.values(scenes).map((scene: any) => scene.thumbnail);
+  }, [scenes]);
 
   const { nodes = [], edges = [] } = React.useMemo(() => {
     const nodeList: any[] = [];
@@ -41,6 +46,7 @@ export const FlowChartContextProvider = ({
       });
 
       if (scene.branch) {
+
         scene.branch.config.options.forEach((c: any, cIdx: number) => {
           if (c.targetSceneId)
             edgeList.push({
@@ -60,17 +66,22 @@ export const FlowChartContextProvider = ({
         });
       }
     });
-
     if (
       edgeList.length &&
-      edgeList[edgeList.length - 1].target !== data?.endSceneId
+      !scenes[edgeList[edgeList.length - 1].target]?.status
     ) {
-      edgeList[edgeList.length - 1].target = "unlocked";
-      edgeList[edgeList.length - 1].id = "unlocked";
+      edgeList.push({
+        id: "unlocked",
+        source: edgeList[edgeList.length - 1].source,
+        target: "unlocked",
+        type: "customEdge",
+      });
+      // edgeList[edgeList.length - 1].target = "unlocked";
+      // edgeList[edgeList.length - 1].id = "unlocked";
     }
     if (
       edgeList.length &&
-      edgeList[edgeList.length - 1].target !== data?.endSceneId
+      !scenes[edgeList[edgeList.length - 1].target]?.status
     ) {
       nodeList.push({
         id: "unlocked",
@@ -85,12 +96,13 @@ export const FlowChartContextProvider = ({
       });
     }
     return { nodes: nodeList, edges: edgeList };
-  }, [scenes, data]);
+  }, [scenes]);
 
   const value: FlowChartContextType = {
     nodes,
     edges,
     data,
+    thumbnailUrls,
   };
 
   return (

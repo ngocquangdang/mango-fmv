@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   ReactFlow,
   Background,
@@ -18,7 +18,7 @@ const nodeTypes = { customNode: CustomNode };
 const edgeTypes = { customEdge: CustomEdge };
 
 const FlowChartInner: React.FC = () => {
-  const { nodes = [], edges = [], data } = useFlowChart();
+  const { nodes = [], edges = [], data, thumbnailUrls } = useFlowChart();
   const { currentSceneId, setCurrentStatus, setPauseType, onPlayPlayer } =
     useVideoPlayerContext();
 
@@ -116,9 +116,21 @@ const FlowChartInner: React.FC = () => {
         <Controls position="bottom-right" />
         <Background gap={24} size={1} color="#e5e7eb" />
       </ReactFlow>
+      <ImagePreloader imageUrls={thumbnailUrls || []} />
     </div>
   );
 };
+
+const ImagePreloader = memo(({ imageUrls }: { imageUrls: string[] }) => {
+  React.useEffect(() => {
+    imageUrls.forEach((url: string) => {
+      const img = new Image();
+      img.src = url;
+    });
+  }, [imageUrls]);
+
+  return null; // This component doesn't render anything visible
+});
 
 const FlowChart: React.FC = () => {
   return (

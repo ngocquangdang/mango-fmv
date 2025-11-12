@@ -34,10 +34,10 @@ const CustomNode = memo(({ data }: CustomNodeProps) => {
           <img
             src={data.thumbnail}
             alt="thumbnail"
-            className="h-[140px] w-full rounded-xl object-cover"
+            className="w-[140px] h-[140px] rounded-xl object-cover"
           />
         ) : !data?.id ? (
-          <div className='w-[140px] h-[140px] flex items-center justify-center'>
+          <div className="w-[140px] h-[140px] flex items-center justify-center">
             <UnlockIcon className="w-6 h-6 text-gray-500" />
           </div>
         ) : (

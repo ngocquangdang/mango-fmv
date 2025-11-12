@@ -4,7 +4,6 @@ import { VideoPlayerContext } from ".";
 import type { Scene } from "../data/storyData";
 import { PausedActionName } from "../types/chapter";
 import { useUserContext } from "../features/user/context";
-import { useUpdateStatus } from "../features/user/hooks";
 
 export interface VideoPlayerContextType {
   type: "intro" | "interactive";
@@ -32,10 +31,11 @@ export const VideoPlayerProvider = ({
   children: React.ReactNode;
 }) => {
   const { api, ready } = useVideoPlayer();
-  const { chapter: data, userId, refetch } = useUserContext();
-  const { mutate: updateStatus } = useUpdateStatus();
+  const { chapter: data, updateSceneStatus } = useUserContext();
+
   const [type, setType] = React.useState<"intro" | "interactive">("intro");
   const [pauseType, setPauseType] = React.useState<string | null>(null);
+  console.log("🚀 ~ VideoPlayerProvider ~ pauseType:", pauseType)
   const [currentStatus, setCurrentStatus] = React.useState<Record<
     string,
     any
@@ -110,6 +110,7 @@ export const VideoPlayerProvider = ({
         setTimeout(() => {
           seekTo(currentStatus?.time);
         }, 50);
+        console.log("seekTo");
       }
       if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
       play();
@@ -119,74 +120,42 @@ export const VideoPlayerProvider = ({
 
   const handleStart = React.useCallback(
     (sceneId: string) => {
-      console.log(
-        "🚀 ~ [START] NEED TO CALL API WITH STATUS INPROGRESS:",
-        sceneId
-      );
-      updateStatus(
-        {
-          projectId: data.id,
-          sceneId: sceneId,
-          chapterId: data.chapterId,
-          watchingSecond: 0,
-          totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
-          status: "INPROGRESS",
-          userId: userId || "",
-        },
-        {
-          onSuccess: () => {
-            refetch();
-          },
-        }
+      console.log("🚀 ~ [START] [INPROGRESS]:", sceneId);
+      updateSceneStatus(
+        sceneId,
+        Math.floor(data.scenes[sceneId]?.duration || 0),
+        0,
+        "INPROGRESS"
       );
       setCurrentSceneId(sceneId);
+      if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
       setPauseType(null);
     },
-    [updateStatus, data.id, userId, refetch]
+    [updateSceneStatus, data.scenes, pauseType]
   );
 
   const handleStop = React.useCallback(
     (payload: Record<string, any>) => {
-      console.log("🚀 ~ [STOP] NEED TO CALL API:", payload);
+      console.log("🚀 ~ [STOP]", payload);
       setCurrentStatus(payload);
       const currentClip = data.scenes[payload.currentSceneId];
 
       if (payload.actionName === PausedActionName.USER_PAUSED_VIDEO) {
-        updateStatus(
-          {
-            projectId: data.id,
-            sceneId: payload.currentSceneId,
-            chapterId: data.chapterId,
-            watchingSecond: Math.floor(payload.time || 0),
-            totalDuration: Math.floor(currentClip?.duration || 0),
-            status: "INPROGRESS",
-            userId: userId || "",
-          },
-          {
-            onSuccess: () => {
-              refetch();
-            },
-          }
+        updateSceneStatus(
+          payload.currentSceneId,
+          Math.floor(currentClip?.duration || 0),
+          Math.floor(payload.time || 0),
+          "INPROGRESS"
         );
         return;
       }
       if (payload.actionName === PausedActionName.DECISION_POINT_REACHED) {
         setPauseType(payload.actionName);
-        updateStatus(
-          {
-            projectId: data.id,
-            sceneId: payload.currentSceneId,
-            chapterId: data.chapterId,
-            watchingSecond: Math.floor(payload.time || 0),
-            totalDuration: Math.floor(currentClip?.duration || 0),
-            status: "INPROGRESS",
-            userId: userId || "",
-          },
-          {
-            onSuccess: () => {
-              refetch();
-            },
-          }
+        updateSceneStatus(
+          payload.currentSceneId,
+          Math.floor(currentClip?.duration || 0),
+          Math.floor(payload.time || 0),
+          "INPROGRESS"
         );
       }
 
@@ -218,7 +187,6 @@ export const VideoPlayerProvider = ({
           handleCollectionItems(hotspot, payload.currentSceneId);
         }
 
-        // TODO: update hotspot with currentSceneId completed
         console.log("🚀 ~ [PLAY BACK]");
         onSetCurrentSceneId(currentClip.previousSceneId);
         setTimeout(() => {
@@ -232,7 +200,7 @@ export const VideoPlayerProvider = ({
       onSetCurrentSceneId,
       seekTo,
       play,
-      updateStatus,
+      updateSceneStatus,
       handleCollectionItems,
       collectionItems,
     ]
@@ -240,11 +208,7 @@ export const VideoPlayerProvider = ({
 
   const handleChoiceSelected = React.useCallback(
     (sceneId: string, nextSceneId: string) => {
-      console.log(
-        "🚀 ~ [CHOICE SELECTED] NEED TO CALL API:",
-        sceneId,
-        nextSceneId
-      );
+      console.log("🚀 ~ [CHOICE SELECTED]", sceneId, nextSceneId);
       setCurrentSceneId(nextSceneId);
       setPauseType(null);
       setCurrentStatus(null);
@@ -254,27 +218,15 @@ export const VideoPlayerProvider = ({
 
   const handleEnded = React.useCallback(
     (sceneId: string) => {
-      console.log("🚀 ~ [ENDED] NEED TO CALL API:", sceneId);
-      // const currentClip = data.scenes[sceneId];
-
-      updateStatus(
-        {
-          projectId: data.id,
-          sceneId: sceneId,
-          chapterId: data.chapterId,
-          watchingSecond: 0,
-          totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
-          status: "COMPLETED",
-          userId: userId || "",
-        },
-        {
-          onSuccess: () => {
-            refetch();
-          },
-        }
+      console.log("🚀 ~ [ENDED]", sceneId);
+      updateSceneStatus(
+        sceneId,
+        Math.floor(data.scenes[sceneId]?.duration || 0),
+        Math.floor(data.scenes[sceneId]?.duration || 0),
+        "COMPLETED"
       );
     },
-    [updateStatus, data.id, userId, refetch]
+    [updateSceneStatus, data.scenes]
   );
 
   const quitPlayer = React.useCallback(() => {
@@ -293,15 +245,14 @@ export const VideoPlayerProvider = ({
   );
 
   React.useEffect(() => {
-    console.log("🚀 ~ React.useEffect ~ data:", data);
     if (!data.id && !data.progress?.currentScene) return;
     setCurrentStatus({
       currentSceneId: data.progress?.currentScene?.sceneId,
-      time: data.progress?.currentScene?.watchingSecond || 0
+      time: data.progress?.currentScene?.watchingSecond || 0,
     });
     setCurrentSceneId(data.progress?.currentScene?.sceneId || null);
     setPauseType(null);
-  }, [data.id, data.progress?.currentScene])
+  }, [data.id, data.progress?.currentScene]);
 
   const onInit = React.useCallback(() => {
     if (!api?.play || !data?.id) return;

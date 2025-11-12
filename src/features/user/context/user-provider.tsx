@@ -16,6 +16,12 @@ export interface UserContextType {
   loading: boolean;
   userId: string | null;
   refetch: () => void;
+  updateSceneStatus: (
+    sceneId: string,
+    totalDuration: number,
+    watchingSecond: number,
+    status: string
+  ) => void;
 }
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -23,9 +29,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mutate: updateStatus } = useUpdateStatus();
 
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [userId, setUserId] = React.useState<string | null>(
-    "519baee1-60e4-402f-9f3e-1fd31b0ef7ci"
-  );
+  const [userId, setUserId] = React.useState<string | null>(null);
 
   const { data: chapter } = useChapter("6ba7b812-9dad-11d1-80b4-00c04fd430c9");
   const { data: progress, refetch } = useUserProgress({
@@ -41,6 +45,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     if (!chapter) return null;
     return mapChapter(chapter, progress?.scenes || {});
   }, [chapter, progress]);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("userId");
+    if (userId) {
+      setUserId(userId);
+    }
+  }, [progress]);
 
   React.useEffect(() => {
     if (chapter && !progress?.currentScene) {
@@ -80,6 +92,33 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(true);
   }, []);
 
+  const updateSceneStatus = React.useCallback(
+    (
+      sceneId: string,
+      totalDuration: number,
+      watchingSecond: number,
+      status: string
+    ) => {
+      updateStatus(
+        {
+          projectId: chapter?.id || "",
+          chapterId: chapter?.chapterId || "",
+          watchingSecond,
+          totalDuration,
+          sceneId,
+          status,
+          userId: userId || "",
+        },
+        {
+          onSuccess: () => {
+            refetch();
+          },
+        }
+      );
+    },
+    [updateStatus, userId, refetch, chapter]
+  );
+
   React.useEffect(() => {
     if (!mgApi) return;
 
@@ -91,6 +130,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     loading,
     userId,
     refetch,
+    updateSceneStatus,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
