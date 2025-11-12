@@ -1,7 +1,7 @@
 import React from "react";
 import { FlowChartContext } from ".";
 import { type Scene } from "../../../data/storyData";
-import type { Edge, Node as ReactFlowNode } from "reactflow";
+import type { Edge, Node as ReactFlowNode } from "@xyflow/react";
 import { useUserContext } from "../../user/context";
 
 export interface FlowChartContextType {
@@ -60,7 +60,7 @@ export const FlowChartContextProvider = ({
         });
       }
     });
-    console.log("🚀 ~ React.useMemo ~ edgeList:", edgeList);
+
     if (
       edgeList.length &&
       edgeList[edgeList.length - 1].target !== data?.endSceneId
@@ -85,7 +85,7 @@ export const FlowChartContextProvider = ({
       });
     }
     return { nodes: nodeList, edges: edgeList };
-  }, [scenes]);
+  }, [scenes, data]);
 
   const value: FlowChartContextType = {
     nodes,

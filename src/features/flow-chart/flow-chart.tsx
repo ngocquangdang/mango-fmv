@@ -1,13 +1,13 @@
 import React from "react";
-import ReactFlow, {
+import {
+  ReactFlow,
   Background,
   Controls,
-  MiniMap,
   Panel,
   ReactFlowProvider,
   type Node,
   type Edge,
-} from "reactflow";
+} from "@xyflow/react";
 import CustomNode from "./custom-node";
 import { useFlowChart } from "./context";
 import { FlowChartContextProvider } from "./context/flow-chart-provider";
@@ -71,8 +71,6 @@ const FlowChartInner: React.FC = () => {
   const decoratedNodes = React.useMemo(() => {
     return (layout.positioned || nodes).map((node: any) => ({
       ...node,
-      width: 180,
-      height: 80,
       data: {
         ...node.data,
         isActive: currentSceneId == node.id,
@@ -84,7 +82,6 @@ const FlowChartInner: React.FC = () => {
   return (
     <div className="h-full w-full">
       <ReactFlow
-        colorMode="dark"
         nodes={decoratedNodes}
         edges={edges.map((e: any) => ({
           ...e,

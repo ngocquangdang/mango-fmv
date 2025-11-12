@@ -1,6 +1,6 @@
-import { Icon, UnlockIcon } from "lucide-react";
+import { UnlockIcon } from "lucide-react";
 import { memo } from "react";
-import { Handle, Position } from "reactflow";
+import { Handle, Position } from "@xyflow/react";
 
 interface CustomNodeProps {
   data?: any;

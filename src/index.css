@@ -1,2 +1,2 @@
 @import "tailwindcss";
-@import "reactflow/dist/style.css";
+@import "@xyflow/react/dist/style.css";
