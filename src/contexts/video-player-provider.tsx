@@ -35,7 +35,6 @@ export const VideoPlayerProvider = ({
 
   const [type, setType] = React.useState<"intro" | "interactive">("intro");
   const [pauseType, setPauseType] = React.useState<string | null>(null);
-  console.log("🚀 ~ VideoPlayerProvider ~ pauseType:", pauseType)
   const [currentStatus, setCurrentStatus] = React.useState<Record<
     string,
     any
@@ -110,7 +109,6 @@ export const VideoPlayerProvider = ({
         setTimeout(() => {
           seekTo(currentStatus?.time);
         }, 50);
-        console.log("seekTo");
       }
       if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
       play();
@@ -128,10 +126,9 @@ export const VideoPlayerProvider = ({
         "INPROGRESS"
       );
       setCurrentSceneId(sceneId);
-      if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
       setPauseType(null);
     },
-    [updateSceneStatus, data.scenes, pauseType]
+    [updateSceneStatus, data.scenes]
   );
 
   const handleStop = React.useCallback(
@@ -187,6 +184,7 @@ export const VideoPlayerProvider = ({
           handleCollectionItems(hotspot, payload.currentSceneId);
         }
 
+        // TODO: update hotspot with currentSceneId completed
         console.log("🚀 ~ [PLAY BACK]");
         onSetCurrentSceneId(currentClip.previousSceneId);
         setTimeout(() => {
