@@ -155,7 +155,7 @@ class FetchApiClient {
 
 export const apiClient = new FetchApiClient();
 export const apiClientInteractiveLicense = new FetchApiClient(
-  "https://interactive-license-api-stg.onidservice.cloud/api/v1"
+  "https://interactive-license-stg.onidservice.cloud/api/v1"
 );
 export const apiClientVideoProgress = new FetchApiClient(
   "https://video-progress-api-jsgjs7nrvq-as.a.run.app/api/v1"

@@ -11,36 +11,33 @@ import type { UpdateStatusPayload } from "../apis";
 import type { Chapter, Scene } from "../../../types/chapter";
 import type { Scene as StoryScene } from "../../../data/storyData";
 
+const mapHotspots = (hotspots: any): any[] => {
+  return hotspots.map((hotspot: any) => ({
+    ...hotspot,
+    items: hotspot.items.map((item: any) => ({
+      ...item,
+      x: item.x/100,
+      y: item.y/100,
+
+    })),
+  }))
+};
 const mapScene = (
-  scene: Scene[] = [],
+  scene: Record<string, Scene> = {},
   videosProgress: Record<string, any>
 ): Record<string, StoryScene> => {
-  // const hotspots = scene
-  //   .map((scene) => {
-  //     return scene.hotspots?.map((hotspot) => hotspot.items).flat();
-  //   })
-  //   .flat()
-  //   .reduce((acc, item) => {
-  //     if (!item) return acc;
-  //     acc = {
-  //       ...acc,
-  //       [item.targetSceneId]: item,
-  //     };
-  //     return acc;
-  //   }, {});
-
-  return scene.reduce((acc, scene) => {
-    acc = {
+  const sceneIds = Object.keys(scene);
+  const mappedScene = sceneIds.reduce((acc, sceneId) => {
+    return {
       ...acc,
-      [scene.id]: {
-        title: scene.name,
-        ...scene,
-        ...(videosProgress && videosProgress[scene.id]),
+      [sceneId]: {
+        ...scene[sceneId as keyof typeof scene],
+        ...(videosProgress && videosProgress[sceneId]),
+        hotspots: mapHotspots(scene[sceneId as keyof typeof scene].hotspots),
       },
     };
-
-    return acc;
   }, {});
+  return mappedScene;
 };
 
 export const mapChapter = (
@@ -49,8 +46,7 @@ export const mapChapter = (
 ): Chapter => {
   return {
     ...chapter,
-    startSceneId: chapter.first_scene_id,
-    scenes: mapScene(chapter.scenes as Scene[], videosProgress),
+    scenes: mapScene(chapter.scenes as Record<string, Scene>, videosProgress),
   };
 };
 
@@ -99,18 +95,16 @@ export const useChapter = (
     queryFn: () => getChapter(projectId, chapterId),
     // enabled: !!chapterId,
   });
-  
+
   // Memoize the transformed data to prevent creating new objects on every render
   const transformedData = React.useMemo(() => {
     if (!data?.data) return undefined;
     return {
       ...data.data,
-      startSceneId: data.data.first_scene_id,
-      chapterId,
-      id: projectId,
+      chapterId: data.data.id,
     };
-  }, [data?.data, chapterId, projectId]);
-  
+  }, [data?.data]);
+
   return {
     data: transformedData,
     ...rest,

@@ -32,21 +32,23 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [userId, setUserId] = React.useState<string | null>(null);
 
   const { data: chapter } = useChapter(undefined, undefined);
-  console.log("🚀 ~ UserProvider ~ chapter:", chapter)
-  
+  console.log("🚀 ~ UserProvider ~ chapter:", chapter);
+
   // Only log when chapter actually changes (by ID, not just reference)
   const prevChapterIdRef = React.useRef<string | undefined>(undefined);
   React.useEffect(() => {
     const currentChapterId = chapter?.id;
     if (currentChapterId !== prevChapterIdRef.current) {
-      console.log("🚀 ~ UserProvider ~ chapter:", chapter);
       prevChapterIdRef.current = currentChapterId;
     }
   }, [chapter]);
-  
+
   // Memoize chapterId to prevent unnecessary refetches
-  const chapterId = React.useMemo(() => chapter?.chapterId || "", [chapter?.chapterId]);
-  
+  const chapterId = React.useMemo(
+    () => chapter?.chapterId || "",
+    [chapter?.chapterId]
+  );
+
   // Memoize query params to prevent unnecessary refetches
   const progressParams = React.useMemo(
     () => ({
@@ -55,15 +57,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }),
     [userId, chapterId]
   );
-  
+
   const { data: progress, refetch } = useUserProgress(progressParams);
 
   // Memoize scene IDs array to prevent unnecessary refetches
   const sceneIds = React.useMemo(
-    () => Object.values(chapter?.scenes || {})?.map((scene: any) => scene.id) || [],
+    () =>
+      Object.values(chapter?.scenes || {})?.map(
+        (scene: any) => scene.filePathId
+      ) || [],
     [chapter?.scenes]
   );
-  
+
   const { data: videos } = useVideos(sceneIds);
 
   const chapterMapped = React.useMemo(() => {
@@ -111,13 +116,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
       );
     }
-  }, [
-    chapterValues,
-    updateStatus,
-    refetch,
-    progress?.currentScene,
-    userId,
-  ]);
+  }, [chapterValues, updateStatus, refetch, progress?.currentScene, userId]);
 
   React.useEffect(() => {
     // if (videos && chapter) {
@@ -172,7 +171,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   // Memoize value object to prevent unnecessary re-renders
   const value: UserContextType = React.useMemo(
     () => ({
-      chapter: chapterMapped ? { ...chapterMapped, progress } as Chapter : ({} as Chapter),
+      chapter: chapterMapped
+        ? ({ ...chapterMapped, progress } as Chapter)
+        : ({} as Chapter),
       loading,
       userId,
       refetch,

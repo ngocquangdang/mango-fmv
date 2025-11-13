@@ -127,7 +127,10 @@ export const FlowChartContextProvider = ({
     const addNode = (id: string, data: any) => {
       nodeList.push({
         id,
-        position: { x: (nodeList.length % 4) * 220, y: Math.floor(nodeList.length / 4) * 260 },
+        position: {
+          x: (nodeList.length % 4) * 220,
+          y: Math.floor(nodeList.length / 4) * 260,
+        },
         data,
         type: "customNode",
       });
@@ -142,34 +145,52 @@ export const FlowChartContextProvider = ({
       });
     };
 
-    const nodes = (id: string, options: BranchOption[]) => {
-      const currentNode = scenes[id];
-
-      options.forEach((option, index) => {
-        addNode(id, { ...scenes[id], ...option });
-        addEdge(`${id}->${option.targetSceneId}-${index}`, id, option.targetSceneId);
-        const nextNode = scenes[option.targetSceneId];
-        if (nextNode && nextNode.branch) {
-          nodes(option.targetSceneId, nextNode.branch?.options || []);
-        } else if (
-          nextNode &&
-          !(nextNode.hotspots?.length || 0) &&
-          !nextNode.branch
-        ) {
-          if (!nextNode.status) {
-            addUnlockNode(option.targetSceneId);
-            addUnlockEdge(option.targetSceneId, currentNode.id);
-          } else {
-            addNode(option.targetSceneId, { ...nextNode });
-            addEdge(`${id}->${option.targetSceneId}`, id, option.targetSceneId);
+    const nodes = (id: string, options: BranchOption[] = []) => {
+      const prevNode = scenes[id];
+      if (options.some((option) => scenes[option.targetSceneId].status)) {
+        options.forEach((option, index) => {
+          if (scenes[option.targetSceneId]?.status) {
+            addNode(option.targetSceneId, {
+              ...scenes[option.targetSceneId],
+              ...option,
+            });
+            addEdge(
+              `${id}->${option.targetSceneId}-${index}`,
+              id,
+              option.targetSceneId
+            );
+            const nextNode = scenes[option.targetSceneId];
+            if (nextNode && nextNode.branch) {
+              nodes(option.targetSceneId, nextNode.branch?.options || []);
+            } else if (
+              nextNode &&
+              !(nextNode.hotspots?.length || 0) &&
+              !nextNode.branch
+            ) {
+              if (!nextNode.status) {
+                addUnlockNode(option.targetSceneId);
+                addUnlockEdge(option.targetSceneId, prevNode.id);
+              } else {
+                addNode(option.targetSceneId, { ...nextNode });
+                addEdge(
+                  `${id}->${option.targetSceneId}`,
+                  id,
+                  option.targetSceneId
+                );
+              }
+            }
           }
-        }
-      });
+        });
+      } else {
+        addUnlockNode(id);
+        addUnlockEdge(id, id);
+      }
     };
 
     // DONOT CHECK THIS
     if (startNode && startNode.branch) {
       const options: BranchOption[] = startNode.branch.options;
+      addNode(startNode.id, { ...startNode });
       nodes(startNode.id, options);
     }
 
