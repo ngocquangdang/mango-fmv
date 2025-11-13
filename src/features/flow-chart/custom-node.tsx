@@ -45,7 +45,7 @@ const CustomNode = memo(({ data }: CustomNodeProps) => {
         )}
         <div className="flex flex-col flex-1 items-center justify-center h-auto">
           <p className="line-clamp-2 text-sm font-medium text-gray-900">
-            {data?.title ?? ""}
+            {data?.name ?? ""}
           </p>
           <p className="mt-0.5 text-[11px] text-gray-500">
             {isActive ? "Now Playing" : data?.subtitle ?? ""}
