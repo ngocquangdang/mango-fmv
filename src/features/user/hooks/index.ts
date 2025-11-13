@@ -33,7 +33,7 @@ const mapScene = (
         ...scene[sceneId as keyof typeof scene],
         ...(videosProgress && videosProgress[sceneId]),
         hotspots: mapHotspots(
-          (scene[sceneId as keyof typeof scene]?.hotspots as any) || []
+          (scene[sceneId as keyof typeof scene]?.hotspots) || []
         ),
       },
     };
@@ -116,7 +116,7 @@ const mapVideos = (videos: any[]): Record<string, any> => {
   return videos.reduce((acc, video) => {
     acc = {
       ...acc,
-      [video.id]: video,
+      [video.sceneId]: video,
     };
     return acc;
   }, {});
@@ -128,8 +128,12 @@ export const useVideos = (ids: string[]) => {
     queryFn: () => getVideos(ids),
     enabled: !!ids.length,
   });
+  const transformedData = React.useMemo(() => {
+    if (!data) return undefined;
+    return mapVideos(data?.data || []);
+  }, [data]);
   return {
-    data: data ? mapVideos(data) : undefined,
+    data: transformedData,
     isLoading,
     error,
   };
