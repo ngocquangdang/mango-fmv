@@ -3,7 +3,7 @@ import { FlowChartContext } from ".";
 import { type Scene } from "../../../data/storyData";
 import type { Edge, Node as ReactFlowNode } from "@xyflow/react";
 import { useUserContext } from "../../user/context";
-import type { BranchOption } from "../../../types/chapter";
+// import type { BranchOption } from "../../../types/chapter";
 
 export interface FlowChartContextType {
   nodes: ReactFlowNode[];
