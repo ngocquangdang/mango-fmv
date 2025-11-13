@@ -1,7 +1,6 @@
 import React, { memo } from "react";
 import {
   ReactFlow,
-  Background,
   Controls,
   Panel,
   ReactFlowProvider,
@@ -80,12 +79,31 @@ const FlowChartInner: React.FC = () => {
     }));
   }, [layout, nodes, currentSceneId]);
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full relative">
+      {/* Background layer */}
+      <div
+        className="absolute inset-0 -z-10"
+        style={{
+          backgroundImage: `linear-gradient(rgba(17, 17, 17, 0) 85%, rgb(17, 17, 17)), url(https://asset.onfan.vn/voting/banner/bannerbanner21.png)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
+      {/* Full screen shadow overlay to highlight nodes */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          zIndex: -5,
+          boxShadow: 'inset 0 0 200px 100px rgba(0, 0, 0, 0.7)',
+        }}
+      />
       <ReactFlow
+        className='bg-red'
         nodes={decoratedNodes}
         edges={edges.map((e: any) => ({
           ...e,
-          style: { stroke: "#c7d2fe" },
+          style: { stroke: "#c7d2fe", strokeWidth: 2.5 },
         }))}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
@@ -114,7 +132,7 @@ const FlowChartInner: React.FC = () => {
         </Panel>
         {/* <MiniMap pannable zoomable className="bg-gray-50!" /> */}
         <Controls position="bottom-right" />
-        <Background gap={24} size={1} color="#e5e7eb" />
+        {/* <Background gap={24} size={1} /> */}
       </ReactFlow>
       <ImagePreloader imageUrls={thumbnailUrls || []} />
     </div>

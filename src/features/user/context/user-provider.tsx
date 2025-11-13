@@ -5,7 +5,6 @@ import {
   useChapter,
   useUpdateStatus,
   useUserProgress,
-  useVideos,
 } from "../hooks";
 import { useMgSdk } from "../../../hooks/useMgSdk";
 import type { MgUserInfo } from "../../../types/user";
@@ -60,15 +59,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: progress, refetch } = useUserProgress(progressParams);
 
   // Memoize scene IDs array to prevent unnecessary refetches
-  const sceneIds = React.useMemo(
-    () =>
-      Object.values(chapter?.scenes || {})?.map(
-        (scene: any) => scene.filePathId
-      ) || [],
-    [chapter?.scenes]
-  );
+  // const sceneIds = React.useMemo(
+  //   () =>
+  //     Object.values(chapter?.scenes || {})?.map(
+  //       (scene: any) => scene.filePathId
+  //     ) || [],
+  //   [chapter?.scenes]
+  // );
 
-  const { data: videos } = useVideos(sceneIds);
+  // const { data: videos } = useVideos(sceneIds);
 
   const chapterMapped = React.useMemo(() => {
     if (!chapter) return null;
@@ -125,7 +124,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
-  }, [videos, chapter]);
+  }, [chapter]);
 
   const onLogin = React.useCallback((mgUserInfo: MgUserInfo) => {
     console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo);
