@@ -16,11 +16,10 @@ const mapHotspots = (hotspots: any): any[] => {
     ...hotspot,
     items: hotspot.items.map((item: any) => ({
       ...item,
-      x: item.x/100,
-      y: item.y/100,
-
+      x: item.x / 100,
+      y: item.y / 100,
     })),
-  }))
+  }));
 };
 const mapScene = (
   scene: Record<string, Scene> = {},
@@ -33,7 +32,9 @@ const mapScene = (
       [sceneId]: {
         ...scene[sceneId as keyof typeof scene],
         ...(videosProgress && videosProgress[sceneId]),
-        hotspots: mapHotspots(scene[sceneId as keyof typeof scene].hotspots),
+        hotspots: mapHotspots(
+          (scene[sceneId as keyof typeof scene]?.hotspots as any) || []
+        ),
       },
     };
   }, {});

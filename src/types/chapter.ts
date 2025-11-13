@@ -71,6 +71,7 @@ export interface Scene {
   thumbnail: string;
   duration: number;
   order: number;
+  hotspots?: any[];
 }
 
 /** Kiểu dữ liệu gốc cho toàn bộ dự án video tương tác */

@@ -32,7 +32,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [userId, setUserId] = React.useState<string | null>(null);
 
   const { data: chapter } = useChapter(undefined, undefined);
-  console.log("🚀 ~ UserProvider ~ chapter:", chapter);
 
   // Only log when chapter actually changes (by ID, not just reference)
   const prevChapterIdRef = React.useRef<string | undefined>(undefined);
