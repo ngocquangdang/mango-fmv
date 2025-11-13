@@ -1,7 +1,6 @@
 import React, { memo } from "react";
 import {
   ReactFlow,
-  Controls,
   Panel,
   ReactFlowProvider,
   type Node,
@@ -18,7 +17,7 @@ const edgeTypes = { customEdge: CustomEdge };
 
 const FlowChartInner: React.FC = () => {
   const { nodes = [], edges = [], data, thumbnailUrls } = useFlowChart();
-  const { currentSceneId, setCurrentStatus, setPauseType, onPlayPlayer } =
+  const { currentSceneId, setCurrentStatus, setPauseType, onPlayPlayer, currentStatus } =
     useVideoPlayerContext();
 
   const layout = React.useMemo(() => {
@@ -80,26 +79,24 @@ const FlowChartInner: React.FC = () => {
   }, [layout, nodes, currentSceneId]);
   return (
     <div className="h-full w-full relative">
-      {/* Background layer */}
       <div
         className="absolute inset-0 -z-10"
         style={{
           backgroundImage: `linear-gradient(rgba(17, 17, 17, 0) 85%, rgb(17, 17, 17)), url(https://asset.onfan.vn/voting/banner/bannerbanner21.png)`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         }}
       />
-      {/* Full screen shadow overlay to highlight nodes */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           zIndex: -5,
-          boxShadow: 'inset 0 0 200px 100px rgba(0, 0, 0, 0.7)',
+          boxShadow: "inset 0 0 200px 100px rgba(0, 0, 0, 0.7)",
         }}
       />
       <ReactFlow
-        className='bg-red'
+        className="bg-red"
         nodes={decoratedNodes}
         edges={edges.map((e: any) => ({
           ...e,
@@ -110,7 +107,7 @@ const FlowChartInner: React.FC = () => {
         defaultEdgeOptions={{
           type: "smoothstep",
         }}
-        minZoom={0.5}
+        minZoom={0.75}
         maxZoom={1.25}
         defaultViewport={{
           x: 100,
@@ -118,8 +115,12 @@ const FlowChartInner: React.FC = () => {
           zoom: 1.25,
         }}
         onNodeClick={(_, node) => {
-          setCurrentStatus(null);
-          setPauseType(null);
+          if (node.id.includes("unlocked")) return;
+          if (node.id !== currentStatus?.currentSceneId) {
+            setCurrentStatus(null);
+            setPauseType(null);
+          }
+
           onPlayPlayer(node.id);
         }}
         proOptions={{ hideAttribution: true }}
@@ -131,7 +132,7 @@ const FlowChartInner: React.FC = () => {
           {data?.title || "Story Flow"}
         </Panel>
         {/* <MiniMap pannable zoomable className="bg-gray-50!" /> */}
-        <Controls position="bottom-right" />
+        {/* <Controls position="bottom-right" /> */}
         {/* <Background gap={24} size={1} /> */}
       </ReactFlow>
       <ImagePreloader imageUrls={thumbnailUrls || []} />

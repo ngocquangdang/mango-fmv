@@ -9,10 +9,11 @@ import {
 } from "../hooks";
 import { useMgSdk } from "../../../hooks/useMgSdk";
 import type { MgUserInfo } from "../../../types/user";
-import type { Chapter } from "../../../types/chapter";
+import type { ChapterMapped } from "../../../types/chapter";
+import { getLocalParam, saveLocalParams } from "../../../lib/api/storage";
 
 export interface UserContextType {
-  chapter: Chapter;
+  chapter: ChapterMapped;
   loading: boolean;
   userId: string | null;
   refetch: () => void;
@@ -31,9 +32,19 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [userId, setUserId] = React.useState<string | null>(null);
 
-  const { data: chapter } = useChapter(undefined, undefined);
+  const { chapterId: chapterIdFromUrl, projectId: projectIdFromUrl } =
+    React.useMemo(() => {
+      const params = new URLSearchParams(window.location.search);
+      const chapterIdFromUrl = params.get("chapterId");
+      const projectIdFromUrl = params.get("projectId");
+      return {
+        chapterId: chapterIdFromUrl || "",
+        projectId: projectIdFromUrl || "",
+      };
+    }, [window.location.search]);
 
-  // Only log when chapter actually changes (by ID, not just reference)
+  const { data: chapter } = useChapter(projectIdFromUrl, chapterIdFromUrl);
+
   const prevChapterIdRef = React.useRef<string | undefined>(undefined);
   React.useEffect(() => {
     const currentChapterId = chapter?.id;
@@ -42,13 +53,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [chapter]);
 
-  // Memoize chapterId to prevent unnecessary refetches
   const chapterId = React.useMemo(
     () => chapter?.chapterId || "",
     [chapter?.chapterId]
   );
 
-  // Memoize query params to prevent unnecessary refetches
   const progressParams = React.useMemo(
     () => ({
       userId: userId || "",
@@ -59,7 +68,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const { data: progress, refetch } = useUserProgress(progressParams);
 
-  // Memoize scene IDs array to prevent unnecessary refetches
   const sceneIds = React.useMemo(
     () =>
       Object.values(chapter?.scenes || {})?.map(
@@ -69,7 +77,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   const { data: videos } = useVideos(sceneIds);
-  console.log("🚀 ~ UserProvider ~ videos:", videos)
+  console.log("🚀 ~ UserProvider ~ videos:", videos);
 
   const chapterMapped = React.useMemo(() => {
     if (!chapter) return null;
@@ -129,7 +137,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [chapter]);
 
   const onLogin = React.useCallback((mgUserInfo: MgUserInfo) => {
-    console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo);
+    saveLocalParams({
+      ticket: mgUserInfo.ticket || "50BA27D21B1830C2A9E1328624D0EC52",
+    });
     const userId = crypto.randomUUID();
     setUserId(userId);
     setLoading(true);
@@ -163,6 +173,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   React.useEffect(() => {
+    if (!getLocalParam("ticket")) {
+      saveLocalParams({
+        ticket: "50BA27D21B1830C2A9E1328624D0EC52",
+      });
+    }
+  }, []);
+  React.useEffect(() => {
     if (!mgApi) return;
 
     mgApi.login?.(onLogin);
@@ -172,8 +189,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const value: UserContextType = React.useMemo(
     () => ({
       chapter: chapterMapped
-        ? ({ ...chapterMapped, progress } as Chapter)
-        : ({} as Chapter),
+        ? ({ ...chapterMapped, progress } as ChapterMapped)
+        : ({} as ChapterMapped),
       loading,
       userId,
       refetch,

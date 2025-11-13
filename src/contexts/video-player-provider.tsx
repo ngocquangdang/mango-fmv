@@ -1,8 +1,8 @@
 import React from "react";
 import { useVideoPlayer } from "../hooks/useVideoPlayer";
 import { VideoPlayerContext } from ".";
-import type { Scene } from "../data/storyData";
-import { PausedActionName } from "../types/chapter";
+
+import { PausedActionName, type Scene } from "../types/chapter";
 import { useUserContext } from "../features/user/context";
 import {
   clearLocalStorage,
@@ -26,6 +26,7 @@ export interface VideoPlayerContextType {
   setCurrentStatus: React.Dispatch<
     React.SetStateAction<Record<string, any> | null>
   >;
+  currentStatus: Record<string, any> | null;
   onPlayPlayer: (sceneId: string) => void;
   quitPlayer: () => void;
 }
@@ -49,8 +50,8 @@ export const VideoPlayerProvider = ({
   );
 
   const [collectionItems, setCollectionItems] = React.useState<
-    Record<string, any>[]
-  >([]);
+    Record<string, any>
+  >({});
 
   // Ensure we only initialize the VideoPlayer SDK once per api instance
   const initializedRef = React.useRef(false);
@@ -172,20 +173,19 @@ export const VideoPlayerProvider = ({
           )
         );
 
-        setCollectionItems((pre) => ({
-          ...pre,
-          [hotspot.id]: {
-            collectionIds: [
-              ...(pre[hotspot.id]?.collectionIds || []),
-              payload.currentSceneId,
-            ],
-            isCompleted:
-              hotspot.minCollectionItems ===
-              collectionItems[hotspot.id]?.collectionIds.length + 1,
-          },
-        }));
-
-        if (hotspot) {
+        if (hotspot && hotspot.id) {
+          setCollectionItems((pre) => ({
+            ...pre,
+            [hotspot.id]: {
+              collectionIds: [
+                ...(pre[hotspot.id]?.collectionIds || []),
+                payload.currentSceneId,
+              ],
+              isCompleted:
+                hotspot.minCollectionItems ===
+                collectionItems[hotspot.id]?.collectionIds.length + 1,
+            },
+          }));
           handleCollectionItems(hotspot, payload.currentSceneId);
         }
 
@@ -193,7 +193,7 @@ export const VideoPlayerProvider = ({
         onSetCurrentSceneId(previousSceneId);
         clearLocalStorage();
         setTimeout(() => {
-          seekTo(hotspot.startTime);
+          seekTo(hotspot?.startTime || 0);
           play();
         }, 100);
       }
@@ -211,17 +211,24 @@ export const VideoPlayerProvider = ({
 
   const handleChoiceSelected = React.useCallback(
     (sceneId: string, nextSceneId: string) => {
-      const isHotspot = (data.scenes[sceneId]?.hotspots?.length || 0) > 0;
+      const isHotspot = data.hotspotScenes?.includes(nextSceneId);
       if (isHotspot) {
         saveLocalParams({ previousSceneId: sceneId });
       } else {
         clearLocalStorage();
+        updateSceneStatus(
+          sceneId,
+          Math.floor(data.scenes[sceneId]?.duration || 0),
+          Math.floor(data.scenes[sceneId]?.duration || 0),
+          "COMPLETED"
+        );
       }
+
       setCurrentSceneId(nextSceneId);
       setPauseType(null);
       setCurrentStatus(null);
     },
-    [data.scenes]
+    [data.id, updateSceneStatus]
   );
 
   const handleEnded = React.useCallback(
@@ -259,8 +266,9 @@ export const VideoPlayerProvider = ({
       time: data.progress?.currentScene?.watchingSecond || 0,
     });
     setCurrentSceneId(data.progress?.currentScene?.sceneId || null);
+    if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
     setPauseType(null);
-  }, [data.id, data.progress?.currentScene]);
+  }, [data.id, data.progress?.currentScene, pauseType]);
 
   const onInit = React.useCallback(() => {
     if (!api?.play || !data?.id) return;
@@ -271,6 +279,20 @@ export const VideoPlayerProvider = ({
       container: "#interactive-video",
       config: {
         chapter: data,
+        ui: {
+          fonts: {
+            base: "",
+          },
+          choices: {
+            // button:
+            //   `group relative inline-flex items-center justify-center
+            //  !rounded-none text-black border-4 border-black bg-sky-400 px-9 py-8 text-3xl font-bold uppercase
+            //  tracking-widest shadow-[14px_14px_0_0_rgba(0,0,0,1)]
+            //  transition-transform duration-150 ease-out
+            //  hover:-translate-x-[6px] hover:-translate-y-[6px] hover:shadow-[20px_20px_0_0_rgba(0,0,0,1)]
+            //  active:translate-x-[-2px] active:translate-y-[-2px] active:shadow-[8px_8px_0_0_rgba(0,0,0,1)]`,
+          },
+        },
         video: {
           controls: params.get("controls") === "true",
           muted: false,
@@ -327,6 +349,7 @@ export const VideoPlayerProvider = ({
     onSetCurrentSceneId,
     onPlay,
     setCurrentStatus,
+    currentStatus,
     onPlayPlayer,
     quitPlayer,
   };

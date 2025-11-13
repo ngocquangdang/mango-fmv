@@ -25,3 +25,15 @@
 .read-the-docs {
   color: #888;
 }
+/* 
+@font-face {
+  font-family: "CondensedDisplay";
+  src: url("/font/condensed-display.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+html, body {
+  font-family: "CondensedDisplay", sans-serif;
+} */

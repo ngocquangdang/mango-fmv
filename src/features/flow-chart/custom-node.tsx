@@ -13,7 +13,7 @@ const CustomNode = memo(({ data }: CustomNodeProps) => {
 
   return (
     <div
-      className={`w-[140px] h-[140px] rounded-xl border bg-white shadow transition
+      className={`w-[200px] h-[140px] rounded-xl border bg-white shadow transition cursor-pointer
         ${
           isActive
             ? "border-indigo-600 ring-2 ring-indigo-400"
@@ -34,21 +34,21 @@ const CustomNode = memo(({ data }: CustomNodeProps) => {
           <img
             src={data.thumbnail}
             alt="thumbnail"
-            className="w-[140px] h-[140px] rounded-xl object-cover"
+            className="w-[198px] h-[138px] rounded-xl object-cover"
           />
         ) : !data?.id ? (
-          <div className="w-[140px] h-[140px] flex items-center justify-center">
+          <div className="w-[200px] h-[138px] flex items-center justify-center">
             <UnlockIcon className="w-6 h-6 text-gray-500" />
           </div>
         ) : (
-          <div className="h-[140px] w-[140px] rounded-xl bg-gray-100" />
+          <div className="h-[200px] w-[138px] rounded-xl bg-gray-100" />
         )}
         <div className="flex flex-col flex-1 items-center justify-center h-auto">
           <p className="line-clamp-2 text-sm font-medium text-blue-900 bg-amber-50 px-5 py-1 rounded">
             {data?.name ?? ""}
           </p>
           <p className="mt-0.5 text-[11px] text-blue-500">
-            {isActive ? "Now Playing" : data?.subtitle ?? ""}
+            {isActive ? "Đang phát" : data?.subtitle ?? ""}
           </p>
         </div>
       </div>

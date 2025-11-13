@@ -8,8 +8,7 @@ import {
   updateStatus,
 } from "../apis";
 import type { UpdateStatusPayload } from "../apis";
-import type { Chapter, Scene } from "../../../types/chapter";
-import type { Scene as StoryScene } from "../../../data/storyData";
+import type { ChapterMapped, Scene } from "../../../types/chapter";
 
 const mapHotspots = (hotspots: any): any[] => {
   return hotspots.map((hotspot: any) => ({
@@ -22,32 +21,46 @@ const mapHotspots = (hotspots: any): any[] => {
   }));
 };
 const mapScene = (
-  scene: Record<string, Scene> = {},
+  scenes: Record<string, Scene> = {},
   videosProgress: Record<string, any>
-): Record<string, StoryScene> => {
-  const sceneIds = Object.keys(scene);
+): { mappedScene: Record<string, Scene>; hotspotScenes: string[] } => {
+  const sceneIds = Object.keys(scenes);
+  const hotspotScenes: string[] = [];
   const mappedScene = sceneIds.reduce((acc, sceneId) => {
+    const scene: Scene = scenes[sceneId as keyof typeof scene];
+    if (scene.hotspots && scene.hotspots.length > 0) {
+      const ids = scene.hotspots
+        ?.map((hp) => hp.items.map((item) => item.targetSceneId))
+        .flat();
+      hotspotScenes.push(...ids);
+    }
+
     return {
       ...acc,
       [sceneId]: {
-        ...scene[sceneId as keyof typeof scene],
+        ...scenes[sceneId as keyof typeof scene],
         ...(videosProgress && videosProgress[sceneId]),
         hotspots: mapHotspots(
-          (scene[sceneId as keyof typeof scene]?.hotspots) || []
+          scenes[sceneId as keyof typeof scene]?.hotspots || []
         ),
       },
     };
   }, {});
-  return mappedScene;
+  return {
+    mappedScene,
+    hotspotScenes,
+  };
 };
 
 export const mapChapter = (
   chapter: any,
   videosProgress: Record<string, any>
-): Chapter => {
+): ChapterMapped => {
+  const { mappedScene, hotspotScenes } = mapScene(chapter.scenes as Record<string, Scene>, videosProgress);
   return {
     ...chapter,
-    scenes: mapScene(chapter.scenes as Record<string, Scene>, videosProgress),
+    scenes: mappedScene,
+    hotspotScenes,
   };
 };
 

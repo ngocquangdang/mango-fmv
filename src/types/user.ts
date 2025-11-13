@@ -8,7 +8,7 @@ export interface UserInfo {
 export interface MgUserInfo {
   userId: string;
   userName: string;
-  userAvatar: string;
+  ticket: string;
 }
 
 export interface UserProgress {
