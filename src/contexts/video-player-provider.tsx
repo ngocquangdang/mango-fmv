@@ -100,8 +100,8 @@ export const VideoPlayerProvider = ({
             currentSceneId,
           ],
           isCompleted:
-            hotspot.minCollectionItems ===
-            (collectionItems[hotspot.id]?.collectionIds?.length || 0) + 1,
+            (collectionItems[hotspot.id]?.collectionIds?.length || 0) + 1 >=
+            hotspot.minCollectionItems,
         },
       });
     },
@@ -172,6 +172,7 @@ export const VideoPlayerProvider = ({
             (item: any) => item.targetSceneId === payload.currentSceneId
           )
         );
+        console.log("🚀 ~ VideoPlayerProvider ~ hotspot:", hotspot)
 
         if (hotspot && hotspot.id) {
           setCollectionItems((pre) => ({

@@ -115,7 +115,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           sceneId: chapterValues.startSceneId || "",
           watchingSecond: 0,
           totalDuration:
-            chapterValues.sences[chapterValues.startSceneId]?.duration || 0,
+            Math.floor(chapterValues.sences[chapterValues.startSceneId]?.duration || 0),
           status: "INPROGRESS",
           userId: userId || "",
         },
