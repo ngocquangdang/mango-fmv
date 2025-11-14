@@ -148,7 +148,7 @@ export const FlowChartContextProvider = ({
 
     const nodes = (id: string, options: BranchOption[] = []) => {
       const prevNode = scenes[id];
-      if (options.some((option) => scenes[option.targetSceneId].status)) {
+      if (options.some((option) => scenes[option.targetSceneId]?.status)) {
         options.forEach((option, index) => {
           if (scenes[option.targetSceneId]?.status) {
             addNode(option.targetSceneId, {
@@ -168,7 +168,7 @@ export const FlowChartContextProvider = ({
               !(nextNode.hotspots?.length || 0) &&
               !nextNode.branch
             ) {
-              if (!nextNode.status) {
+              if (!nextNode?.status) {
                 addUnlockNode(option.targetSceneId);
                 addUnlockEdge(option.targetSceneId, prevNode.id);
               } else {

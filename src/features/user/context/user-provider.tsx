@@ -101,6 +101,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       id: chapter?.id,
       startSceneId: chapter?.startSceneId,
       exists: !!chapter,
+      sences: chapter?.scenes,
     }),
     [chapter]
   );
@@ -113,7 +114,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           projectId: chapterValues.id || "",
           sceneId: chapterValues.startSceneId || "",
           watchingSecond: 0,
-          totalDuration: 10,
+          totalDuration:
+            chapterValues.sences[chapterValues.startSceneId]?.duration || 0,
           status: "INPROGRESS",
           userId: userId || "",
         },

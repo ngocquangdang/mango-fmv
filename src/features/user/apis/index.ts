@@ -232,7 +232,10 @@ export const getChapters = async () => {
 
 export const getChapter = async (projectId: string, chapterId: string) => {
   const response = await apiClienProject.get(
-    `/projects/${projectId}/chapters/${chapterId}/preview`
+    `/projects/${projectId}/chapters/${chapterId}/preview`,
+    {
+      "X-Ticket": getLocalParam("ticket") || "",
+    }
   );
   return response;
   // return mockProject;
