@@ -182,8 +182,8 @@ export const VideoPlayerProvider = ({
                 payload.currentSceneId,
               ],
               isCompleted:
-                hotspot.minCollectionItems ===
-                collectionItems[hotspot.id]?.collectionIds.length + 1,
+                collectionItems[hotspot.id]?.collectionIds.length + 1 >=
+                hotspot.minCollectionItems,
             },
           }));
           handleCollectionItems(hotspot, payload.currentSceneId);
