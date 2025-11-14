@@ -23,7 +23,7 @@ export const FlowChartContextProvider = ({
   }, [data]);
 
   const thumbnailUrls = React.useMemo(() => {
-    return Object.values(scenes).map((scene: any) => scene.thumbnail);
+    return Object.values(scenes).map((scene: any) => scene.thumbUrl);
   }, [scenes]);
 
   // const { nodes = [], edges = [] } = React.useMemo(() => {

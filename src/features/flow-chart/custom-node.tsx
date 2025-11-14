@@ -30,9 +30,9 @@ const CustomNode = memo(({ data }: CustomNodeProps) => {
         className="bg-transparent! border-0!"
       />
       <div className="flex items-center gap-3 flex-col">
-        {data?.thumbnail ? (
+        {data?.thumbUrl ? (
           <img
-            src={data.thumbnail}
+            src={data.thumbUrl}
             alt="thumbnail"
             className="w-[198px] h-[138px] rounded-xl object-cover"
           />
@@ -41,7 +41,7 @@ const CustomNode = memo(({ data }: CustomNodeProps) => {
             <UnlockIcon className="w-6 h-6 text-gray-500" />
           </div>
         ) : (
-          <div className="h-[200px] w-[138px] rounded-xl bg-gray-100" />
+          <div className="w-[200px] h-[138px] rounded-xl bg-gray-100" />
         )}
         <div className="flex flex-col flex-1 items-center justify-center h-auto">
           <p className="line-clamp-2 text-sm font-medium text-blue-900 bg-amber-50 px-5 py-1 rounded">
