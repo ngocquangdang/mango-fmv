@@ -216,10 +216,15 @@ export const VideoPlayerProvider = ({
       const items = {
         ...collectionItems,
         [hotspotId]: {
-          collectionIds: [...(collectionItems[hotspotId]?.collectionIds || []), collectionItemId],
-          isCompleted: true,
+          collectionIds: [
+            ...(collectionItems[hotspotId]?.collectionIds || []),
+            collectionItemId,
+          ],
+          isCompleted:
+            (collectionItems[hotspotId]?.collectionIds?.length || 0) + 1 >=
+            (collectionItems[hotspotId]?.minCollectionItems || 0),
         },
-      }
+      };
       setCollectionItems(items);
       api?.setCollectionItems?.(items);
     },
