@@ -1,10 +1,5 @@
-// import { Play } from "lucide-react";
 import type { EdgeProps } from "@xyflow/react";
-import {
-  BaseEdge,
-  EdgeLabelRenderer,
-  getSmoothStepPath,
-} from "@xyflow/react";
+import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from "@xyflow/react";
 
 export default function CustomEdge({
   id,

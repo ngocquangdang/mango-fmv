@@ -115,6 +115,8 @@ const FlowChartInner: React.FC = () => {
           zoom: 1.25,
         }}
         onNodeClick={(_, node) => {
+          const scene = data?.scenes[node.id];
+          if (!scene.videoUrl) return;
           if (node.id.includes("unlocked")) return;
           if (node.id !== currentStatus?.currentSceneId) {
             setCurrentStatus(null);
@@ -129,7 +131,7 @@ const FlowChartInner: React.FC = () => {
           position="top-left"
           className="rounded-md bg-white/80 px-2 py-1 text-[11px] shadow"
         >
-          {data?.title || "Story Flow"}
+          {data?.title || "Story"}
         </Panel>
         {/* <MiniMap pannable zoomable className="bg-gray-50!" /> */}
         {/* <Controls position="bottom-right" /> */}

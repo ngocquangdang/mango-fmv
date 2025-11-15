@@ -19,6 +19,7 @@ declare global {
       setAutoplayEnabled?: (enabled: boolean) => void;
       setCurrentSceneId?: (sceneId: string) => void;
       setCollectionItems?: (collectionItems: Record<string, any>) => void;
+      onCollectionSelected?: (cb: (collectionItemId: string) => void) => () => void;
     };
   }
 }

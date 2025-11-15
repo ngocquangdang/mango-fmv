@@ -13,8 +13,10 @@ import type { ChapterMapped, Scene } from "../../../types/chapter";
 const mapHotspots = (hotspots: any): any[] => {
   return hotspots.map((hotspot: any) => ({
     ...hotspot,
-    items: hotspot.items.map((item: any) => ({
+    items: hotspot.items.map((item: any, index: number) => ({
       ...item,
+      id: hotspot.id + "_item_" + index,
+      type: hotspot.type,
       x: item.x / 100,
       y: item.y / 100,
     })),
@@ -22,7 +24,8 @@ const mapHotspots = (hotspots: any): any[] => {
 };
 const mapScene = (
   scenes: Record<string, Scene> = {},
-  videosProgress: Record<string, any>
+  videosProgress: Record<string, any>,
+  videos: Record<string, any>
 ): { mappedScene: Record<string, Scene>; hotspotScenes: string[] } => {
   const sceneIds = Object.keys(scenes);
   const hotspotScenes: string[] = [];
@@ -40,6 +43,7 @@ const mapScene = (
       [sceneId]: {
         ...scenes[sceneId as keyof typeof scene],
         ...(videosProgress && videosProgress[sceneId]),
+        ...(videos && videos[sceneId]),
         hotspots: mapHotspots(
           scenes[sceneId as keyof typeof scene]?.hotspots || []
         ),
@@ -54,9 +58,14 @@ const mapScene = (
 
 export const mapChapter = (
   chapter: any,
-  videosProgress: Record<string, any>
+  videosProgress: Record<string, any>,
+  videos: Record<string, any>
 ): ChapterMapped => {
-  const { mappedScene, hotspotScenes } = mapScene(chapter.scenes as Record<string, Scene>, videosProgress);
+  const { mappedScene, hotspotScenes } = mapScene(
+    chapter.scenes as Record<string, Scene>,
+    videosProgress,
+    videos
+  );
   return {
     ...chapter,
     scenes: mappedScene,
@@ -107,7 +116,7 @@ export const useChapter = (
   const { data, ...rest } = useQuery({
     queryKey: ["chapter", projectId, chapterId],
     queryFn: () => getChapter(projectId, chapterId),
-    // enabled: !!chapterId,
+    enabled: !!chapterId,
   });
 
   // Memoize the transformed data to prevent creating new objects on every render

@@ -172,7 +172,6 @@ export const VideoPlayerProvider = ({
             (item: any) => item.targetSceneId === payload.currentSceneId
           )
         );
-        console.log("🚀 ~ VideoPlayerProvider ~ hotspot:", hotspot)
 
         if (hotspot && hotspot.id) {
           setCollectionItems((pre) => ({
@@ -208,6 +207,23 @@ export const VideoPlayerProvider = ({
       handleCollectionItems,
       collectionItems,
     ]
+  );
+
+  const handleCollectionSelected = React.useCallback(
+    (collectionItemId: string) => {
+      console.log("🚀 ~ [HOTSPOT COLLECTION]", collectionItemId);
+      const [hotspotId] = collectionItemId.split("_item_");
+      const items = {
+        ...collectionItems,
+        [hotspotId]: {
+          collectionIds: [...(collectionItems[hotspotId]?.collectionIds || []), collectionItemId],
+          isCompleted: true,
+        },
+      }
+      setCollectionItems(items);
+      api?.setCollectionItems?.(items);
+    },
+    [api, collectionItems]
   );
 
   const handleChoiceSelected = React.useCallback(
@@ -293,6 +309,12 @@ export const VideoPlayerProvider = ({
             //  hover:-translate-x-[6px] hover:-translate-y-[6px] hover:shadow-[20px_20px_0_0_rgba(0,0,0,1)]
             //  active:translate-x-[-2px] active:translate-y-[-2px] active:shadow-[8px_8px_0_0_rgba(0,0,0,1)]`,
           },
+          ping: {
+            enabled: false,
+            showLabel: false,
+            position: "top-right",
+            interval: 3000, // Check every 3 seconds
+          },
         },
         video: {
           controls: params.get("controls") === "true",
@@ -322,19 +344,30 @@ export const VideoPlayerProvider = ({
     const offStop = api.onPause?.(handleStop);
     const offEnded = api.onEnded?.(handleEnded);
     const offChoice = api.onChoiceSelected?.(handleChoiceSelected);
+    const offCollectionSelected = api.onCollectionSelected?.(
+      handleCollectionSelected
+    );
 
     unsubRef.current.push(
       offStart ?? (() => {}),
       offStop ?? (() => {}),
       offEnded ?? (() => {}),
-      offChoice ?? (() => {})
+      offChoice ?? (() => {}),
+      offCollectionSelected ?? (() => {})
     );
 
     return () => {
       unsubRef.current.forEach((fn) => fn?.());
       unsubRef.current = [];
     };
-  }, [api, handleStart, handleStop, handleChoiceSelected, handleEnded]);
+  }, [
+    api,
+    handleStart,
+    handleStop,
+    handleChoiceSelected,
+    handleEnded,
+    handleCollectionSelected,
+  ]);
 
   const value: VideoPlayerContextType = {
     type,

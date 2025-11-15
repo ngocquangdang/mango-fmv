@@ -17,6 +17,11 @@ export const FlowChartContextProvider = ({
   children: React.ReactNode;
 }) => {
   const { chapter: data } = useUserContext();
+  const isPreview = React.useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    const isPreview = params.get("isPreview");
+    return isPreview === "true";
+  }, []);
 
   const scenes = React.useMemo(() => {
     return data?.scenes || ({} as Record<string, Scene>);
@@ -148,9 +153,12 @@ export const FlowChartContextProvider = ({
 
     const nodes = (id: string, options: BranchOption[] = []) => {
       const prevNode = scenes[id];
-      if (options.some((option) => scenes[option.targetSceneId]?.status)) {
+      if (
+        options.some((option) => scenes[option.targetSceneId]?.status) ||
+        isPreview
+      ) {
         options.forEach((option, index) => {
-          if (scenes[option.targetSceneId]?.status) {
+          if (scenes[option.targetSceneId]?.status || isPreview) {
             addNode(option.targetSceneId, {
               ...scenes[option.targetSceneId],
               ...option,
@@ -168,16 +176,9 @@ export const FlowChartContextProvider = ({
               !(nextNode.hotspots?.length || 0) &&
               !nextNode.branch
             ) {
-              if (!nextNode?.status) {
+              if (!nextNode?.status && !isPreview) {
                 addUnlockNode(option.targetSceneId);
                 addUnlockEdge(option.targetSceneId, prevNode.id);
-              } else {
-                // addNode(option.targetSceneId, { ...nextNode });
-                // addEdge(
-                //   `${id}->${option.targetSceneId}`,
-                //   id,
-                //   option.targetSceneId
-                // );
               }
             }
           }

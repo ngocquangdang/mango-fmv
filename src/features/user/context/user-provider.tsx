@@ -30,18 +30,24 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mutate: updateStatus } = useUpdateStatus();
 
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [userId, setUserId] = React.useState<string | null>(null);
+  // const [userId, setUserId] = React.useState<string | null>(null);
 
-  const { chapterId: chapterIdFromUrl, projectId: projectIdFromUrl } =
-    React.useMemo(() => {
-      const params = new URLSearchParams(window.location.search);
-      const chapterIdFromUrl = params.get("chapterId");
-      const projectIdFromUrl = params.get("projectId");
-      return {
-        chapterId: chapterIdFromUrl || "",
-        projectId: projectIdFromUrl || "",
-      };
-    }, [window.location.search]);
+  const {
+    chapterId: chapterIdFromUrl,
+    projectId: projectIdFromUrl,
+    userId: userIdFromUrl,
+  } = React.useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    const chapterIdFromUrl = params.get("chapterId");
+    const projectIdFromUrl = params.get("projectId");
+    const userIdFromUrl = params.get("userId") || crypto.randomUUID();
+
+    return {
+      chapterId: chapterIdFromUrl || "",
+      projectId: projectIdFromUrl || "",
+      userId: userIdFromUrl || "",
+    };
+  }, [window.location.search]);
 
   const { data: chapter } = useChapter(projectIdFromUrl, chapterIdFromUrl);
 
@@ -60,39 +66,25 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const progressParams = React.useMemo(
     () => ({
-      userId: userId || "",
+      userId: userIdFromUrl || "",
       chapterId: chapterId,
     }),
-    [userId, chapterId]
+    [userIdFromUrl, chapterId]
   );
 
   const { data: progress, refetch } = useUserProgress(progressParams);
 
   const sceneIds = React.useMemo(
-    () =>
-      Object.values(chapter?.scenes || {})?.map(
-        (scene: any) => scene.filePathId
-      ) || [],
-    [chapter?.scenes]
+    () => Object.keys(chapter?.scenes || {}),
+    [chapter]
   );
 
   const { data: videos } = useVideos(sceneIds);
-  console.log("🚀 ~ UserProvider ~ videos:", videos);
 
   const chapterMapped = React.useMemo(() => {
     if (!chapter) return null;
-    return mapChapter(chapter, progress?.scenes || {});
-  }, [chapter, progress?.scenes]);
-
-  // Only run once on mount to get userId from URL
-  React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const userIdFromUrl = params.get("userId");
-    if (userIdFromUrl && !userId) {
-      setUserId(userIdFromUrl);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+    return mapChapter(chapter, progress?.scenes || {}, videos || {});
+  }, [chapter, progress?.scenes, videos]);
 
   // Memoize chapter values to prevent unnecessary effect triggers
   const chapterValues = React.useMemo(
@@ -107,17 +99,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   React.useEffect(() => {
-    if (chapterValues.exists && !progress?.currentScene && userId) {
+    if (chapterValues.exists && !progress?.currentScene && userIdFromUrl) {
       updateStatus(
         {
           chapterId: chapterValues.chapterId || "",
           projectId: chapterValues.id || "",
           sceneId: chapterValues.startSceneId || "",
           watchingSecond: 0,
-          totalDuration:
-            Math.floor(chapterValues.sences[chapterValues.startSceneId]?.duration || 0),
+          totalDuration: Math.floor(
+            chapterValues.sences[chapterValues.startSceneId]?.duration || 0
+          ),
           status: "INPROGRESS",
-          userId: userId || "",
+          userId: userIdFromUrl || "",
         },
         {
           onSuccess: () => {
@@ -126,7 +119,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
       );
     }
-  }, [chapterValues, updateStatus, refetch, progress?.currentScene, userId]);
+  }, [
+    chapterValues,
+    updateStatus,
+    refetch,
+    progress?.currentScene,
+    userIdFromUrl,
+  ]);
 
   React.useEffect(() => {
     // if (videos && chapter) {
@@ -142,8 +141,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     saveLocalParams({
       ticket: mgUserInfo.ticket || "50BA27D21B1830C2A9E1328624D0EC52",
     });
-    const userId = crypto.randomUUID();
-    setUserId(userId);
+    // const userId = crypto.randomUUID();
+    // setUserId(userId);
     setLoading(true);
   }, []);
 
@@ -162,7 +161,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           totalDuration,
           sceneId,
           status,
-          userId: userId || "",
+          userId: userIdFromUrl || "",
         },
         {
           onSuccess: () => {
@@ -171,7 +170,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
       );
     },
-    [updateStatus, userId, refetch, chapter]
+    [updateStatus, userIdFromUrl, refetch, chapter]
   );
 
   React.useEffect(() => {
@@ -194,11 +193,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         ? ({ ...chapterMapped, progress } as ChapterMapped)
         : ({} as ChapterMapped),
       loading,
-      userId,
+      userId: userIdFromUrl,
       refetch,
       updateSceneStatus,
     }),
-    [chapterMapped, progress, loading, userId, refetch, updateSceneStatus]
+    [
+      chapterMapped,
+      progress,
+      loading,
+      userIdFromUrl,
+      refetch,
+      updateSceneStatus,
+    ]
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
