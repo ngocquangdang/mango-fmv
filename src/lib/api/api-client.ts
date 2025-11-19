@@ -158,7 +158,7 @@ export const apiClientInteractiveLicense = new FetchApiClient(
   "https://interactive-license-stg.onidservice.cloud/api/v1"
 );
 export const apiClientVideoProgress = new FetchApiClient(
-  "https://video-progress-api-jsgjs7nrvq-as.a.run.app/api/v1"
+  "https://interactive-video-mango.onidservice.cloud/api/v1"
 );
 
 export const apiClienProject = new FetchApiClient(
