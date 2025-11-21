@@ -162,7 +162,7 @@ export const apiClientVideoProgress = new FetchApiClient(
 );
 
 export const apiClienProject = new FetchApiClient(
-  "https://interactive-video-editor-ac-stg.onidservice.cloud/api/v1"
+  "https://onlala-cms-api-stg.onidservice.cloud/api/v1"
 );
 
 export type { ApiResponse as ApiResponseType };
