@@ -11,8 +11,16 @@ import {
 } from "../lib/api/storage";
 
 export interface VideoPlayerContextType {
-  type: "intro" | "interactive";
-  setType: (type: "intro" | "interactive") => void;
+  type: "intro" | "interactive" | "story" | "journal" | "ranking" | "playAgain";
+  setType: (
+    type:
+      | "intro"
+      | "interactive"
+      | "story"
+      | "journal"
+      | "ranking"
+      | "playAgain"
+  ) => void;
   currentSceneId: string | null;
   clips: Record<string, Scene>;
   play: () => void;
@@ -39,7 +47,9 @@ export const VideoPlayerProvider = ({
   const { api, ready } = useVideoPlayer();
   const { chapter: data, updateSceneStatus } = useUserContext();
 
-  const [type, setType] = React.useState<"intro" | "interactive">("intro");
+  const [type, setType] = React.useState<
+    "intro" | "interactive" | "story" | "journal" | "ranking" | "playAgain"
+  >("intro");
   const [pauseType, setPauseType] = React.useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = React.useState<Record<
     string,

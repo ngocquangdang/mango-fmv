@@ -11,14 +11,27 @@ import { useFlowChart } from "./context";
 import { FlowChartContextProvider } from "./context/flow-chart-provider";
 import { useVideoPlayerContext } from "../../contexts";
 import CustomEdge from "./custom-edge";
+import ButtonUI from "../../components/button-ui";
+import ButtonLighter from "../../components/button-lighter";
+import NoteLeft from "../../components/note-left";
+import Tab from "../../components/tab";
+import { PixelProgress } from "../../components/pixel-progress";
+import DetailItem from "../../components/detail-item";
+import DetailCollection from "../../components/detail-collection";
+import DetailImage from '../../components/detail-image';
 
 const nodeTypes = { customNode: CustomNode };
 const edgeTypes = { customEdge: CustomEdge };
 
 const FlowChartInner: React.FC = () => {
   const { nodes = [], edges = [], data, thumbnailUrls } = useFlowChart();
-  const { currentSceneId, setCurrentStatus, setPauseType, onPlayPlayer, currentStatus } =
-    useVideoPlayerContext();
+  const {
+    currentSceneId,
+    setCurrentStatus,
+    setPauseType,
+    onPlayPlayer,
+    currentStatus,
+  } = useVideoPlayerContext();
 
   const layout = React.useMemo(() => {
     const startId = data?.startSceneId;
@@ -133,9 +146,6 @@ const FlowChartInner: React.FC = () => {
         >
           {data?.title || "Story"}
         </Panel>
-        {/* <MiniMap pannable zoomable className="bg-gray-50!" /> */}
-        {/* <Controls position="bottom-right" /> */}
-        {/* <Background gap={24} size={1} /> */}
       </ReactFlow>
       <ImagePreloader imageUrls={thumbnailUrls || []} />
     </div>

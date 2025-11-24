@@ -7,6 +7,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -25,7 +26,8 @@
 .read-the-docs {
   color: #888;
 }
-/* 
+
+
 @font-face {
   font-family: "CondensedDisplay";
   src: url("/font/condensed-display.ttf") format("truetype");
@@ -34,6 +36,281 @@
   font-display: swap;
 }
 
-html, body {
+html,
+body {
   font-family: "CondensedDisplay", sans-serif;
-} */
+}
+
+.button {
+  width: 100%;
+  height: 111px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  font-size: 27.4px;
+  color: #fff;
+  font-family: 'Ari-W9500 Display';
+}
+
+.subtract {
+  position: absolute;
+  height: calc(100% - 20px);
+  width: calc(100% - 20px);
+  top: 10px;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  background-color: #fa7036;
+}
+
+.subtract-child {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 10px;
+  right: -10px;
+  bottom: -10px;
+  left: 10px;
+  background-color: #d9d9d9;
+  flex-shrink: 0;
+}
+
+.subtract-item {
+  position: absolute;
+  top: 0px;
+  right: -20px;
+  background-color: #d9d9d9;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.subtract-inner {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: #d9d9d9;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.rectangle-div {
+  position: absolute;
+  right: -20px;
+  bottom: -20px;
+  background-color: #d9d9d9;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.button-subtract-child {
+  position: absolute;
+  bottom: -20px;
+  left: 0px;
+  background-color: #d9d9d9;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.rectangle-parent {
+  position: absolute;
+  width: 100%;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+  height: 111px;
+}
+
+.group-child {
+  position: absolute;
+  width: calc(100% - 40px);
+  top: 0px;
+  right: 20px;
+  left: 20px;
+  background-color: #111;
+  height: 10px;
+}
+
+.group-item {
+  position: absolute;
+  width: calc(100% - 40px);
+  right: 20px;
+  bottom: 0px;
+  left: 20px;
+  background-color: #111;
+  height: 10px;
+}
+
+.group-inner {
+  position: absolute;
+  height: calc(100% - 101px);
+  top: 91px;
+  right: -61px;
+  bottom: 10px;
+  background-color: #111;
+  width: 71px;
+  transform: rotate(-90deg);
+  transform-origin: 0 0;
+}
+
+.button-group-child {
+  position: absolute;
+  height: calc(100% - 101px);
+  top: 91px;
+  bottom: 10px;
+  left: 10px;
+  background-color: #111;
+  width: 71px;
+  transform: rotate(-90deg);
+  transform-origin: 0 0;
+}
+
+.group-child2 {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  background-color: #111;
+  width: 10px;
+  height: 10px;
+  transform: rotate(180deg);
+  transform-origin: 0 0;
+}
+
+.group-child3 {
+  position: absolute;
+  top: 10px;
+  right: 0px;
+  background-color: #111;
+  width: 10px;
+  height: 10px;
+  transform: rotate(180deg);
+  transform-origin: 0 0;
+}
+
+.rectangle-group {
+  position: absolute;
+  width: calc(100% - 40px);
+  top: 20px;
+  right: 20px;
+  left: 20px;
+  height: 20px;
+}
+
+.group-child4 {
+  position: absolute;
+  width: calc(100% - 20px);
+  top: 0px;
+  right: 10px;
+  left: 10px;
+  background-color: #f0c446;
+  height: 10px;
+}
+
+.group-child5 {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #f0c446;
+  width: 10px;
+  height: 10px;
+  transform: rotate(180deg);
+  transform-origin: 0 0;
+}
+
+.group-child6 {
+  position: absolute;
+  top: 10px;
+  right: -10px;
+  background-color: #f0c446;
+  width: 10px;
+  height: 10px;
+  transform: rotate(180deg);
+  transform-origin: 0 0;
+}
+
+.group-child7 {
+  position: absolute;
+  bottom: 0px;
+  left: 20px;
+  background-color: #111;
+  width: 10px;
+  height: 10px;
+  transform: rotate(180deg);
+  transform-origin: 0 0;
+}
+
+.group-child8 {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  background-color: #111;
+  width: 10px;
+  height: 10px;
+  transform: rotate(180deg);
+  transform-origin: 0 0;
+}
+
+.rectangle-container {
+  position: absolute;
+  width: calc(100% - 20px);
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  height: 20px;
+}
+
+.group-child9 {
+  position: absolute;
+  width: calc(100% - 20px);
+  right: 10px;
+  bottom: 0px;
+  left: 10px;
+  background-color: #ce4d2a;
+  height: 10px;
+}
+
+.group-child10 {
+  position: absolute;
+  bottom: 0px;
+  left: 10px;
+  background-color: #ce4d2a;
+  width: 10px;
+  height: 10px;
+  transform: rotate(180deg);
+  transform-origin: 0 0;
+}
+
+.group-child11 {
+  position: absolute;
+  right: -10px;
+  bottom: 0px;
+  background-color: #ce4d2a;
+  width: 10px;
+  height: 10px;
+  transform: rotate(180deg);
+  transform-origin: 0 0;
+}
+
+.button-wrapper {
+  position: absolute;
+  top: calc(50% - 27.5px);
+  left: calc(50% - 147.5px);
+  width: 296px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.button2 {
+  position: relative;
+}
+
+.swiper-wrapper {
+  width: fit-content !important;
+}
