@@ -197,8 +197,7 @@ export const FlowChartContextProvider = ({
     }
     return { nodes: nodeList, edges: edgeList };
   }, [scenes, data?.startSceneId]);
-  console.log("nodes2", nodes2);
-  console.log("edges2", edges2);
+
   const value: FlowChartContextType = {
     nodes: nodes2,
     edges: edges2,

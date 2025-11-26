@@ -16,7 +16,8 @@ import Note from "./features/note";
 import Loading from "./components/loading";
 import EndChapter from "./features/end-chapter/end-chapter";
 import DialogConfirm from "./components/ui/dialog/dialog-confirm";
-import { useToast } from './components/ui/toast/use-toast';
+import { useToast } from "./components/ui/toast/use-toast";
+import backgroundImage from "./assets/bg.png";
 
 function App() {
   const { loading, updateSceneStatus } = useUserContext();
@@ -32,7 +33,6 @@ function App() {
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const { showToast } = useToast();
 
-  const backgroundImage = "/src/assets/bg.png";
   const handleBack = () => {
     if (type === "interactive") {
       setDialogName("quitPlayer");
