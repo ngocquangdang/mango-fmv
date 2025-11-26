@@ -23,6 +23,7 @@ export interface Hotspot {
   id: string;
   items: HotspotItem[];
   minCollectionItems: number;
+  returnToSource: boolean;
   sceneId: string;
   startTime: number;
   type: string;
@@ -74,6 +75,7 @@ export enum PausedActionName {
   DECISION_POINT_REACHED = "DECISION_POINT_REACHED",
   VIDEO_ENDED = "VIDEO_ENDED",
   USER_PAUSED_VIDEO = "USER_PAUSED_VIDEO",
+  END_REVIEW="END_REVIEW"
 }
 
 export enum SceneType {

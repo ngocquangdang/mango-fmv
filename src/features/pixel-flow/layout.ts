@@ -9,7 +9,7 @@ const nodeHeight = 200;
 
 export const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'LR') => {
   const isHorizontal = direction === 'LR';
-  dagreGraph.setGraph({ rankdir: direction });
+  dagreGraph.setGraph({ rankdir: direction, ranksep: 250, nodesep: 100 });
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
@@ -36,6 +36,55 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'L
     };
 
     return newNode;
+  });
+
+  // Center child nodes vertically around their parent
+  const nodeMap = new Map(layoutedNodes.map(n => [n.id, n]));
+  const processedChildren = new Set<string>();
+  
+  layoutedNodes.forEach((parentNode) => {
+    // Find all children of this node
+    const childEdges = edges.filter(e => e.source === parentNode.id);
+    const children = childEdges
+      .map(e => nodeMap.get(e.target))
+      .filter((n): n is typeof layoutedNodes[0] => n !== undefined && !processedChildren.has(n.id));
+    
+    if (children.length === 0) return;
+    
+    // Sort children by their original Y position to maintain order
+    children.sort((a, b) => (a?.position?.y || 0) - (b?.position?.y || 0));
+    
+    // Calculate parent's vertical center (middle of the node)
+    const parentCenterY = parentNode.position.y + nodeHeight / 2;
+    
+    if (children.length === 1) {
+      // Single child: center it with parent
+      const child = children[0];
+      if (child?.position) {
+        child.position.y = parentCenterY - nodeHeight / 2;
+        processedChildren.add(child.id);
+      }
+    } else {
+      // Multiple children: distribute evenly around parent center
+      const verticalSpacing = 350; // Space between children centers
+      
+      // Calculate total vertical span of all children
+      const totalSpan = verticalSpacing * (children.length - 1);
+      
+      // Start position: parent center minus half the total span
+      const firstChildCenterY = parentCenterY - (totalSpan / 2);
+      
+      children.forEach((child, index) => {
+        if (child?.position) {
+          const childCenterY = firstChildCenterY + (index * verticalSpacing);
+          child.position.y = childCenterY - nodeHeight / 2;
+          processedChildren.add(child.id);
+          
+          // Debug logging
+          console.log(`Parent ${parentNode.id} center: ${parentCenterY}, Child ${child.id} center: ${childCenterY}`);
+        }
+      });
+    }
   });
 
   return { nodes: layoutedNodes, edges };

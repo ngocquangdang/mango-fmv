@@ -21,11 +21,13 @@ export default function YieldGrid({ items, onItemClick }: YieldGridProps) {
   const handleNext = () => {
     swiperRef.current?.slideNext();
   };
+  if (!items.length) return null;
   return (
-    <div className="flex items-center gap-8">
-      <button onClick={handlePrev} className={`w-10 h-10 `}>
-        <ArrowLeft width={40} height={40} />
-      </button>
+    <div className="flex items-center gap-8 justify-center">
+      <button className={`min-w-10 h-10 `}>
+        {
+          items.length > 8 && <ArrowLeft width={40} height={40} onClick={handlePrev} />
+        }  </button>
       <Swiper
         modules={[Grid, Navigation]}
         slidesPerView={4}
@@ -49,9 +51,11 @@ export default function YieldGrid({ items, onItemClick }: YieldGridProps) {
           </SwiperSlide>
         ))}
       </Swiper>
-      <button onClick={handleNext} className={`w-10 h-10 `}>
-        <ArrowRight width={40} height={40} />
-      </button>
+      <button className={`min-w-10 h-10`}>
+        {
+          items.length > 8 && <ArrowRight width={40} height={40} onClick={handleNext} />
+        }  </button>
+
     </div>
   );
 }

@@ -5,13 +5,21 @@ import { VideoPlayerContext } from ".";
 import { PausedActionName, type Scene } from "../types/chapter";
 import { useUserContext } from "../features/user/context";
 import {
-  clearLocalStorage,
   getLocalParam,
+  removeLocalParam,
   saveLocalParams,
 } from "../lib/api/storage";
+import ButtonLighter from "../components/button-lighter";
 
 export interface VideoPlayerContextType {
-  type: "intro" | "interactive" | "story" | "journal" | "ranking" | "playAgain";
+  type:
+    | "intro"
+    | "interactive"
+    | "story"
+    | "journal"
+    | "ranking"
+    | "playAgain"
+    | "endChapter";
   setType: (
     type:
       | "intro"
@@ -20,11 +28,13 @@ export interface VideoPlayerContextType {
       | "journal"
       | "ranking"
       | "playAgain"
+      | "endChapter"
   ) => void;
   currentSceneId: string | null;
   clips: Record<string, Scene>;
   play: () => void;
   pause: () => void;
+  seekTo: (time: number, mode?: "absolute" | "relative") => void;
   pauseType: string | null;
   setPauseType: React.Dispatch<React.SetStateAction<string | null>>;
   ready: boolean;
@@ -37,6 +47,8 @@ export interface VideoPlayerContextType {
   currentStatus: Record<string, any> | null;
   onPlayPlayer: (sceneId: string) => void;
   quitPlayer: () => void;
+  setReviewScene: (status: boolean) => void;
+  isReviewScene: boolean;
 }
 
 export const VideoPlayerProvider = ({
@@ -48,7 +60,13 @@ export const VideoPlayerProvider = ({
   const { chapter: data, updateSceneStatus } = useUserContext();
 
   const [type, setType] = React.useState<
-    "intro" | "interactive" | "story" | "journal" | "ranking" | "playAgain"
+    | "intro"
+    | "interactive"
+    | "story"
+    | "journal"
+    | "ranking"
+    | "playAgain"
+    | "endChapter"
   >("intro");
   const [pauseType, setPauseType] = React.useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = React.useState<Record<
@@ -62,7 +80,7 @@ export const VideoPlayerProvider = ({
   const [collectionItems, setCollectionItems] = React.useState<
     Record<string, any>
   >({});
-
+  const [isReviewScene, setIsReviewScene] = React.useState(false);
   // Ensure we only initialize the VideoPlayer SDK once per api instance
   const initializedRef = React.useRef(false);
   const unsubRef = React.useRef<Array<() => void>>([]);
@@ -78,9 +96,9 @@ export const VideoPlayerProvider = ({
   }, [api]);
 
   const seekTo = React.useCallback(
-    (time: number) => {
+    (time: number, mode?: "absolute" | "relative") => {
       if (!api) return;
-      api.seek?.(time);
+      api.seek?.(time, mode);
     },
     [api]
   );
@@ -89,6 +107,15 @@ export const VideoPlayerProvider = ({
     if (!api) return;
     api.setAutoplayEnabled?.(true);
   }, [api]);
+
+  const setReviewScene = React.useCallback(
+    (status: boolean) => {
+      if (!api) return;
+      api.setReviewScene?.(status);
+      setIsReviewScene(status);
+    },
+    [api, setIsReviewScene]
+  );
 
   const onSetCurrentSceneId = React.useCallback(
     (sceneId: string) => {
@@ -182,7 +209,7 @@ export const VideoPlayerProvider = ({
             (item: any) => item.targetSceneId === payload.currentSceneId
           )
         );
-
+        if (hotspot && !hotspot.returnToSource) return;
         if (hotspot && hotspot.id) {
           setCollectionItems((pre) => ({
             ...pre,
@@ -201,7 +228,7 @@ export const VideoPlayerProvider = ({
 
         console.log("🚀 ~ [PLAY BACK]");
         onSetCurrentSceneId(previousSceneId);
-        clearLocalStorage();
+        removeLocalParam("previousSceneId");
         setTimeout(() => {
           seekTo(hotspot?.startTime || 0);
           play();
@@ -221,7 +248,7 @@ export const VideoPlayerProvider = ({
 
   const handleCollectionSelected = React.useCallback(
     (collectionItemId: string) => {
-      console.log("🚀 ~ [HOTSPOT COLLECTION]", collectionItemId);
+      console.log("🚀 ~ [HOTSPOT COLLECTION ITEM]", collectionItemId);
       const [hotspotId] = collectionItemId.split("_item_");
       const items = {
         ...collectionItems,
@@ -237,6 +264,9 @@ export const VideoPlayerProvider = ({
       };
       setCollectionItems(items);
       api?.setCollectionItems?.(items);
+      if (items[hotspotId].isCompleted) {
+        play();
+      }
     },
     [api, collectionItems]
   );
@@ -247,7 +277,7 @@ export const VideoPlayerProvider = ({
       if (isHotspot) {
         saveLocalParams({ previousSceneId: sceneId });
       } else {
-        clearLocalStorage();
+        removeLocalParam("previousSceneId");
         updateSceneStatus(
           sceneId,
           Math.floor(data.scenes[sceneId]?.duration || 0),
@@ -307,6 +337,22 @@ export const VideoPlayerProvider = ({
     console.log("Init player");
     const params = new URLSearchParams(window.location.search);
 
+    function ChoiceButtonWrapper({
+      choice,
+      onClick,
+      onKeyDown,
+    }: {
+      choice: any;
+      onClick: () => void;
+      onKeyDown: () => void;
+    }) {
+      return (
+        <ButtonLighter onClick={onClick} onKeyDown={onKeyDown}>
+          {choice.text}
+        </ButtonLighter>
+      );
+    }
+
     api.onInit?.({
       container: "#interactive-video",
       config: {
@@ -316,13 +362,7 @@ export const VideoPlayerProvider = ({
             base: "",
           },
           choices: {
-            // button:
-            //   `group relative inline-flex items-center justify-center
-            //  !rounded-none text-black border-4 border-black bg-sky-400 px-9 py-8 text-3xl font-bold uppercase
-            //  tracking-widest shadow-[14px_14px_0_0_rgba(0,0,0,1)]
-            //  transition-transform duration-150 ease-out
-            //  hover:-translate-x-[6px] hover:-translate-y-[6px] hover:shadow-[20px_20px_0_0_rgba(0,0,0,1)]
-            //  active:translate-x-[-2px] active:translate-y-[-2px] active:shadow-[8px_8px_0_0_rgba(0,0,0,1)]`,
+            buttonComponent: ChoiceButtonWrapper,
           },
           ping: {
             enabled: false,
@@ -391,6 +431,7 @@ export const VideoPlayerProvider = ({
     currentSceneId,
     play,
     pause,
+    seekTo,
     pauseType,
     setPauseType,
     ready,
@@ -401,6 +442,8 @@ export const VideoPlayerProvider = ({
     currentStatus,
     onPlayPlayer,
     quitPlayer,
+    setReviewScene,
+    isReviewScene,
   };
   return (
     <VideoPlayerContext.Provider value={value}>

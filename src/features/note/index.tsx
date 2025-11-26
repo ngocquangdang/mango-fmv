@@ -5,9 +5,10 @@ import CharacterCard from "./components/character-card";
 import CharacterActiveCard from "./components/character-active-card";
 import YieldGrid from "./components/yield-grid";
 import NoteGrid from "./components/note-grid";
-import DetailDialog from "../../components/detail-dialog";
 
 import Banner from "../../components/banner";
+import { DetailDialogProvider } from "../../components/ui/dialog/detail-dialog-context";
+import { useDetailDialog } from "../../components/ui/dialog/use-detail-dialog";
 
 const tabBlocks: TabBlockConfig[] = [
   {
@@ -183,7 +184,7 @@ const tabContentData: Record<
   ],
 };
 
-export default function Note() {
+function Note() {
   const [activeChar, setActiveChar] = useState<string>("Thái Lê Minh Hiếu");
   const [activeTab, setActiveTab] = useState<string>(tabBlocks[0]?.key ?? "");
 
@@ -234,13 +235,8 @@ export default function Note() {
       imageSrc: "https://picsum.photos/200/300",
     },
   ];
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<{
-    id: string;
-    label?: string;
-    imageSrc: string;
-    isActive?: boolean;
-  } | null>(null);
+
+  const { openDetailDialog } = useDetailDialog();
 
   const handleItemClick = (item: {
     id: string;
@@ -248,21 +244,20 @@ export default function Note() {
     imageSrc: string;
     isActive?: boolean;
   }) => {
-    setSelectedItem(item);
-    setDialogOpen(true);
+    openDetailDialog({
+      type: activeTab === "tab-standard-0" ? "collection" : "image",
+      rowLabel: item.label,
+      sectionLabel: item.label,
+    });
   };
 
   const selectedChar = chars.find((char) => char.name === activeChar);
   const currentTabContent = tabContentData[activeTab] || [];
 
-
   return (
     <div className="flex relative w-full justify-center items-center">
       <div style={{ width: "fit-content" }}>
-        <Banner
-          className="fixed top-0 left-[37%] z-10 "
-          text="Nhật ký"
-        />
+        <Banner className="fixed top-0 left-[37%] z-10 " text="Nhật ký" />
       </div>
       <div className="w-[84%] mx-auto flex justify-center items-center">
         <div className="relative ">
@@ -296,20 +291,19 @@ export default function Note() {
                     key={char.name}
                     src={char.imageSrc}
                     onClick={() => setActiveChar(char.name)}
-                  // className="w-20"
+                    // className="w-20"
                   />
                 ) : (
                   <CharacterCard
                     key={char.name}
                     src={char.imageSrc}
                     onClick={() => setActiveChar(char.name)}
-                  // className="w-20"
+                    // className="w-20"
                   />
                 )
               )}
             </div>
           </NoteLeft>
-
         </div>
         <Tab
           activeTab={activeTab}
@@ -319,22 +313,28 @@ export default function Note() {
           <div className="h-full w-fit py-14 flex items-center justify-between">
             <div className="flex-1 px-4 mx-auto">
               {activeTab === "tab-standard-0" ? (
-                <YieldGrid items={currentTabContent} onItemClick={handleItemClick} />
+                <YieldGrid
+                  items={currentTabContent}
+                  onItemClick={handleItemClick}
+                />
               ) : (
-                <NoteGrid items={currentTabContent} onItemClick={handleItemClick} />
+                <NoteGrid
+                  items={currentTabContent}
+                  onItemClick={handleItemClick}
+                />
               )}
             </div>
           </div>
         </Tab>
-
-        <DetailDialog
-          isOpen={dialogOpen}
-          onClose={() => setDialogOpen(false)}
-          type={activeTab === "tab-standard-0" ? "collection" : "image"}
-          rowLabel={selectedItem?.label}
-          sectionLabel={selectedItem?.label}
-        />
       </div>
-    </div >
+    </div>
+  );
+}
+
+export default function NoteInner() {
+  return (
+    <DetailDialogProvider>
+      <Note />
+    </DetailDialogProvider>
   );
 }

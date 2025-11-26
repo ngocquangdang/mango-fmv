@@ -1,11 +1,11 @@
 export default function ArrowLeft({
   width = 10,
   height = 10,
-  className,
+  onClick,
 }: {
   width?: number | string;
   height?: number | string;
-  className?: string;
+  onClick?: () => void;
 }) {
   return (
     <svg
@@ -14,6 +14,7 @@ export default function ArrowLeft({
       viewBox="0 0 45 45"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      onClick={onClick}
     >
       <rect x="28" width="5" height="5" fill="#111111" />
       <rect

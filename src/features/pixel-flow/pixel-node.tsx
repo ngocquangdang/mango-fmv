@@ -4,8 +4,6 @@ import LockIcon from "../../components/icon/lock-icon";
 import NodeCard from "../../components/node-card";
 
 const PixelNode = ({ data }: NodeProps) => {
-  const { selected, isActive } = data;
-
   return (
     <div aria-label={`Story node: ${data?.title ?? ""}`} tabIndex={0}>
       <Handle
@@ -14,13 +12,15 @@ const PixelNode = ({ data }: NodeProps) => {
         id="in"
         className="bg-transparent! border-0!"
       />
-      {isActive ? (
+      {!data.status ? (
         <LockIcon />
       ) : (
         <div className="flex items-center gap-3 flex-col">
           <NodeCard
-            src={data?.thumbUrl || "https://picsum.photos/seed/picsum/200/300"}
-            width="25vw"
+            src={
+              (data?.thumbUrl as string) ||
+              "https://picsum.photos/seed/picsum/200/300"
+            }
           />
         </div>
       )}

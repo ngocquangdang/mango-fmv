@@ -13,9 +13,9 @@ type BannerProps = {
 export default function Banner({
   className,
   text = "BANNER",
-  charWidth = 30,
-  padding = 100,
-  minWidth = 300,
+  charWidth = 19.2, // Reduced by 40% total (0.8 × 0.8)
+  padding = 64, // Reduced by 40% total (0.8 × 0.8)
+  minWidth = 192, // Reduced by 40% total (0.8 × 0.8)
   width,
   height: svgHeight,
 }: BannerProps) {
@@ -55,15 +55,15 @@ export default function Banner({
   const contentWidth = Math.max(0, finalWidth - LEFT_WIDTH - RIGHT_WIDTH);
 
   const totalWidth = LEFT_WIDTH + contentWidth + RIGHT_WIDTH;
-  const height = svgHeight ?? 124;
+  const height = svgHeight ?? 79.2; // Reduced by 40% total (0.8 × 0.8)
 
   // Calculate font size to fit text within the available content width
   const availableTextWidth = Math.max(0, totalWidth - LEFT_WIDTH - RIGHT_WIDTH - 20); // 20px padding for safety
   const estimatedTextWidth = text.length * charWidth;
   // If text is empty or estimated width is 0, default to 40. Otherwise scale down if needed.
   const fontSize = estimatedTextWidth > 0
-    ? Math.min(40, (availableTextWidth / estimatedTextWidth) * 40)
-    : 40;
+    ? Math.min(28, (availableTextWidth / estimatedTextWidth) * 28)
+    : 28;
 
   return (
     <div
@@ -84,161 +84,161 @@ export default function Banner({
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="none"
       >
-        {/* Left Section */}
+        {/* Left Section - scaled by 0.64 (0.8 × 0.8) */}
         <g>
           <path
-            d="M3 3L39 3V27.0583V121.002L15 121L3 27.0583V3Z"
+            d="M1.92 1.92L24.96 1.92V17.32V77.44L9.6 77.44L1.92 17.32V1.92Z"
             fill="#1570EF"
           />
-          <rect x="24" y="27" width="15" height="85" fill="#36BFFA" />
-          <rect x="30" y="24" width="9" height="3" fill="#344054" />
+          <rect x="15.36" y="17.28" width="9.6" height="54.4" fill="#36BFFA" />
+          <rect x="19.2" y="15.36" width="5.76" height="1.92" fill="#344054" />
           <rect
-            width="9"
-            height="3"
-            transform="matrix(1 0 0 -1 30 115)"
+            width="5.76"
+            height="1.92"
+            transform="matrix(1 0 0 -1 19.2 73.6)"
             fill="#344054"
           />
-          <rect x="24" y="27" width="3" height="3" fill="#1570EF" />
-          <rect x="24" y="30" width="3" height="3" fill="#344054" />
-          <rect x="27" y="27" width="3" height="3" fill="#344054" />
+          <rect x="15.36" y="17.28" width="1.92" height="1.92" fill="#1570EF" />
+          <rect x="15.36" y="19.2" width="1.92" height="1.92" fill="#344054" />
+          <rect x="17.28" y="17.28" width="1.92" height="1.92" fill="#344054" />
           <rect
-            width="3"
-            height="3"
-            transform="matrix(1 0 0 -1 24 112)"
+            width="1.92"
+            height="1.92"
+            transform="matrix(1 0 0 -1 15.36 71.68)"
             fill="#1570EF"
           />
           <rect
-            width="3"
-            height="3"
-            transform="matrix(1 0 0 -1 24 109)"
+            width="1.92"
+            height="1.92"
+            transform="matrix(1 0 0 -1 15.36 69.76)"
             fill="#344054"
           />
           <rect
-            width="3"
-            height="3"
-            transform="matrix(1 0 0 -1 27 112)"
+            width="1.92"
+            height="1.92"
+            transform="matrix(1 0 0 -1 17.28 71.68)"
             fill="#344054"
           />
-          <rect x="21" y="33" width="3" height="73" fill="#344054" />
-          <rect x="3" width="36" height="3" fill="#344054" />
+          <rect x="13.44" y="21.12" width="1.92" height="46.72" fill="#344054" />
+          <rect x="1.92" width="23.04" height="1.92" fill="#344054" />
           <rect
-            width="24"
-            height="3"
-            transform="matrix(1 0 0 -1 15 124)"
+            width="15.36"
+            height="1.92"
+            transform="matrix(1 0 0 -1 9.6 79.36)"
             fill="#344054"
           />
-          <rect x="3" y="3" width="3" height="3" fill="#1570EF" />
-          <rect x="6" y="6" width="3" height="3" fill="#FFDE29" />
-          <rect x="9" y="9" width="3" height="3" fill="#FFDE29" />
-          <rect x="9" y="19" width="3" height="3" fill="#FFDE29" />
-          <rect x="12" y="12" width="3" height="3" fill="#FFDE29" />
-          <rect x="12" y="22" width="3" height="3" fill="#FFDE29" />
-          <rect x="15" y="15" width="3" height="3" fill="#FFDE29" />
-          <rect x="15" y="25" width="3" height="3" fill="#FFDE29" />
+          <rect x="1.92" y="1.92" width="1.92" height="1.92" fill="#1570EF" />
+          <rect x="3.84" y="3.84" width="1.92" height="1.92" fill="#FFDE29" />
+          <rect x="5.76" y="5.76" width="1.92" height="1.92" fill="#FFDE29" />
+          <rect x="5.76" y="12.16" width="1.92" height="1.92" fill="#FFDE29" />
+          <rect x="7.68" y="7.68" width="1.92" height="1.92" fill="#FFDE29" />
+          <rect x="7.68" y="14.08" width="1.92" height="1.92" fill="#FFDE29" />
+          <rect x="9.6" y="9.6" width="1.92" height="1.92" fill="#FFDE29" />
+          <rect x="9.6" y="16" width="1.92" height="1.92" fill="#FFDE29" />
           <rect
-            width="3"
-            height="3"
-            transform="matrix(1 0 0 -1 18 118)"
+            width="1.92"
+            height="1.92"
+            transform="matrix(1 0 0 -1 11.52 75.52)"
             fill="#FFDE29"
           />
-          <rect y="3" width="3" height="24" fill="#344054" />
-          <rect x="3" y="27" width="3" height="24" fill="#344054" />
-          <rect x="6" y="51" width="3" height="24" fill="#344054" />
-          <rect x="9" y="75" width="3" height="24" fill="#344054" />
-          <rect x="12" y="99" width="3" height="22" fill="#344054" />
+          <rect y="1.92" width="1.92" height="15.36" fill="#344054" />
+          <rect x="1.92" y="17.28" width="1.92" height="15.36" fill="#344054" />
+          <rect x="3.84" y="32.64" width="1.92" height="15.36" fill="#344054" />
+          <rect x="5.76" y="48" width="1.92" height="15.36" fill="#344054" />
+          <rect x="7.68" y="63.36" width="1.92" height="14.08" fill="#344054" />
         </g>
 
-        {/* Middle Section */}
-        <g transform={`translate(-1, 0)`}>
-          <rect x="39" y="3" width={contentWidth} height="118" fill="#1570EF" />
-          <rect x="39" y="27" width={contentWidth} height="85" fill="#36BFFA" />
-          <rect x="39" y="24" width={contentWidth} height="3" fill="#344054" />
+        {/* Middle Section - scaled by 0.64 (0.8 × 0.8) */}
+        <g transform={`translate(-0.64, 0)`}>
+          <rect x="24.96" y="1.92" width={contentWidth} height="75.52" fill="#1570EF" />
+          <rect x="22.96" y="17.28" width={contentWidth} height="54.4" fill="#36BFFA" />
+          <rect x="24.96" y="15.36" width={contentWidth} height="1.92" fill="#344054" />
           <rect
             width={contentWidth}
-            height="3"
-            transform="matrix(1 0 0 -1 39 115)"
+            height="1.92"
+            transform="matrix(1 0 0 -1 24.96 73.6)"
             fill="#344054"
           />
-          <rect x="39" width={contentWidth} height="3" fill="#344054" />
+          <rect x="24.96" width={contentWidth} height="1.92" fill="#344054" />
           <rect
             width={contentWidth}
-            height="3"
-            transform="matrix(1 0 0 -1 39 124)"
+            height="1.92"
+            transform="matrix(1 0 0 -1 24.96 79.36)"
             fill="#344054"
           />
-          <rect x="39" y="12" width={contentWidth} height="3" fill="#3538CD" />
+          <rect x="24.96" y="7.68" width={contentWidth} height="1.92" fill="#3538CD" />
         </g>
 
-        {/* Right Section */}
-        <g transform={`translate(${totalWidth - 43}, 0)`}>
-          <g transform="scale(-1, 1) translate(-39, 0)">
+        {/* Right Section - scaled by 0.64 (0.8 × 0.8) */}
+        <g transform={`translate(${totalWidth - 57.52}, 0)`}>
+          <g transform="scale(-1, 1) translate(-24.96, 0)">
             <path
-              d="M3 3L39 3V27.0583V121.002L15 121L3 27.0583V3Z"
+              d="M1.92 1.92L24.96 1.92V17.32V77.44L9.6 77.44L1.92 17.32V1.92Z"
               fill="#1570EF"
             />
-            <rect x="24" y="27" width="15" height="85" fill="#36BFFA" />
-            <rect x="30" y="24" width="9" height="3" fill="#344054" />
+            <rect x="15.36" y="17.28" width="9.6" height="54.4" fill="#36BFFA" />
+            <rect x="19.2" y="15.36" width="5.76" height="1.92" fill="#344054" />
             <rect
-              width="9"
-              height="3"
-              transform="matrix(1 0 0 -1 30 115)"
+              width="5.76"
+              height="1.92"
+              transform="matrix(1 0 0 -1 19.2 73.6)"
               fill="#344054"
             />
-            <rect x="24" y="27" width="3" height="3" fill="#1570EF" />
-            <rect x="24" y="30" width="3" height="3" fill="#344054" />
-            <rect x="27" y="27" width="3" height="3" fill="#344054" />
+            <rect x="15.36" y="17.28" width="1.92" height="1.92" fill="#1570EF" />
+            <rect x="15.36" y="19.2" width="1.92" height="1.92" fill="#344054" />
+            <rect x="17.28" y="17.28" width="1.92" height="1.92" fill="#344054" />
             <rect
-              width="3"
-              height="3"
-              transform="matrix(1 0 0 -1 24 112)"
+              width="1.92"
+              height="1.92"
+              transform="matrix(1 0 0 -1 15.36 71.68)"
               fill="#1570EF"
             />
             <rect
-              width="3"
-              height="3"
-              transform="matrix(1 0 0 -1 24 109)"
+              width="1.92"
+              height="1.92"
+              transform="matrix(1 0 0 -1 15.36 69.76)"
               fill="#344054"
             />
             <rect
-              width="3"
-              height="3"
-              transform="matrix(1 0 0 -1 27 112)"
+              width="1.92"
+              height="1.92"
+              transform="matrix(1 0 0 -1 17.28 71.68)"
               fill="#344054"
             />
-            <rect x="21" y="33" width="3" height="73" fill="#344054" />
-            <rect x="3" width="36" height="3" fill="#344054" />
+            <rect x="13.44" y="21.12" width="1.92" height="46.72" fill="#344054" />
+            <rect x="1.92" width="23.04" height="1.92" fill="#344054" />
             <rect
-              width="24"
-              height="3"
-              transform="matrix(1 0 0 -1 15 124)"
+              width="15.36"
+              height="1.92"
+              transform="matrix(1 0 0 -1 9.6 79.36)"
               fill="#344054"
             />
-            <rect x="3" y="3" width="3" height="3" fill="#1570EF" />
-            <rect x="6" y="6" width="3" height="3" fill="#FFDE29" />
-            <rect x="9" y="9" width="3" height="3" fill="#FFDE29" />
-            <rect x="9" y="19" width="3" height="3" fill="#FFDE29" />
-            <rect x="12" y="12" width="3" height="3" fill="#FFDE29" />
-            <rect x="12" y="22" width="3" height="3" fill="#FFDE29" />
-            <rect x="15" y="15" width="3" height="3" fill="#FFDE29" />
-            <rect x="15" y="25" width="3" height="3" fill="#FFDE29" />
+            <rect x="1.92" y="1.92" width="1.92" height="1.92" fill="#1570EF" />
+            <rect x="3.84" y="3.84" width="1.92" height="1.92" fill="#FFDE29" />
+            <rect x="5.76" y="5.76" width="1.92" height="1.92" fill="#FFDE29" />
+            <rect x="5.76" y="12.16" width="1.92" height="1.92" fill="#FFDE29" />
+            <rect x="7.68" y="7.68" width="1.92" height="1.92" fill="#FFDE29" />
+            <rect x="7.68" y="14.08" width="1.92" height="1.92" fill="#FFDE29" />
+            <rect x="9.6" y="9.6" width="1.92" height="1.92" fill="#FFDE29" />
+            <rect x="9.6" y="16" width="1.92" height="1.92" fill="#FFDE29" />
             <rect
-              width="3"
-              height="3"
-              transform="matrix(1 0 0 -1 18 118)"
+              width="1.92"
+              height="1.92"
+              transform="matrix(1 0 0 -1 11.52 75.52)"
               fill="#FFDE29"
             />
-            <rect y="3" width="3" height="24" fill="#344054" />
-            <rect x="3" y="27" width="3" height="24" fill="#344054" />
-            <rect x="6" y="51" width="3" height="24" fill="#344054" />
-            <rect x="9" y="75" width="3" height="24" fill="#344054" />
-            <rect x="12" y="99" width="3" height="22" fill="#344054" />
+            <rect y="1.92" width="1.92" height="15.36" fill="#344054" />
+            <rect x="1.92" y="17.28" width="1.92" height="15.36" fill="#344054" />
+            <rect x="3.84" y="32.64" width="1.92" height="15.36" fill="#344054" />
+            <rect x="5.76" y="48" width="1.92" height="15.36" fill="#344054" />
+            <rect x="7.68" y="63.36" width="1.92" height="14.08" fill="#344054" />
           </g>
         </g>
 
         {/* Text */}
         <text
-          x="50%"
-          y="55%"
+          x="46%"
+          y="60%"
           dominantBaseline="middle"
           textAnchor="middle"
           fill="white"

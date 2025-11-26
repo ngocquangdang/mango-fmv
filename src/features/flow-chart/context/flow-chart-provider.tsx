@@ -17,11 +17,11 @@ export const FlowChartContextProvider = ({
   children: React.ReactNode;
 }) => {
   const { chapter: data } = useUserContext();
-  const isPreview = React.useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    const isPreview = params.get("isPreview");
-    return isPreview === "true";
-  }, []);
+  // const isPreview = React.useMemo(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   const isPreview = params.get("isPreview");
+  //   return isPreview === "true";
+  // }, []);
 
   const scenes = React.useMemo(() => {
     return data?.scenes || ({} as Record<string, Scene>);
@@ -110,25 +110,25 @@ export const FlowChartContextProvider = ({
     const edgeList: any[] = [];
 
     const startNode = scenes[data?.startSceneId];
-    const addUnlockNode = (id: string) => {
-      nodeList.push({
-        id: "unlocked_" + id,
-        position: {
-          x: (nodeList.length % 4) * 220,
-          y: Math.floor(nodeList.length / 4) * 260,
-        },
-        data: {},
-        type: "customNode",
-      });
-    };
-    const addUnlockEdge = (id: string, sourceId: string) => {
-      edgeList.push({
-        id: "unlocked_" + id,
-        source: sourceId,
-        target: "unlocked_" + id,
-        type: "customEdge",
-      });
-    };
+    // const addUnlockNode = (id: string) => {
+    //   nodeList.push({
+    //     id: "unlocked_" + id,
+    //     position: {
+    //       x: (nodeList.length % 4) * 220,
+    //       y: Math.floor(nodeList.length / 4) * 260,
+    //     },
+    //     data: { isActive: true },
+    //     type: "customNode",
+    //   });
+    // };
+    // const addUnlockEdge = (id: string, sourceId: string) => {
+    //   edgeList.push({
+    //     id: "unlocked_" + id,
+    //     source: sourceId,
+    //     target: "unlocked_" + id,
+    //     type: "customEdge",
+    //   });
+    // };
 
     const addNode = (id: string, data: any) => {
       nodeList.push({
@@ -152,52 +152,53 @@ export const FlowChartContextProvider = ({
     };
 
     const nodes = (id: string, options: BranchOption[] = []) => {
-      const prevNode = scenes[id];
-      if (
-        options.some((option) => scenes[option.targetSceneId]?.status) ||
-        isPreview
-      ) {
-        options.forEach((option, index) => {
-          if (scenes[option.targetSceneId]?.status || isPreview) {
-            addNode(option.targetSceneId, {
-              ...scenes[option.targetSceneId],
-              ...option,
-            });
-            addEdge(
-              `${id}->${option.targetSceneId}-${index}`,
-              id,
-              option.targetSceneId
-            );
-            const nextNode = scenes[option.targetSceneId];
-            if (nextNode && nextNode.branch) {
-              nodes(option.targetSceneId, nextNode.branch?.options || []);
-            } else if (
-              nextNode &&
-              !(nextNode.hotspots?.length || 0) &&
-              !nextNode.branch
-            ) {
-              if (!nextNode?.status && !isPreview) {
-                addUnlockNode(option.targetSceneId);
-                addUnlockEdge(option.targetSceneId, prevNode.id);
-              }
-            }
-          }
+      // const prevNode = scenes[id];
+      // if (
+      //   options.some((option) => scenes[option.targetSceneId]?.status) ||
+      //   isPreview
+      // ) {
+      options.forEach((option, index) => {
+
+        addNode(option.targetSceneId, {
+          ...scenes[option.targetSceneId],
+          ...option,
         });
-      } else {
-        addUnlockNode(id);
-        addUnlockEdge(id, id);
-      }
+        addEdge(
+          `${id}->${option.targetSceneId}-${index}`,
+          id,
+          option.targetSceneId
+        );
+        const nextNode = scenes[option.targetSceneId];
+        if (nextNode && nextNode.branch) {
+          nodes(option.targetSceneId, nextNode.branch?.options || []);
+        } else if (
+          nextNode &&
+          !(nextNode.hotspots?.length || 0) &&
+          !nextNode.branch
+        ) {
+          // if (!nextNode?.status && !isPreview) {
+          //   addUnlockNode(option.targetSceneId);
+          //   addUnlockEdge(option.targetSceneId, prevNode.id);
+          // }
+        }
+        // }
+      });
+      // } else {
+      //   addUnlockNode(id);
+      //   addUnlockEdge(id, id);
+      // }
     };
 
     // DONOT CHECK THIS
-    if (startNode && startNode.branch) {
-      const options: BranchOption[] = startNode.branch.options;
+    if (startNode) {
+      const options: BranchOption[] = startNode.branch?.options || [];
       addNode(startNode.id, { ...startNode });
       nodes(startNode.id, options);
     }
     return { nodes: nodeList, edges: edgeList };
   }, [scenes, data?.startSceneId]);
-
+  console.log("nodes2", nodes2);
+  console.log("edges2", edges2);
   const value: FlowChartContextType = {
     nodes: nodes2,
     edges: edges2,

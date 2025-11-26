@@ -1,14 +1,14 @@
 export default function ArrowRight({
   width = 10,
   height = 10,
-  className,
+  onClick,
 }: {
   width?: number | string;
   height?: number | string;
-  className?: string;
+  onClick?: () => void;
 }) {
   return (
-    <svg width={width} height={height} viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={width} height={height} viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={onClick}>
       <rect width="5" height="5" transform="matrix(-1 0 0 1 17 0)" fill="#111111" />
       <rect x="17" y="25" width="5" height="5" fill="#111111" />
       <rect width="5" height="5" transform="matrix(-1 0 0 1 27 10)" fill="#111111" />

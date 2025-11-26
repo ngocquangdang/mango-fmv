@@ -15,11 +15,12 @@ declare global {
       play?: () => void;
       pause?: () => void;
       destroy?: () => void;
-      seek?: (time: number) => void;
+      seek?: (time: number, mode?: "absolute" | "relative") => void;
       setAutoplayEnabled?: (enabled: boolean) => void;
       setCurrentSceneId?: (sceneId: string) => void;
       setCollectionItems?: (collectionItems: Record<string, any>) => void;
       onCollectionSelected?: (cb: (collectionItemId: string) => void) => () => void;
+      setReviewScene?: (status: boolean) => void;
     };
   }
 }

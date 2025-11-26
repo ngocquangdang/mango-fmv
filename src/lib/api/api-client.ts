@@ -1,5 +1,5 @@
 // API Client with authentication
-import { getAccessToken, removeCookieToken } from "./session";
+import { getAccessToken } from "./session";
 
 export interface ApiResponse<T = any> {
   data: T;
@@ -23,12 +23,12 @@ const getAuthToken = (): string | null => {
   return null;
 };
 
-const handleAuthError = (): void => {
-  if (typeof window !== "undefined") {
-    removeCookieToken();
-    window.location.href = "/auth";
-  }
-};
+// const handleAuthError = (): void => {
+//   if (typeof window !== "undefined") {
+//     removeCookieToken();
+//     window.location.href = "/auth";
+//   }
+// };
 
 const createHeaders = (customHeaders?: Record<string, string>): Headers => {
   const headers = new Headers({
@@ -46,7 +46,7 @@ const createHeaders = (customHeaders?: Record<string, string>): Headers => {
 
 const handleResponse = async (response: Response): Promise<any> => {
   if (response.status === 401) {
-    handleAuthError();
+    // handleAuthError();
     throw new ApiError("Unauthorized", 401);
   }
 

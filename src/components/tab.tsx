@@ -61,7 +61,8 @@ export default function Tab({ children, activeTab, onTabChange, tabBlocks }: Tab
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
     >
-      {tabBlocks.map((config, index) => {
+      {(() => {
+        const tabElements = tabBlocks.map((config, index) => {
         const {
           key,
           label,
@@ -115,9 +116,9 @@ export default function Tab({ children, activeTab, onTabChange, tabBlocks }: Tab
           }
         };
 
-        return (
-          <SvgTabBlock
-            key={key}
+          const tabNode = (
+            <SvgTabBlock
+              key={key}
             origin={currentOrigin}
             clipId={currentClipId}
             innerClipId={currentInnerClipId}
@@ -125,8 +126,8 @@ export default function Tab({ children, activeTab, onTabChange, tabBlocks }: Tab
             colors={resolvedColors}
           >
             <foreignObject
-              x={labelX - 100}
-              y={labelY - 25}
+              x={labelX - 95}
+              y={labelY - 23}
               width={200}
               height={50}
               requiredExtensions="http://www.w3.org/1999/xhtml"
@@ -141,124 +142,139 @@ export default function Tab({ children, activeTab, onTabChange, tabBlocks }: Tab
                 {label}
               </div>
             </foreignObject>
-          </SvgTabBlock>
+            </SvgTabBlock>
+          );
+
+          return { key, isActive, node: tabNode };
+        });
+
+        const inactiveTabs = tabElements
+          .filter((tab) => !tab.isActive)
+          .map((tab) => tab.node);
+        const activeTabNode = tabElements.find((tab) => tab.isActive)?.node;
+
+        return (
+          <>
+            {inactiveTabs}
+            <g clip-path="url(#clip8_28_52262)">
+              <path
+                d="M1181 98H1191V800H1181V810H20V800H10V98H20V88H1181V98Z"
+                fill="#FEF0C7"
+              />
+              <rect x="30" y="77.65" width="1141" height="10" fill="black" />
+              <g style={{ mixBlendMode: "soft-light" }}>
+                <rect x="30" y="88" width="1141" height="10" fill="white" />
+              </g>
+              <rect x="30" y="810" width="1141" height="10" fill="black" />
+              <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
+                <rect x="30" y="800" width="1141" height="10" fill="black" />
+              </g>
+              <rect
+                x="1191"
+                y="790"
+                width="682"
+                height="9.99997"
+                transform="rotate(-90 1191 790)"
+                fill="black"
+              />
+              <rect
+                width="682"
+                height="10"
+                transform="matrix(4.25577e-08 -1 -1 -4.48963e-08 10 790)"
+                fill="black"
+              />
+              <rect x="1171" y="88" width="10" height="10" fill="black" />
+              <g style={{ mixBlendMode: "soft-light" }}>
+                <rect x="1171" y="98" width="10" height="10" fill="white" />
+              </g>
+              <rect x="1181" y="98" width="10" height="10" fill="black" />
+              <rect
+                width="10"
+                height="10"
+                transform="matrix(-1 0 0 1 30 88)"
+                fill="black"
+              />
+              <g style={{ mixBlendMode: "soft-light" }}>
+                <rect
+                  width="10"
+                  height="10"
+                  transform="matrix(-1 0 0 1 30 98)"
+                  fill="white"
+                />
+              </g>
+              <rect
+                width="10"
+                height="10"
+                transform="matrix(-1 0 0 1 20 98)"
+                fill="black"
+              />
+              <g style={{ mixBlendMode: "soft-light" }}>
+                <rect
+                  width="10"
+                  height="10"
+                  transform="matrix(-1 0 0 1 20 108)"
+                  fill="white"
+                />
+              </g>
+              <rect
+                width="10"
+                height="10"
+                transform="matrix(1 0 0 -1 1171 810)"
+                fill="black"
+              />
+              <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
+                <rect
+                  width="10"
+                  height="10"
+                  transform="matrix(1 0 0 -1 1171 800)"
+                  fill="black"
+                />
+              </g>
+              <rect
+                width="10"
+                height="10"
+                transform="matrix(1 0 0 -1 1181 800)"
+                fill="black"
+              />
+              <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
+                <rect
+                  width="10"
+                  height="10"
+                  transform="matrix(1 0 0 -1 1181 790)"
+                  fill="black"
+                />
+              </g>
+              <rect
+                x="30"
+                y="810"
+                width="10"
+                height="10"
+                transform="rotate(180 30 810)"
+                fill="black"
+              />
+              <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
+                <rect
+                  x="30"
+                  y="800"
+                  width="10"
+                  height="10"
+                  transform="rotate(180 30 800)"
+                  fill="black"
+                />
+              </g>
+              <rect
+                x="20"
+                y="800"
+                width="10"
+                height="10"
+                transform="rotate(180 20 800)"
+                fill="black"
+              />
+            </g>
+            {activeTabNode}
+          </>
         );
-      })}
-      <g clip-path="url(#clip8_28_52262)">
-        <path
-          d="M1181 98H1191V800H1181V810H20V800H10V98H20V88H1181V98Z"
-          fill="#FEF0C7"
-        />
-        <rect x="30" y="78" width="1141" height="10" fill="black" />
-        <g style={{ mixBlendMode: "soft-light" }}>
-          <rect x="30" y="88" width="1141" height="10" fill="white" />
-        </g>
-        <rect x="30" y="810" width="1141" height="10" fill="black" />
-        <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
-          <rect x="30" y="800" width="1141" height="10" fill="black" />
-        </g>
-        <rect
-          x="1191"
-          y="790"
-          width="682"
-          height="9.99997"
-          transform="rotate(-90 1191 790)"
-          fill="black"
-        />
-        <rect
-          width="682"
-          height="10"
-          transform="matrix(4.25577e-08 -1 -1 -4.48963e-08 10 790)"
-          fill="black"
-        />
-        <rect x="1171" y="88" width="10" height="10" fill="black" />
-        <g style={{ mixBlendMode: "soft-light" }}>
-          <rect x="1171" y="98" width="10" height="10" fill="white" />
-        </g>
-        <rect x="1181" y="98" width="10" height="10" fill="black" />
-        <rect
-          width="10"
-          height="10"
-          transform="matrix(-1 0 0 1 30 88)"
-          fill="black"
-        />
-        <g style={{ mixBlendMode: "soft-light" }}>
-          <rect
-            width="10"
-            height="10"
-            transform="matrix(-1 0 0 1 30 98)"
-            fill="white"
-          />
-        </g>
-        <rect
-          width="10"
-          height="10"
-          transform="matrix(-1 0 0 1 20 98)"
-          fill="black"
-        />
-        <g style={{ mixBlendMode: "soft-light" }}>
-          <rect
-            width="10"
-            height="10"
-            transform="matrix(-1 0 0 1 20 108)"
-            fill="white"
-          />
-        </g>
-        <rect
-          width="10"
-          height="10"
-          transform="matrix(1 0 0 -1 1171 810)"
-          fill="black"
-        />
-        <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
-          <rect
-            width="10"
-            height="10"
-            transform="matrix(1 0 0 -1 1171 800)"
-            fill="black"
-          />
-        </g>
-        <rect
-          width="10"
-          height="10"
-          transform="matrix(1 0 0 -1 1181 800)"
-          fill="black"
-        />
-        <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
-          <rect
-            width="10"
-            height="10"
-            transform="matrix(1 0 0 -1 1181 790)"
-            fill="black"
-          />
-        </g>
-        <rect
-          x="30"
-          y="810"
-          width="10"
-          height="10"
-          transform="rotate(180 30 810)"
-          fill="black"
-        />
-        <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
-          <rect
-            x="30"
-            y="800"
-            width="10"
-            height="10"
-            transform="rotate(180 30 800)"
-            fill="black"
-          />
-        </g>
-        <rect
-          x="20"
-          y="800"
-          width="10"
-          height="10"
-          transform="rotate(180 20 800)"
-          fill="black"
-        />
-      </g>
+      })()}
 
       {children && (
         <foreignObject

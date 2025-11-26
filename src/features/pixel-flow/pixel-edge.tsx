@@ -1,4 +1,5 @@
 import { type EdgeProps, getSmoothStepPath } from "@xyflow/react";
+import { useFlowChart } from "../flow-chart/context";
 
 const PixelEdge = ({
   id,
@@ -10,7 +11,11 @@ const PixelEdge = ({
   targetPosition,
   style = {},
   markerEnd,
+  target,
 }: EdgeProps) => {
+  const { data } = useFlowChart();
+  const targetSceneStatus = target ? data?.scenes?.[target]?.status : undefined;
+  const isCompleted = Boolean(targetSceneStatus);
   const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
@@ -18,7 +23,7 @@ const PixelEdge = ({
     targetX,
     targetY,
     targetPosition,
-    borderRadius: 0, // Sharp corners for pixel look
+    borderRadius: 1, // Sharp corners for pixel look
   });
 
   return (
@@ -27,9 +32,9 @@ const PixelEdge = ({
         id={id}
         style={{
           ...style,
-          strokeWidth: 3,
-          stroke: "black",
-          strokeDasharray: "8 8", // Dashed effect
+          strokeWidth: 6,
+          stroke: "#FA7036",
+          strokeDasharray: isCompleted ? undefined : "8 8",
         }}
         className="react-flow__edge-path"
         d={edgePath}

@@ -1,6 +1,5 @@
 import DetailImage from "./detail-image";
-import DetailCollection from "./detail-collection";
-import DetailItem from './detail-item';
+import DetailItem from "./detail-item";
 
 type DetailDialogProps = {
   isOpen: boolean;
@@ -26,13 +25,19 @@ export default function DetailDialog({
       onClick={onClose}
     >
       <div className="flex items-end justify-end w-[80vw] h-[80vh]">
-        <div onClick={(e) => e.stopPropagation()}>
-          {type === "image" ? (
-            <DetailImage rowLabel={rowLabel} sectionLabel={sectionLabel} onClose={onClose} />
-          ) : (
-            <DetailItem rowLabel={rowLabel} sectionLabel={sectionLabel} onClose={onClose} />
-          )}
-        </div>
+        {type === "image" ? (
+          <DetailImage
+            rowLabel={rowLabel}
+            sectionLabel={sectionLabel}
+            onClose={onClose}
+          />
+        ) : (
+          <DetailItem
+            rowLabel={rowLabel}
+            sectionLabel={sectionLabel}
+            onClose={onClose}
+          />
+        )}
       </div>
     </div>
   );

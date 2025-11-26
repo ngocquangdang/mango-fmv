@@ -24,8 +24,10 @@ export default function NoteGrid({ items, onItemClick }: NoteGridProps) {
 
   return (
     <div className="flex items-center gap-8">
-      <button onClick={handlePrev} className={`w-10 h-10 `}>
-        <ArrowLeft width={40} height={40} />
+      <button className={`min-w-10 h-10 `}>
+        {
+          items.length > 8 && <ArrowLeft width={40} height={40} onClick={handlePrev} />
+        }
       </button>
       <Swiper
         modules={[Grid, Navigation]}
@@ -50,8 +52,10 @@ export default function NoteGrid({ items, onItemClick }: NoteGridProps) {
           </SwiperSlide>
         ))}
       </Swiper>
-      <button onClick={handleNext} className={`w-10 h-10 `}>
-        <ArrowRight width={40} height={40} />
+      <button className={`min-w-10 h-10 `}>
+        {
+          items.length > 8 && <ArrowRight width={40} height={40} onClick={handleNext} />
+        }
       </button>
     </div>
   );

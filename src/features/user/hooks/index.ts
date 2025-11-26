@@ -6,6 +6,7 @@ import {
   getUserProgress,
   getVideos,
   updateStatus,
+  restartChapter,
 } from "../apis";
 import type { UpdateStatusPayload } from "../apis";
 import type { ChapterMapped, Scene } from "../../../types/chapter";
@@ -86,7 +87,7 @@ export const useUserProgress = (queryParams: Record<string, string>) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["user-progress", queryParams],
     queryFn: () => getUserProgress(queryParams),
-    enabled: !!queryParams.userId && !!queryParams.chapterId,
+    enabled: !!queryParams.chapterId,
   });
   return {
     data: { ...data?.data, scenes: mapVideoProgress(data?.data?.scenes || []) },
@@ -159,4 +160,10 @@ export const useVideos = (ids: string[]) => {
     isLoading,
     error,
   };
+};
+
+export const useRestartChapter = () => {
+  return useMutation({
+    mutationFn: (chapterId: string) => restartChapter(chapterId),
+  });
 };

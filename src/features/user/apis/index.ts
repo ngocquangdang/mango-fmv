@@ -199,7 +199,6 @@ export interface UpdateStatusPayload {
   watchingSecond: number;
   totalDuration: number;
   status: string;
-  userId: string;
 }
 
 export const getUserProgress = async (queryParams: Record<string, string>) => {
@@ -247,6 +246,17 @@ export const getVideos = async (ids: string[]) => {
   });
   const response = await apiClientInteractiveLicense.get(
     `/video-interactions/tokens?${queryParams.toString()}`,
+    {
+      "X-Ticket": getLocalParam("ticket") || "",
+    }
+  );
+  return response;
+};
+
+export const restartChapter = async (chapterId: string) => {
+  const response = await apiClientVideoProgress.put(
+    `/chapter/${chapterId}/restart`,
+    {},
     {
       "X-Ticket": getLocalParam("ticket") || "",
     }

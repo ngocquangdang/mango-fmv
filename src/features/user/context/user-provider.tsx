@@ -15,7 +15,6 @@ import { getLocalParam, saveLocalParams } from "../../../lib/api/storage";
 export interface UserContextType {
   chapter: ChapterMapped;
   loading: boolean;
-  userId: string | null;
   refetch: () => void;
   updateSceneStatus: (
     sceneId: string,
@@ -30,26 +29,23 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mutate: updateStatus } = useUpdateStatus();
 
   const [loading, setLoading] = React.useState<boolean>(false);
-  // const [userId, setUserId] = React.useState<string | null>(null);
 
-  const {
-    chapterId: chapterIdFromUrl,
-    projectId: projectIdFromUrl,
-    userId: userIdFromUrl,
-  } = React.useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    const chapterIdFromUrl = params.get("chapterId");
-    const projectIdFromUrl = params.get("projectId");
-    const userIdFromUrl = params.get("userId") || crypto.randomUUID();
+  const { chapterId: chapterIdFromUrl, projectId: projectIdFromUrl } =
+    React.useMemo(() => {
+      const params = new URLSearchParams(window.location.search);
+      const chapterIdFromUrl = params.get("chapterId");
+      const projectIdFromUrl = params.get("projectId");
 
-    return {
-      chapterId: chapterIdFromUrl || "",
-      projectId: projectIdFromUrl || "",
-      userId: userIdFromUrl || "",
-    };
-  }, [window.location.search]);
+      return {
+        chapterId: chapterIdFromUrl || "",
+        projectId: projectIdFromUrl || "",
+      };
+    }, [window.location.search]);
 
-  const { data: chapter } = useChapter(projectIdFromUrl, chapterIdFromUrl);
+  const { data: chapter, isLoading: isChapterLoading } = useChapter(
+    projectIdFromUrl,
+    chapterIdFromUrl
+  );
 
   const prevChapterIdRef = React.useRef<string | undefined>(undefined);
   React.useEffect(() => {
@@ -66,20 +62,23 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const progressParams = React.useMemo(
     () => ({
-      userId: userIdFromUrl || "",
       chapterId: chapterId,
     }),
-    [userIdFromUrl, chapterId]
+    [chapterId]
   );
 
-  const { data: progress, refetch } = useUserProgress(progressParams);
+  const {
+    data: progress,
+    refetch,
+    isLoading: isProgressLoading,
+  } = useUserProgress(progressParams);
 
   const sceneIds = React.useMemo(
     () => Object.keys(chapter?.scenes || {}),
     [chapter]
   );
 
-  const { data: videos } = useVideos(sceneIds);
+  const { data: videos, isLoading: isVideosLoading } = useVideos(sceneIds);
 
   const chapterMapped = React.useMemo(() => {
     if (!chapter) return null;
@@ -99,7 +98,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   React.useEffect(() => {
-    if (chapterValues.exists && !progress?.currentScene && userIdFromUrl) {
+    if (chapterValues.exists && !progress?.currentScene) {
       updateStatus(
         {
           chapterId: chapterValues.chapterId || "",
@@ -110,7 +109,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             chapterValues.sences[chapterValues.startSceneId]?.duration || 0
           ),
           status: "INPROGRESS",
-          userId: userIdFromUrl || "",
         },
         {
           onSuccess: () => {
@@ -119,30 +117,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
       );
     }
-  }, [
-    chapterValues,
-    updateStatus,
-    refetch,
-    progress?.currentScene,
-    userIdFromUrl,
-  ]);
+  }, [chapterValues, updateStatus, refetch, progress?.currentScene]);
 
   React.useEffect(() => {
-    // if (videos && chapter) {
-    //   setLoading(false);
-    // }
-
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, [chapter]);
+    setLoading(isChapterLoading || isProgressLoading || isVideosLoading);
+  }, [isChapterLoading, isProgressLoading, isVideosLoading]);
 
   const onLogin = React.useCallback((mgUserInfo: MgUserInfo) => {
     saveLocalParams({
       ticket: mgUserInfo.ticket || "50BA27D21B1830C2A9E1328624D0EC52",
     });
-    // const userId = crypto.randomUUID();
-    // setUserId(userId);
     setLoading(true);
   }, []);
 
@@ -161,7 +145,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           totalDuration,
           sceneId,
           status,
-          userId: userIdFromUrl || "",
         },
         {
           onSuccess: () => {
@@ -170,13 +153,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
       );
     },
-    [updateStatus, userIdFromUrl, refetch, chapter]
+    [updateStatus, refetch, chapter]
   );
 
   React.useEffect(() => {
     if (!getLocalParam("ticket")) {
       saveLocalParams({
-        ticket: "50BA27D21B1830C2A9E1328624D0EC52",
+        ticket: "0E7B0A603841309CAF9E3B5D0366C812",
       });
     }
   }, []);
@@ -193,18 +176,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         ? ({ ...chapterMapped, progress } as ChapterMapped)
         : ({} as ChapterMapped),
       loading,
-      userId: userIdFromUrl,
       refetch,
       updateSceneStatus,
     }),
-    [
-      chapterMapped,
-      progress,
-      loading,
-      userIdFromUrl,
-      refetch,
-      updateSceneStatus,
-    ]
+    [chapterMapped, progress, loading, refetch, updateSceneStatus]
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

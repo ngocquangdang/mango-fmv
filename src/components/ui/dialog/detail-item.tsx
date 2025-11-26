@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 type DetailItemProps = {
   rowLabel?: string;
@@ -10,7 +10,7 @@ type DetailItemProps = {
 };
 
 const defaultRowLabel = "DETAIL ITEM ROW";
-const DEFAULT_WIDTH = 1637;
+// const DEFAULT_WIDTH = 1637;
 const DEFAULT_HEIGHT = 746;
 
 export default function DetailItem({
@@ -22,23 +22,23 @@ export default function DetailItem({
   onClose
 }: DetailItemProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState<number>(0);
+  // const [containerWidth, setContainerWidth] = useState<number>(0);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
+  // useEffect(() => {
+  //   if (!containerRef.current) return;
 
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setContainerWidth(entry.contentRect.width);
-      }
-    });
+  //   const observer = new ResizeObserver((entries) => {
+  //     for (const entry of entries) {
+  //       setContainerWidth(entry.contentRect.width);
+  //     }
+  //   });
 
-    observer.observe(containerRef.current);
+  //   observer.observe(containerRef.current);
 
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  //   return () => {
+  //     observer.disconnect();
+  //   };
+  // }, []);
 
   const rowLabelText = rowLabel?.trim() ?? "";
   const sectionLabelText = sectionLabel?.trim() ?? "";
@@ -46,10 +46,10 @@ export default function DetailItem({
   const normalizedSectionLabel =
     sectionLabelText.length > 0 ? sectionLabelText : undefined;
 
-  const calculatedWidth =
-    width && typeof width === "number"
-      ? width
-      : containerWidth || (typeof width === "number" ? width : DEFAULT_WIDTH);
+  // const calculatedWidth =
+  //   width && typeof width === "number"
+  //     ? width
+  //     : containerWidth || (typeof width === "number" ? width : DEFAULT_WIDTH);
 
   const calculatedHeight =
     svgHeight && typeof svgHeight === "number"
