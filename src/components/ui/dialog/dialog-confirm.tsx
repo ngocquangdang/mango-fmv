@@ -11,7 +11,6 @@ type DialogConfirmProps = {
 
 export default function DialogConfirm({
   isOpen,
-  onClose,
   title,
   description,
   onConfirm,
@@ -23,7 +22,6 @@ export default function DialogConfirm({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ background: "#00000099" }}
-    // onClick={onClose}
     >
       <div className="flex items-end">
         <div onClick={(e) => e.stopPropagation()}>
