@@ -1247,7 +1247,7 @@ export const PixelProgress: React.FC<PixelProgressProps> = ({
           justifyContent: "center",
         }}
       >
-        <ButtonLighter onClick={onClickBtn} className="cursor-pointer">
+        <ButtonLighter onClick={onClickBtn} className="cursor-pointer text-white">
           Tiếp tục
         </ButtonLighter>
       </div>

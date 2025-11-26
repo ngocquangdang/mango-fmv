@@ -74,7 +74,7 @@ const PixelFlow = () => {
         minZoom={0.5}
         maxZoom={0.5}
         defaultViewport={{
-          x: 60,
+          x: 100,
           y: 0,
           zoom: 0.5,
         }}

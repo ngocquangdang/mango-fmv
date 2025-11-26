@@ -48,7 +48,7 @@ export default function Project() {
               <div className="relative ">
                 <Box src={item.iconUrl} width={72} height={72} className="" />
                 <img
-                  src={"./assets/heart.png"}
+                  src={"./images/heart.png"}
                   alt={item.id}
                   className="absolute w-11 h-11 -right-[30%] bottom-0"
                 />

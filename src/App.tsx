@@ -17,7 +17,6 @@ import Loading from "./components/loading";
 import EndChapter from "./features/end-chapter/end-chapter";
 import DialogConfirm from "./components/ui/dialog/dialog-confirm";
 import { useToast } from "./components/ui/toast/use-toast";
-import backgroundImage from "./assets/bg.png";
 
 function App() {
   const { loading, updateSceneStatus } = useUserContext();
@@ -32,6 +31,7 @@ function App() {
   } = useVideoPlayerContext();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const { showToast } = useToast();
+  const backgroundImage = "/images/bg.png";
 
   const handleBack = () => {
     if (type === "interactive") {
