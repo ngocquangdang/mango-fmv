@@ -57,9 +57,10 @@ function App() {
     );
     setDialogName(null);
     setReviewScene(false);
+    setType("story");
     showToast({
       description: "Bạn đã mở khóa cảnh mới.",
-      duration: 10000,
+      duration: 3000,
       position: "top-right",
     });
   };
@@ -90,7 +91,7 @@ function App() {
         })()
       )}
       {type !== "intro" && (
-        <div className="absolute top-5 left-5 p-4 z-10 cursor-pointer">
+        <div className="absolute top-0 left-0 p-4 z-10 cursor-pointer">
           <BackIcon onClick={handleBack} className="max-w-[42px]" />
         </div>
       )}

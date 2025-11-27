@@ -4,6 +4,7 @@ type YieldDefaultCardProps = {
   src: string;
   width?: number | string;
   height?: number | string;
+  className?: string;
   children?: ReactNode;
 };
 
@@ -12,9 +13,11 @@ export default function YieldDefaultCard({
   width = 200,
   height = 231,
   children,
+  className = "",
 }: YieldDefaultCardProps) {
   return (
     <svg
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 200 231"

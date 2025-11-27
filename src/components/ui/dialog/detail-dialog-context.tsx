@@ -20,8 +20,8 @@ export const DetailDialogProvider = ({
     setState((prev) => {
       prev.onClose?.();
       return {
-        ...prev,
-        isOpen: false,
+      ...prev,
+      isOpen: false,
         onClose: undefined,
       };
     });

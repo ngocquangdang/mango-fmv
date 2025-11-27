@@ -36,27 +36,41 @@ export default function Project() {
   return (
     <FlowChartContextProvider>
       <div className="w-full h-full relative">
-        <div className="flex items-center justify-center">
-          <Banner className="" text="Cốt Truyện" />
-        </div>
-        <div className="mt-4 flex flex-row gap-10 justify-center">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="flex flex-col items-center justify-center"
-            >
-              <div className="relative ">
-                <Box src={item.iconUrl} width={72} height={72} className="" />
-                <img
-                  src={"./images/heart.png"}
-                  alt={item.id}
-                  className="absolute w-11 h-11 -right-[30%] bottom-0"
-                />
+        <div className='lg:block flex justify-between'>
+          <div></div>
+          <div className="flex ml-40 lg:ml-0 justify-center">
+            <Banner
+              className="w-[140px]! h-[68px]! lg:w-[280px]! lg:h-[80px]!"
+              text="Cốt Truyện"
+            />
+          </div>
+          <div className="pr-8 pt-2 lg:mt-4 flex flex-row lg:gap-10 gap-6 justify-center">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="flex flex-col items-center justify-center"
+              >
+                <div className="relative ">
+                  <Box
+                    src={item.iconUrl}
+                    className="cursor-pointer w-10 h-10 lg:w-[72px] lg:h-[72px]"
+                    width={72}
+                    height={72}
+                  />
+                  <img
+                    src={"./images/heart.png"}
+                    alt={item.id}
+                    className="absolute w-6 h-6 lg:w-11 lg:h-11 -right-[30%] bottom-0"
+                  />
+                </div>
+                <div className="text-sm lg:text-2xl text-gray-500 mt-2">
+                  + {item.points}
+                </div>
               </div>
-              <div className="text-2xl text-gray-500 mt-2">+ {item.points}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
         <div className="mt-2 w-full h-[70%]">
           <PixelFlow />
         </div>

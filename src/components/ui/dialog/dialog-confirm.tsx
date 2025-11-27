@@ -20,234 +20,81 @@ export default function DialogConfirm({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: "#00000099" }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      data-testid="dialog-confirm-overlay"
+      style={{
+        background: "#00000099",
+        paddingTop: "max(1rem, env(safe-area-inset-top))",
+        paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+        paddingLeft: "max(1rem, env(safe-area-inset-left))",
+        paddingRight: "max(1rem, env(safe-area-inset-right))",
+      }}
     >
-      <div className="flex items-end">
-        <div onClick={(e) => e.stopPropagation()}>
-          <svg
-            width="559.36"
-            height="293.76"
-            viewBox="0 0 874 459"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g clip-path="url(#clip0_3_10690)">
-              <path
-                d="M854 20H864V439H854V449H20V439H10V20H20V10H854V20Z"
-                fill="#FFFDFA"
-              />
-              <rect x="30" width="814" height="10" fill="black" />
-              <g style={{ mixBlendMode: "soft-light" }}>
-                <rect x="30" y="10" width="814" height="10" fill="white" />
-              </g>
-              <rect x="30" y="449" width="814" height="10" fill="black" />
-              <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
-                <rect x="30" y="439" width="814" height="10" fill="black" />
-              </g>
-              <rect
-                x="864"
-                y="429"
-                width="399"
-                height="9.99997"
-                transform="rotate(-90 864 429)"
-                fill="black"
-              />
-              <rect
-                width="399"
-                height="10"
-                transform="matrix(7.27428e-08 -1 -1 -2.62663e-08 10 429)"
-                fill="black"
-              />
-              <rect x="844" y="10" width="10" height="10" fill="black" />
-              <g style={{ mixBlendMode: "soft-light" }}>
-                <rect x="844" y="20" width="10" height="10" fill="white" />
-              </g>
-              <rect x="854" y="20" width="10" height="10" fill="black" />
-              <rect
-                width="10"
-                height="10"
-                transform="matrix(-1 0 0 1 30 10)"
-                fill="black"
-              />
-              <g style={{ mixBlendMode: "soft-light" }}>
-                <rect
-                  width="10"
-                  height="10"
-                  transform="matrix(-1 0 0 1 30 20)"
-                  fill="white"
-                />
-              </g>
-              <rect
-                width="10"
-                height="10"
-                transform="matrix(-1 0 0 1 20 20)"
-                fill="black"
-              />
-              <g style={{ mixBlendMode: "soft-light" }}>
-                <rect
-                  width="10"
-                  height="10"
-                  transform="matrix(-1 0 0 1 20 30)"
-                  fill="white"
-                />
-              </g>
-              <rect
-                width="10"
-                height="10"
-                transform="matrix(1 0 0 -1 844 449)"
-                fill="black"
-              />
-              <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
-                <rect
-                  width="10"
-                  height="10"
-                  transform="matrix(1 0 0 -1 844 439)"
-                  fill="black"
-                />
-              </g>
-              <rect
-                width="10"
-                height="10"
-                transform="matrix(1 0 0 -1 854 439)"
-                fill="black"
-              />
-              <g style={{ mixBlendMode: "color-burn" }} opacity="0.3">
-                <rect
-                  width="10"
-                  height="10"
-                  transform="matrix(1 0 0 -1 854 429)"
-                  fill="black"
-                />
-              </g>
-              <rect
-                x="30"
-                y="449"
-                width="10"
-                height="10"
-                transform="rotate(180 30 449)"
-                fill="black"
-              />
-              <g style={{ mixBlendMode: "color-burn" }} opacity={0.3}>
-                <rect
-                  x="30"
-                  y="439"
-                  width="10"
-                  height="10"
-                  transform="rotate(180 30 439)"
-                  fill="black"
-                />
-              </g>
-              <rect
-                x="20"
-                y="439"
-                width="10"
-                height="10"
-                transform="rotate(180 20 439)"
-                fill="black"
-              />
-            </g>
-            <text
-              x="437"
-              y="120"
-              textAnchor="middle"
-              fill="black"
-              fontSize="36"
-              fontWeight="bold"
-            >
-              {title}
-            </text>
-            <foreignObject x="160" y="145" width="554" height="120">
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textAlign: "center",
-                  padding: "10px 20px",
-                }}
-              >
-                <p
+      <div className="flex items-center justify-center w-[90%] md:w-[60%]">
+        <div className="svg-container">
+          <div className="content-wrapper p-4 md:p-8 text-center flex flex-col justify-between gap-4 lg:gap-8">
+            <div className="flex flex-col gap-2">
+              <p className="text-xl font-bold">{title}</p>
+              <p className="text-sm lg:text-base">{description}</p>
+            </div>
+            <div className="flex gap-4 min-h-[38px] md:min-h-[48px]">
+              <ButtonLighter onClick={onCancel}>
+                <span
                   style={{
-                    fontSize: "24px",
-                    lineHeight: "1.5",
-                    color: "black",
-                    margin: 0,
-                    wordWrap: "break-word",
+                    color: "white",
+                    fontWeight: "bold",
                   }}
                 >
-                  {description}
-                </p>
-              </div>
-            </foreignObject>
-            <foreignObject x="130" y="282" width="287" height="86">
-              <div
-                style={{
-                  width: "287px",
-                  height: "86px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  Hủy bỏ
+                </span>
+              </ButtonLighter>
+
+              <ButtonLighter
+                hoverColor={{
+                  main: "#FF8A50",
+                  accent: "#FFD460",
+                  shadow: "#E55A2A",
+                  border: "#000000",
                 }}
+                onClick={onConfirm}
               >
-                <ButtonLighter
-                  width={287}
-                  className="h-full"
-                  onClick={onCancel}
-                >
-                  <span
-                    style={{
-                      color: "white",
-                      fontSize: "24px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Hủy bỏ
-                  </span>
-                </ButtonLighter>
-              </div>
-            </foreignObject>
-            <foreignObject x="457" y="282" width="287" height="86">
-              <div
-                style={{
-                  width: "287px",
-                  height: "86px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <ButtonLighter
-                  width={287}
-                  className="h-full"
-                  hoverColor={{
-                    main: "#FF8A50",
-                    accent: "#FFD460",
-                    shadow: "#E55A2A",
-                    border: "#000000",
+                <span
+                  style={{
+                    color: "white",
+                    fontWeight: "bold",
                   }}
-                  onClick={onConfirm}
                 >
-                  <span
-                    style={{
-                      color: "white",
-                      fontSize: "24px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Xác nhận
-                  </span>
-                </ButtonLighter>
-              </div>
-            </foreignObject>
-            <defs>
-              <clipPath id="clip0_3_10690">
-                <rect width="874" height="459" fill="white" />
-              </clipPath>
-            </defs>
-          </svg>
+                  Xác nhận
+                </span>
+              </ButtonLighter>
+            </div>
+          </div>
+
+          <div className="rect-common rect-1"></div>
+          <div className="rect-common rect-2 blend-soft-light"></div>
+          <div className="rect-common rect-3"></div>
+          <div className="rect-common rect-4 blend-color-burn opacity-30"></div>
+
+          <div className="rect-vertical rect-5"></div>
+          <div className="rect-vertical rect-6"></div>
+
+          <div className="rect-square rect-7"></div>
+          <div className="rect-square rect-8 blend-soft-light"></div>
+          <div className="rect-square rect-9"></div>
+
+          <div className="rect-square rect-10"></div>
+          <div className="rect-square rect-11 blend-soft-light"></div>
+          <div className="rect-square rect-12"></div>
+          <div className="rect-square rect-13 blend-soft-light"></div>
+
+          <div className="rect-square rect-14"></div>
+          <div className="rect-square rect-15 blend-color-burn opacity-30"></div>
+          <div className="rect-square rect-16"></div>
+          <div className="rect-square rect-17 blend-color-burn opacity-30"></div>
+
+          <div className="rect-square rect-18"></div>
+          <div className="rect-square rect-19 blend-color-burn opacity-30"></div>
+          <div className="rect-square rect-20"></div>
         </div>
       </div>
     </div>

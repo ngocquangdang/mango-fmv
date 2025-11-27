@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { useId } from "react";
 
 type BoxProps = {
   src?: string;
@@ -11,24 +11,37 @@ type BoxProps = {
 
 export default function Box({
   src = "https://picsum.photos/seed/picsum/200/300",
-  width = 80,
-  height = 80,
+  // width = "min(25vw, 180px)",
+  // height = "min(25vw, 180px)",
   borderColor = "#111111",
   backgroundColor = "#FFDE29",
   className = "",
 }: BoxProps) {
   const clipPathId = useId().replace(/:/g, "");
 
-  const dimensionStyle = useMemo(
-    () => ({
-      width: typeof width === "number" ? `${width}px` : width,
-      height: typeof height === "number" ? `${height}px` : height,
-    }),
-    [width, height],
-  );
+  // const dimensionStyle = useMemo(() => {
+  //   const calcWidth =
+  //     typeof width === "number" ? `${width}px` : width || "min(25vw, 180px)";
+  //   const calcHeight =
+  //     typeof height === "number" ? `${height}px` : height || "min(25vw, 180px)";
+  //   return {
+  //     width: calcWidth,
+  //     height: calcHeight,
+  //     minWidth: "40px",
+  //     minHeight: "40px",
+  //   };
+  // }, [width, height]);
 
   return (
-    <div className={`relative overflow-hidden ${className}`} style={dimensionStyle}>
+    <div
+      className={`relative overflow-hidden ${className}`}
+      style={{
+        // ...dimensionStyle,
+        maxWidth: "100%",
+        maxHeight: "100%",
+        aspectRatio: "1 / 1",
+      }}
+    >
       <svg
         width="100%"
         height="100%"

@@ -314,3 +314,186 @@ body {
 .swiper-wrapper {
   width: fit-content !important;
 }
+/* Container chính (viewBox 874x459) */
+.svg-container {
+  width: min(90vw, 574px);
+  max-width: 100%;
+  aspect-ratio: 874 / 459;
+  height: auto;
+  min-height: 200px;
+  position: relative; /* Quan trọng cho z-index và absolute positioning */
+  overflow: hidden;
+  background-color: transparent;
+}
+
+/* Base styles cho các lớp khung */
+.svg-container > div {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+/* Nội dung dialog */
+.dialog-title {
+  position: absolute;
+  top: 26.14%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  text-align: center;
+  font-weight: bold;
+  color: black;
+  font-size: clamp(20px, 4vw, 36px);
+  z-index: 3;
+}
+
+.dialog-description {
+  position: absolute;
+  top: 31.59%;
+  left: 18.32%;
+  width: 63.42%;
+  height: 26.14%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(8px, 1.5vw, 20px) clamp(12px, 2vw, 20px);
+  text-align: center;
+  color: black;
+  z-index: 3;
+}
+
+.dialog-description p {
+  font-size: clamp(14px, 2.5vw, 24px);
+  line-height: 1.5;
+  margin: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.dialog-button {
+  position: absolute;
+  top: 61.43%;
+  width: 32.84%;
+  height: 18.73%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.dialog-button button {
+  width: 100%;
+  height: 100%;
+}
+
+.dialog-button-cancel {
+  left: 14.88%;
+}
+
+.dialog-button-confirm {
+  left: 52.30%;
+}
+
+/* -------------------------------------- */
+/* LỚP NỘI DUNG (Chiếm toàn bộ 100%, nằm dưới viền) */
+.content-wrapper {
+  top: 2.18%;
+  left: 2.29%;
+  width: 95.42%;
+  height: 95.64%;
+  background-color: white; /* Nền trắng như yêu cầu */
+  overflow: hidden; 
+  z-index: 1; 
+}
+
+/* -------------------------------------- */
+/* ĐỊNH NGHĨA CHUNG CHO KHUNG VIỀN (Nằm trên nội dung) */
+.svg-container .rect-common,
+.svg-container .rect-vertical,
+.svg-container .rect-square {
+  background-color: black; /* Mặc định là đen */
+  z-index: 2; 
+}
+
+/* Định nghĩa các lớp hòa trộn (Blend Modes) */
+.blend-soft-light {
+  mix-blend-mode: soft-light;
+  background-color: white; /* Dùng màu trắng cho soft-light theo SVG */
+}
+
+.blend-color-burn {
+  mix-blend-mode: color-burn;
+}
+
+.opacity-30 {
+  opacity: 0.3;
+}
+/* -------------------------------------- */
+
+/* CÁC THANH NGANG */
+.rect-1 { 
+  top: 0;
+  left: 3.43%;
+  width: 93.14%;
+  height: 2.18%;
+}
+.rect-2 { 
+  top: 2.18%;
+  left: 3.43%;
+  width: 93.14%;
+  height: 2.18%;
+}
+.rect-3 { 
+  top: 97.82%;
+  left: 3.43%;
+  width: 93.14%;
+  height: 2.18%;
+}
+.rect-4 { 
+  top: 95.64%;
+  left: 3.43%;
+  width: 93.14%;
+  height: 2.18%;
+}
+
+/* CÁC THANH DỌC */
+.rect-5 { 
+  top: 6.54%;
+  left: 97.72%;
+  width: 1.14%;
+  height: 86.93%;
+}
+.rect-6 { 
+  top: 6.54%;
+  left: 1.14%;
+  width: 1.14%;
+  height: 86.93%;
+}
+
+/* -------------------------------------- */
+/* CÁC Ô VUÔNG GÓC (10x10) */
+.rect-square {
+  width: 1.144%;
+  height: 2.178%;
+}
+
+/* Góc trên bên phải */
+.rect-7 { top: 2.18%; left: 96.57%; }
+.rect-8 { top: 4.36%; left: 96.57%; }
+.rect-9 { top: 4.36%; left: 97.72%; }
+
+/* Góc trên bên trái */
+.rect-10 { top: 2.18%; left: 2.29%; } 
+.rect-11 { top: 4.36%; left: 2.29%; }
+.rect-12 { top: 4.36%; left: 1.14%; } 
+.rect-13 { top: 6.54%; left: 1.14%; }
+
+/* Góc dưới bên phải */
+.rect-14 { top: 95.64%; left: 96.57%; }
+.rect-15 { top: 93.46%; left: 96.57%; }
+.rect-16 { top: 93.46%; left: 97.72%; }
+.rect-17 { top: 91.29%; left: 97.72%; }
+
+/* Góc dưới bên trái */
+.rect-18 { top: 95.64%; left: 2.29%; }
+.rect-19 { top: 93.46%; left: 2.29%; }
+.rect-20 { top: 93.46%; left: 1.14%; }

@@ -39,13 +39,24 @@ const defaultActiveColors: Required<ColorSet> = {
 };
 
 type TabProps = {
+  width?: number | string;
+  height?: number | string;
   children?: ReactNode;
   activeTab: string;
   onTabChange: (key: string) => void;
   tabBlocks: TabBlockConfig[];
+  className?: string;
 };
 
-export default function Tab({ children, activeTab, onTabChange, tabBlocks }: TabProps) {
+export default function Tab({
+  width = "1201",
+  height = "820",
+  children,
+  activeTab,
+  onTabChange,
+  tabBlocks,
+  className,
+}: TabProps) {
   const handleTabClick = (tabKey: string) => {
     onTabChange(tabKey);
   };
@@ -54,94 +65,95 @@ export default function Tab({ children, activeTab, onTabChange, tabBlocks }: Tab
 
   return (
     <svg
-      width="1201"
-      height="820"
+      width={typeof width === "number" ? `${width} ` : width}
+      height={typeof height === "number" ? `${height} ` : height}
       viewBox="0 0 1201 820"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
+      className={className}
     >
       {(() => {
         const tabElements = tabBlocks.map((config, index) => {
-        const {
-          key,
-          label,
-          origin,
-          activeOrigin,
-          labelOffset = DEFAULT_LABEL_OFFSET,
-          activeLabelOffset,
-          labelFontSize = 16,
-          activeLabelFontSize,
-          baseColors,
-          activeColors,
-          clipId,
-          innerClipId,
-          activeClipId,
-          activeInnerClipId,
-        } = config;
+          const {
+            key,
+            label,
+            origin,
+            activeOrigin,
+            labelOffset = DEFAULT_LABEL_OFFSET,
+            activeLabelOffset,
+            labelFontSize = 16,
+            activeLabelFontSize,
+            baseColors,
+            activeColors,
+            clipId,
+            innerClipId,
+            activeClipId,
+            activeInnerClipId,
+          } = config;
 
-        const isActive = key === activeTab;
-        const shouldShift = index > 0 && activeIndex > index;
-        const shiftX = shouldShift ? 10 : 0;
-        const baseOrigin = {
-          x: origin.x - shiftX,
-          y: origin.y,
-        };
-        const shiftedActiveOrigin = activeOrigin
-          ? { x: activeOrigin.x - shiftX, y: activeOrigin.y }
-          : baseOrigin;
+          const isActive = key === activeTab;
+          const shouldShift = index > 0 && activeIndex > index;
+          const shiftX = shouldShift ? 10 : 0;
+          const baseOrigin = {
+            x: origin.x - shiftX,
+            y: origin.y,
+          };
+          const shiftedActiveOrigin = activeOrigin
+            ? { x: activeOrigin.x - shiftX, y: activeOrigin.y }
+            : baseOrigin;
 
-        const currentOrigin = isActive ? shiftedActiveOrigin : baseOrigin;
-        const currentClipId = isActive ? activeClipId ?? clipId : clipId;
-        const currentInnerClipId = isActive
-          ? activeInnerClipId ?? innerClipId
-          : innerClipId;
-        const currentLabelOffset = isActive
-          ? activeLabelOffset ?? labelOffset
-          : labelOffset;
-        const labelX = currentOrigin.x + currentLabelOffset.x;
-        const labelY = currentOrigin.y + currentLabelOffset.y;
-        const resolvedVariant = isActive ? "selected" : "standard";
-        const resolvedFontSize =
-          (isActive ? activeLabelFontSize : labelFontSize) ??
-          (isActive ? 18 : 16);
-        const resolvedColors = isActive
-          ? { ...defaultActiveColors, ...activeColors }
-          : { ...defaultStandardColors, ...baseColors };
+          const currentOrigin = isActive ? shiftedActiveOrigin : baseOrigin;
+          const currentClipId = isActive ? activeClipId ?? clipId : clipId;
+          const currentInnerClipId = isActive
+            ? activeInnerClipId ?? innerClipId
+            : innerClipId;
+          const currentLabelOffset = isActive
+            ? activeLabelOffset ?? labelOffset
+            : labelOffset;
+          const labelX = currentOrigin.x + currentLabelOffset.x;
+          const labelY = currentOrigin.y + currentLabelOffset.y;
+          const resolvedVariant = isActive ? "selected" : "standard";
+          const resolvedFontSize =
+            (isActive ? activeLabelFontSize : labelFontSize) ??
+            (isActive ? 18 : 16);
+          const resolvedColors = isActive
+            ? { ...defaultActiveColors, ...activeColors }
+            : { ...defaultStandardColors, ...baseColors };
 
-        const handleKeyDown = (event: React.KeyboardEvent) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            handleTabClick(key);
-          }
-        };
+          const handleKeyDown = (event: React.KeyboardEvent) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              handleTabClick(key);
+            }
+          };
 
           const tabNode = (
             <SvgTabBlock
               key={key}
-            origin={currentOrigin}
-            clipId={currentClipId}
-            innerClipId={currentInnerClipId}
-            variant={resolvedVariant}
-            colors={resolvedColors}
-          >
-            <foreignObject
-              x={labelX - 95}
-              y={labelY - 23}
-              width={200}
-              height={50}
-              requiredExtensions="http://www.w3.org/1999/xhtml"
+              origin={currentOrigin}
+              clipId={currentClipId}
+              innerClipId={currentInnerClipId}
+              variant={resolvedVariant}
+              colors={resolvedColors}
             >
-              <div
-                className="h-full w-full flex items-center justify-center text-center cursor-pointer"
-                style={{ color: "white", fontSize: resolvedFontSize }}
-                tabIndex={0}
-                onClick={() => handleTabClick(key)}
-                onKeyDown={handleKeyDown}
+              <foreignObject
+                x={labelX - 95}
+                y={labelY - 23}
+                width={200}
+                height={50}
+                requiredExtensions="http://www.w3.org/1999/xhtml"
               >
-                {label}
-              </div>
-            </foreignObject>
+                <div
+                  className="h-full w-full flex items-center justify-center text-center cursor-pointer"
+                  style={{ color: "white", fontSize: resolvedFontSize }}
+                  tabIndex={0}
+                  onClick={() => handleTabClick(key)}
+                  onKeyDown={handleKeyDown}
+                >
+                  {label}
+                </div>
+              </foreignObject>
             </SvgTabBlock>
           );
 
@@ -161,7 +173,7 @@ export default function Tab({ children, activeTab, onTabChange, tabBlocks }: Tab
                 d="M1181 98H1191V800H1181V810H20V800H10V98H20V88H1181V98Z"
                 fill="#FEF0C7"
               />
-              <rect x="30" y="77.65" width="1141" height="10" fill="black" />
+              <rect x="30" y="77.5" width="1141" height="10" fill="black" />
               <g style={{ mixBlendMode: "soft-light" }}>
                 <rect x="30" y="88" width="1141" height="10" fill="white" />
               </g>
@@ -283,8 +295,9 @@ export default function Tab({ children, activeTab, onTabChange, tabBlocks }: Tab
           width={1120}
           height={620}
           requiredExtensions="http://www.w3.org/1999/xhtml"
+          xmlns="http://www.w3.org/1999/xhtml"
         >
-          <div className="h-full w-full">{children}</div>
+          {children}
         </foreignObject>
       )}
 

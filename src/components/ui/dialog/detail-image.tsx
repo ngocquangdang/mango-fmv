@@ -11,13 +11,13 @@ type DetailCollectionProps = {
 
 const defaultRowLabel = "DETAIL COLLECTION ROW";
 // const DEFAULT_WIDTH = 700;
-const DEFAULT_HEIGHT = 746;
+// const DEFAULT_HEIGHT = 746;
 
 export default function DetailImage({
   rowLabel = defaultRowLabel,
   sectionLabel,
   // width,
-  height: svgHeight,
+  // height: svgHeight,
   // className,
   onClose
 }: DetailCollectionProps) {
@@ -51,18 +51,18 @@ export default function DetailImage({
   //     ? width
   //     : containerWidth || (typeof width === "number" ? width : DEFAULT_WIDTH);
 
-  const calculatedHeight =
-    svgHeight && typeof svgHeight === "number"
-      ? svgHeight
-      : typeof svgHeight === "string"
-        ? svgHeight
-        : DEFAULT_HEIGHT;
+    // const calculatedHeight =
+    //   svgHeight && typeof svgHeight === "number"
+    //     ? svgHeight
+    //     : typeof svgHeight === "string"
+    //       ? svgHeight
+    //       : DEFAULT_HEIGHT;
 
   return (
     // <div ref={containerRef} className={className} style={{ width: width || "100%", height: svgHeight || "auto" }}>
     <svg
       width={"100%"}
-      height={calculatedHeight}
+      height={"100%"}
       viewBox="0 0 1637 746"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

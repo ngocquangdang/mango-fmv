@@ -67,7 +67,7 @@ export const VideoPlayerProvider = ({
     | "ranking"
     | "playAgain"
     | "endChapter"
-  >("intro");
+  >("endChapter");
   const [pauseType, setPauseType] = React.useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = React.useState<Record<
     string,

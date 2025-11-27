@@ -24,7 +24,7 @@ export default function DetailDialog({
       style={{ background: "#00000099" }}
       onClick={onClose}
     >
-      <div className="flex items-end justify-end w-[80vw] h-[80vh]">
+      <div className="flex items-end justify-end w-[80vw]">
         {type === "image" ? (
           <DetailImage
             rowLabel={rowLabel}

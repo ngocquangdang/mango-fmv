@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 
 type YieldActiveCardProps = {
   imageSrc: string;
+  className?: string;
   width?: number | string;
   height?: number | string;
   children?: ReactNode;
@@ -11,10 +12,12 @@ export default function YieldActiveCard({
   imageSrc,
   width = 200,
   height = 231,
+  className = "",
   children,
 }: YieldActiveCardProps) {
   return (
     <svg
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 200 231"
@@ -400,7 +403,7 @@ export default function YieldActiveCard({
             fill="#FFA720"
           />
         </g>
-        {/* Replaced path with foreignObject for custom content */}
+
         <foreignObject x="10" y="180" width="180" height="40">
           <div className="w-full h-full flex items-center justify-center">
             {children}

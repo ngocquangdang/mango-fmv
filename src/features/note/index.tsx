@@ -148,6 +148,16 @@ const tabContentData: Record<
       label: "???",
       imageSrc: "https://picsum.photos/seed/unknown12/200/200",
     },
+    {
+      id: "7",
+      label: "???",
+      imageSrc: "https://picsum.photos/seed/unknown18/200/200",
+    },
+    {
+      id: "8",
+      label: "???",
+      imageSrc: "https://picsum.photos/seed/unknown19/200/200",
+    },
   ],
   "tab-standard-2": [
     {
@@ -180,6 +190,16 @@ const tabContentData: Record<
       id: "6",
       label: "???",
       imageSrc: "https://picsum.photos/seed/unknown17/200/200",
+    },
+    {
+      id: "7",
+      label: "???",
+      imageSrc: "https://picsum.photos/seed/unknown18/200/200",
+    },
+    {
+      id: "8",
+      label: "???",
+      imageSrc: "https://picsum.photos/seed/unknown19/200/200",
     },
   ],
 };
@@ -255,14 +275,19 @@ function Note() {
   const currentTabContent = tabContentData[activeTab] || [];
 
   return (
-    <div className="flex relative w-full justify-center items-center">
-      <div style={{ width: "fit-content" }}>
-        <Banner className="fixed top-0 left-[37%] z-10 " text="Nhật ký" />
+    <div className=" w-full h-full">
+      <div className="flex justify-center">
+        <Banner
+          className="w-[140px]! h-[64px]! lg:w-[280px]! lg:h-[80px]!"
+          text="Nhật ký"
+        />
       </div>
-      <div className="w-[84%] mx-auto flex justify-center items-center">
-        <div className="relative ">
+      <div className="lg:w-[84%] w-[80%] mt-10 mx-auto flex justify-center items-center">
+        <div className="relative w-[32%]">
           <NoteLeft
-            className="w-full h-full"
+            width={"100%"}
+            height={"100%"}
+            className="w-full"
             noteImage={
               <img src={selectedChar?.imageSrc} alt={selectedChar?.name} />
             }
@@ -291,14 +316,12 @@ function Note() {
                     key={char.name}
                     src={char.imageSrc}
                     onClick={() => setActiveChar(char.name)}
-                    // className="w-20"
                   />
                 ) : (
                   <CharacterCard
                     key={char.name}
                     src={char.imageSrc}
                     onClick={() => setActiveChar(char.name)}
-                    // className="w-20"
                   />
                 )
               )}
@@ -306,25 +329,21 @@ function Note() {
           </NoteLeft>
         </div>
         <Tab
+          width={"100%"}
+          height={"100%"}
           activeTab={activeTab}
           onTabChange={setActiveTab}
           tabBlocks={tabBlocks}
+          className="w-[65%]"
         >
-          <div className="h-full w-fit py-14 flex items-center justify-between">
-            <div className="flex-1 px-4 mx-auto">
-              {activeTab === "tab-standard-0" ? (
-                <YieldGrid
-                  items={currentTabContent}
-                  onItemClick={handleItemClick}
-                />
-              ) : (
-                <NoteGrid
-                  items={currentTabContent}
-                  onItemClick={handleItemClick}
-                />
-              )}
-            </div>
-          </div>
+          {activeTab === "tab-standard-0" ? (
+            <YieldGrid
+              items={currentTabContent}
+              onItemClick={handleItemClick}
+            />
+          ) : (
+            <NoteGrid items={currentTabContent} onItemClick={handleItemClick} />
+          )}
         </Tab>
       </div>
     </div>

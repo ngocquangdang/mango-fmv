@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import SeekPre from "./seek-pre";
 import SeekTo from "./seek-to";
 import SupperSeekPre from "./supper-seek-pre";
@@ -9,7 +10,11 @@ import Start from "./start";
 
 export default function MediaPlayerControl() {
   const { pause, seekTo, pauseType, play } = useVideoPlayerContext();
+  const [isPlaying, setIsPlaying] = useState(true);
 
+  useEffect(() => {
+    setIsPlaying(pauseType === PausedActionName.USER_PAUSED_VIDEO);
+  }, [pauseType]);
   const handleSupperSeekPreClick = () => {
     console.log("supper seek pre");
     seekTo?.(-10, "relative");
@@ -23,11 +28,13 @@ export default function MediaPlayerControl() {
   const handlePauseClick = () => {
     console.log("pause");
     pause();
+    setIsPlaying(false);
   };
 
   const handlePlayClick = () => {
     console.log("play");
     play();
+    setIsPlaying(true);
   };
 
   const handleSeekToClick = () => {
@@ -42,15 +49,33 @@ export default function MediaPlayerControl() {
 
   return (
     <div className="flex items-center justify-center gap-10">
-      <SupperSeekPre onClick={handleSupperSeekPreClick} />
-      <SeekPre onClick={handleSeekPreClick} />
-      {pauseType === PausedActionName.USER_PAUSED_VIDEO ? (
-        <Pause onClick={handlePauseClick} />
+      <SupperSeekPre
+        onClick={handleSupperSeekPreClick}
+        className="w-[40px] h-[40px] lg:w-[64px] lg:h-[64px]"
+      />
+      <SeekPre
+        onClick={handleSeekPreClick}
+        className="w-[40px] h-[40px] lg:w-[64px] lg:h-[64px]"
+      />
+      {isPlaying ? (
+        <Pause
+          onClick={handlePauseClick}
+          className="w-[46px] h-[46px] lg:w-[84px] lg:h-[84px]"
+        />
       ) : (
-        <Start onClick={handlePlayClick} />
+        <Start
+          onClick={handlePlayClick}
+          className="w-[46px] h-[46px] lg:w-[84px] lg:h-[84px]"
+        />
       )}
-      <SeekTo onClick={handleSeekToClick} />
-      <SupperSeekTo onClick={handleSupperSeekToClick} />
+      <SeekTo
+        onClick={handleSeekToClick}
+        className="w-[40px] h-[40px] lg:w-[64px] lg:h-[64px]"
+      />
+      <SupperSeekTo
+        onClick={handleSupperSeekToClick}
+        className="w-[40px] h-[40px] lg:w-[64px] lg:h-[64px]"
+      />
     </div>
   );
 }

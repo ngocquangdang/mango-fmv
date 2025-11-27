@@ -19,8 +19,9 @@ export default function ButtonLighter({
   ...props
 }: ButtonLighterProps & { width?: number }) {
   // Generate stable IDs without hooks
-  const clipId0 = `btn-lighter-clip-${width}-0`;
-  const clipId1 = `btn-lighter-clip-${width}-1`;
+  const uniqueId = props.id || `default-${width}`;
+  const clipId0 = `btn-lighter-clip-${uniqueId}-0`;
+  const clipId1 = `btn-lighter-clip-${uniqueId}-1`;
 
   // Default colors (non-hover state)
   const defaultColors = {

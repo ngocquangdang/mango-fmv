@@ -52,26 +52,26 @@ export default function Home() {
       {/* Left Side - Navigation Items */}
       <div className="absolute left-15 bottom-8 flex flex-col gap-6 z-20">
         <ButtonLighter
-          className="min-h-[66px] max-w-[243px] text-white cursor-pointer"
+          className="min-h-[46px] lg:min-h-[66px] max-w-[180px] lg:max-w-[243px] text-white cursor-pointer"
           onClick={() => handleClick("story")}
         >
           Cốt truyện
         </ButtonLighter>
         <ButtonLighter
-          className="min-h-[66px] max-w-[243px] text-white cursor-pointer"
+          className="min-h-[46px] lg:min-h-[66px] max-w-[180px] lg:max-w-[243px] text-white cursor-pointer"
           onClick={() => handleClick("journal")}
         >
           Nhật ký
         </ButtonLighter>
         <ButtonLighter
-          className="min-h-[66px] max-w-[243px] text-white cursor-pointer"
+          className="min-h-[46px] lg:min-h-[66px] max-w-[180px] lg:max-w-[243px] text-white cursor-pointer"
           onClick={() => handleClick("ranking")}
         >
           Xếp hạng
         </ButtonLighter>
         {(chapter.progress?.currentScene?.watchingSecond || 0) > 0 && (
           <ButtonLighter
-            className="min-h-[66px] max-w-[243px] text-white cursor-pointer"
+            className="min-h-[46px] lg:min-h-[66px] max-w-[180px] lg:max-w-[243px] text-white cursor-pointer"
             onClick={() => handleClick("playAgain")}
           >
             Chơi lại
@@ -82,7 +82,7 @@ export default function Home() {
       {/* Bottom Center - Start Button (as text) */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
         <ButtonUI
-          className="!min-h-[80px] max-w-[243px] text-white cursor-pointer"
+          className="lg:min-h-[80px]! min-h-[60px]! w-full! min-w-[160px]! max-w-[180px]! lg:max-w-[243px] text-white cursor-pointer"
           onClick={handleStart}
         >
           {(chapter.progress?.currentScene?.watchingSecond || 0) > 0 ? "Tiếp tục" : "Bắt đầu"}

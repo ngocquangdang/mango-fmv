@@ -58,12 +58,12 @@ export default function Banner({
   const height = svgHeight ?? 79.2; // Reduced by 40% total (0.8 × 0.8)
 
   // Calculate font size to fit text within the available content width
-  const availableTextWidth = Math.max(0, totalWidth - LEFT_WIDTH - RIGHT_WIDTH - 20); // 20px padding for safety
-  const estimatedTextWidth = text.length * charWidth;
+  // const availableTextWidth = Math.max(0, totalWidth - LEFT_WIDTH - RIGHT_WIDTH - 20); // 20px padding for safety
+  // const estimatedTextWidth = text.length * charWidth;
   // If text is empty or estimated width is 0, default to 40. Otherwise scale down if needed.
-  const fontSize = estimatedTextWidth > 0
-    ? Math.min(28, (availableTextWidth / estimatedTextWidth) * 28)
-    : 28;
+  // const fontSize = estimatedTextWidth > 0
+  //   ? Math.min(16, (availableTextWidth / estimatedTextWidth) * 16)
+  //   : 16;
 
   return (
     <div
@@ -79,7 +79,7 @@ export default function Banner({
       <svg
         width="100%"
         height="100%"
-        viewBox={`0 0 ${totalWidth} ${height}`}
+        viewBox={`0 0 ${totalWidth - 30} ${height}`}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="none"
@@ -242,9 +242,8 @@ export default function Banner({
           dominantBaseline="middle"
           textAnchor="middle"
           fill="white"
-          fontSize={fontSize}
-          fontFamily="CondensedDisplay, sans-serif"
-          style={{ textTransform: "uppercase", letterSpacing: "0.05em" }}
+          fontSize={16}
+          style={{ textTransform: "uppercase" }}
         >
           {text}
         </text>

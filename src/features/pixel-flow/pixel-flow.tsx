@@ -71,7 +71,7 @@ const PixelFlow = () => {
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        minZoom={0.5}
+        minZoom={0.3}
         maxZoom={0.5}
         defaultViewport={{
           x: 100,
@@ -83,7 +83,7 @@ const PixelFlow = () => {
           setReviewScene(false);
 
           if (!scene.videoUrl) return;
-          if (node.id.includes("unlocked")) return;
+          if (!scene.status) return;
           if (node.id !== currentStatus?.currentSceneId) {
             setCurrentStatus(null);
             setPauseType(null);

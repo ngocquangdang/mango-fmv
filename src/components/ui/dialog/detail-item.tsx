@@ -11,7 +11,7 @@ type DetailItemProps = {
 
 const defaultRowLabel = "DETAIL ITEM ROW";
 // const DEFAULT_WIDTH = 1637;
-const DEFAULT_HEIGHT = 746;
+// const DEFAULT_HEIGHT = 746;
 
 export default function DetailItem({
   rowLabel = defaultRowLabel,
@@ -51,18 +51,18 @@ export default function DetailItem({
   //     ? width
   //     : containerWidth || (typeof width === "number" ? width : DEFAULT_WIDTH);
 
-  const calculatedHeight =
-    svgHeight && typeof svgHeight === "number"
-      ? svgHeight
-      : typeof svgHeight === "string"
-        ? svgHeight
-        : DEFAULT_HEIGHT;
+  // const calculatedHeight =
+  //   svgHeight && typeof svgHeight === "number"
+  //     ? svgHeight
+  //     : typeof svgHeight === "string"
+  //       ? svgHeight
+  //       : DEFAULT_HEIGHT;
 
   return (
     <div ref={containerRef} className={className} style={{ width: width || "100%", height: svgHeight || "auto" }}>
       <svg
         width={"100%"}
-        height={calculatedHeight}
+        height={"100%"}
         viewBox="0 0 1637 746"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
