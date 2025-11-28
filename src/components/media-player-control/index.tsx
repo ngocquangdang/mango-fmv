@@ -1,20 +1,16 @@
-import { useEffect, useState } from "react";
+
 import SeekPre from "./seek-pre";
 import SeekTo from "./seek-to";
 import SupperSeekPre from "./supper-seek-pre";
 import SupperSeekTo from "./supper-seek-to";
 import Pause from "./pause";
 import { useVideoPlayerContext } from "../../contexts";
-import { PausedActionName } from "../../types/chapter";
+
 import Start from "./start";
 
 export default function MediaPlayerControl() {
-  const { pause, seekTo, pauseType, play } = useVideoPlayerContext();
-  const [isPlaying, setIsPlaying] = useState(true);
+  const { pause, seekTo, play, isPlaying, setIsPlaying } = useVideoPlayerContext();
 
-  useEffect(() => {
-    setIsPlaying(pauseType === PausedActionName.USER_PAUSED_VIDEO);
-  }, [pauseType]);
   const handleSupperSeekPreClick = () => {
     console.log("supper seek pre");
     seekTo?.(-10, "relative");

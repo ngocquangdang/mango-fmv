@@ -13,13 +13,13 @@ import ButtonLighter from "../components/button-lighter";
 
 export interface VideoPlayerContextType {
   type:
-    | "intro"
-    | "interactive"
-    | "story"
-    | "journal"
-    | "ranking"
-    | "playAgain"
-    | "endChapter";
+  | "intro"
+  | "interactive"
+  | "story"
+  | "journal"
+  | "ranking"
+  | "playAgain"
+  | "endChapter";
   setType: (
     type:
       | "intro"
@@ -49,6 +49,8 @@ export interface VideoPlayerContextType {
   quitPlayer: () => void;
   setReviewScene: (status: boolean) => void;
   isReviewScene: boolean;
+  isPlaying: boolean;
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const VideoPlayerProvider = ({
@@ -81,6 +83,8 @@ export const VideoPlayerProvider = ({
     Record<string, any>
   >({});
   const [isReviewScene, setIsReviewScene] = React.useState(false);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
   // Ensure we only initialize the VideoPlayer SDK once per api instance
   const initializedRef = React.useRef(false);
   const unsubRef = React.useRef<Array<() => void>>([]);
@@ -113,6 +117,7 @@ export const VideoPlayerProvider = ({
       if (!api) return;
       api.setReviewScene?.(status);
       setIsReviewScene(status);
+      setIsPlaying(status);
     },
     [api, setIsReviewScene]
   );
@@ -404,11 +409,11 @@ export const VideoPlayerProvider = ({
     );
 
     unsubRef.current.push(
-      offStart ?? (() => {}),
-      offStop ?? (() => {}),
-      offEnded ?? (() => {}),
-      offChoice ?? (() => {}),
-      offCollectionSelected ?? (() => {})
+      offStart ?? (() => { }),
+      offStop ?? (() => { }),
+      offEnded ?? (() => { }),
+      offChoice ?? (() => { }),
+      offCollectionSelected ?? (() => { })
     );
 
     return () => {
@@ -444,6 +449,8 @@ export const VideoPlayerProvider = ({
     quitPlayer,
     setReviewScene,
     isReviewScene,
+    isPlaying,
+    setIsPlaying,
   };
   return (
     <VideoPlayerContext.Provider value={value}>

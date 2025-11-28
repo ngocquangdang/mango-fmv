@@ -2260,10 +2260,10 @@ export default function LayoutEndChapter({
         }}
       >
         <ButtonLighter
-          className="w-full h-[26x] md:h-[42px] text-white text-xs flex items-center justify-center"
+          className="w-full h-[16px] md:h-[42px] text-white text-xs flex items-center justify-center px-2 md:px-4"
           onClick={onPlayAgain}
         >
-          <span className="text-xs">Chơi lại</span>
+          <span className="text-[6px] md:text-xs">Chơi lại</span>
         </ButtonLighter>
       </div>
     </div>

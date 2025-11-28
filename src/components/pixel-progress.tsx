@@ -454,7 +454,7 @@ const PixelProgressSVG = ({ progress }: { progress: number }) => (
     >
       {Math.round(progress)}%
     </text>
-    <rect x="1200" width="144" height="99" fill="url(#pattern0_3_9909)" />
+    {/* <rect x="1200" width="144" height="99" fill="url(#pattern0_3_9909)" /> */}
     <g clip-path="url(#clip2_3_9909)">
       <path
         d="M317 156L308 165V177L317 186H320V177V165V156H317Z"
@@ -1113,7 +1113,7 @@ const PixelProgressSVG = ({ progress }: { progress: number }) => (
       />
     </g>
     <defs>
-      <pattern
+      {/* <pattern
         id="pattern0_3_9909"
         patternContentUnits="objectBoundingBox"
         width="1"
@@ -1123,7 +1123,7 @@ const PixelProgressSVG = ({ progress }: { progress: number }) => (
           xlinkHref="#image0_3_9909"
           transform="scale(0.00195312 0.00285645)"
         />
-      </pattern>
+      </pattern> */}
       <clipPath id="green-bar-clip">
         <rect
           x="314"
@@ -1247,7 +1247,7 @@ export const PixelProgress: React.FC<PixelProgressProps> = ({
           justifyContent: "center",
         }}
       >
-        <ButtonLighter onClick={onClickBtn} className="cursor-pointer text-white">
+        <ButtonLighter onClick={onClickBtn} className="cursor-pointer text-white text-[6px] md:text-base">
           Tiếp tục
         </ButtonLighter>
       </div>

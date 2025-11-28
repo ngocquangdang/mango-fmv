@@ -36,15 +36,15 @@ export default function Project() {
   return (
     <FlowChartContextProvider>
       <div className="w-full h-full relative">
-        <div className='lg:block flex justify-between'>
+        <div className='lg:block block md:flex md:justify-between'>
           <div></div>
-          <div className="flex ml-40 lg:ml-0 justify-center">
+          <div className="flex ml-0 md:ml-40 lg:ml-0 justify-center">
             <Banner
               className="w-[140px]! h-[68px]! lg:w-[280px]! lg:h-[80px]!"
               text="Cốt Truyện"
             />
           </div>
-          <div className="pr-8 pt-2 lg:mt-4 flex flex-row lg:gap-10 gap-6 justify-center">
+          <div className="md:pr-8 lg:pr-0 pr-0 pt-2 lg:mt-4 flex flex-row lg:gap-10 gap-6 justify-center">
             {items.map((item) => (
               <div
                 key={item.id}
@@ -75,7 +75,7 @@ export default function Project() {
           <PixelFlow />
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 w-[64%] mx-auto z-10">
+        <div className="fixed bottom-0 left-0 right-0 md:w-[64%] w-[90%] mx-auto z-10">
           <PixelProgress progress={60} onClickBtn={handlePlay} />
         </div>
       </div>

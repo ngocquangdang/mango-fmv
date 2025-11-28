@@ -1,13 +1,14 @@
 import React from "react";
 
-interface ButtonLighterProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonLighterProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   className?: string;
   hoverColor?: {
-    main?: string;      // Màu chính (mặc định #629BFE)
-    accent?: string;    // Màu accent (mặc định #5FCDE3)
-    shadow?: string;    // Màu shadow (mặc định #5B6DDF)
-    border?: string;    // Màu border (mặc định #111111)
+    main?: string; // Màu chính (mặc định #629BFE)
+    accent?: string; // Màu accent (mặc định #5FCDE3)
+    shadow?: string; // Màu shadow (mặc định #5B6DDF)
+    border?: string; // Màu border (mặc định #111111)
   };
 }
 
@@ -42,18 +43,20 @@ export default function ButtonLighter({
   return (
     <button
       className={`relative inline-flex items-center justify-center transition-all duration-200 group ${className}`}
-      style={{
-        width: '100%',
-        aspectRatio: `${width} / 55.04`, // Reduced by 40% total (0.8 × 0.8)
-        '--btn-main': defaultColors.main,
-        '--btn-accent': defaultColors.accent,
-        '--btn-shadow': defaultColors.shadow,
-        '--btn-border': defaultColors.border,
-        '--btn-hover-main': hoverColors.main,
-        '--btn-hover-accent': hoverColors.accent,
-        '--btn-hover-shadow': hoverColors.shadow,
-        '--btn-hover-border': hoverColors.border,
-      } as React.CSSProperties}
+      style={
+        {
+          width: "100%",
+          aspectRatio: `${width} / 55.04`, // Reduced by 40% total (0.8 × 0.8)
+          "--btn-main": defaultColors.main,
+          "--btn-accent": defaultColors.accent,
+          "--btn-shadow": defaultColors.shadow,
+          "--btn-border": defaultColors.border,
+          "--btn-hover-main": hoverColors.main,
+          "--btn-hover-accent": hoverColors.accent,
+          "--btn-hover-shadow": hoverColors.shadow,
+          "--btn-hover-border": hoverColors.border,
+        } as React.CSSProperties
+      }
       {...props}
     >
       {/* SVG Background - scales with container */}
@@ -76,12 +79,27 @@ export default function ButtonLighter({
         `}</style>
         <g clipPath={`url(#${clipId0})`}>
           <path
-            d={`M${width - 6.40128} 6.40064H${width - 0.00064}V48.641856H${width - 6.39936}V55.04H0V55.03936H6.3993728V48.64H0V6.4H6.4V0H${width - 6.40128}V6.40064Z`}
+            d={`M${width - 6.40128} 6.40064H${width - 0.00064}V48.641856H${
+              width - 6.39936
+            }V55.04H0V55.03936H6.3993728V48.64H0V6.4H6.4V0H${
+              width - 6.40128
+            }V6.40064Z`}
             className="btn-lighter-main"
           />
           <g clipPath={`url(#${clipId1})`}>
-            <rect x="6.3937472" width={width - 12.79488} height="3.2" className="btn-lighter-border" />
-            <rect x="6.3993728" y="51.84" width={width - 12.79872} height="3.2" className="btn-lighter-border" />
+            <rect
+              x="6.3937472"
+              width={width - 12.79488}
+              height="3.2"
+              className="btn-lighter-border"
+            />
+            <rect
+              x="6.3993728"
+              y="51.84"
+              width={width - 12.79872}
+              height="3.2"
+              className="btn-lighter-border"
+            />
             <rect
               x={width - 3.20128}
               y="48.64"
@@ -108,7 +126,13 @@ export default function ButtonLighter({
               transform={`matrix(-1 0 0 1 ${width - 3.20128} 3.2)`}
               className="btn-lighter-border"
             />
-            <rect x="9.6" y="6.4" width={width - 19.20128} height="3.2" className="btn-lighter-accent" />
+            <rect
+              x="9.6"
+              y="6.4"
+              width={width - 19.20128}
+              height="3.2"
+              className="btn-lighter-accent"
+            />
             <rect
               width="3.2"
               height="3.2"
@@ -173,7 +197,7 @@ export default function ButtonLighter({
       </svg>
 
       {/* Children content */}
-      <span className="relative z-10 px-4 py-2">
+      <span className="relative z-10 px-0 md:px-4 py-0 md:py-2 flex items-center justify-center">
         {children}
       </span>
     </button>

@@ -31,21 +31,23 @@ export default function EndChapter() {
   };
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-screen overflow-hidden">
       <div className="flex justify-center">
         <Banner
           className="w-[260px]! h-[68px]! lg:w-[380px]! lg:h-[80px]!"
           text="Kết thúc chương"
         />
       </div>
-      <LayoutEndChapter
-        className="lg:w-[973px] lg:h-[564px] w-[60%] h-[64%] mx-auto"
-        onPlayAgain={() => handleClick("playAgain")}
-        chapter={<>chapter 1</>}
-        description="lorem ipsum dolor sit amet consectetur adipisicing elit"
-        progress="60%"
-        gift={[{}, {}, {}, {}, {}, {}]}
-      />
+      <div className="relative mt-2 lg:mt-20">
+        <LayoutEndChapter
+          className="lg:w-[973px] lg:h-[564px] md:w-[60%] md:h-[64%] w-[90%] h-[70%] mx-auto my-auto"
+          onPlayAgain={() => handleClick("playAgain")}
+          chapter={<>chapter 1</>}
+          description="lorem ipsum dolor sit amet consectetur adipisicing elit"
+          progress="60%"
+          gift={[{}, {}, {}, {}, {}, {}]}
+        />
+      </div>
       <DialogConfirm
         isOpen={dialogName === "quitPlayer"}
         onClose={() => setDialogName(null)}
