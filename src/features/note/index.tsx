@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import NoteLeft from "../../components/note-left";
 import Tab, { type TabBlockConfig } from "../../components/tab";
 import CharacterCard from "./components/character-card";
