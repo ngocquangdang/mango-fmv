@@ -180,8 +180,8 @@ export default function CharacterActiveCard({
           height="1"
         >
           <image
-            width="134"
-            height="164"
+            width="1"
+            height="1"
             href={src}
             preserveAspectRatio="xMidYMid slice"
           />

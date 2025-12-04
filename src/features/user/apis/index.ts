@@ -263,3 +263,13 @@ export const restartChapter = async (chapterId: string) => {
   );
   return response;
 };
+
+export const getCharacters = async (projectId: string = "5bc6a77b-e4d6-4a04-a0c8-629da6b2a9d0") => {
+  const response = await apiClienProject.get(
+    `/public/projects/${projectId}/characters`,
+    {
+      accept: "*/*",
+    }
+  );
+  return response;
+};

@@ -12,6 +12,7 @@ export interface HotspotItem {
   id: string;
   iconUrl: string;
   previousSceneId: string;
+  returnToSource: boolean;
   r: number;
   targetSceneId: string;
   title: string;
@@ -75,10 +76,31 @@ export enum PausedActionName {
   DECISION_POINT_REACHED = "DECISION_POINT_REACHED",
   VIDEO_ENDED = "VIDEO_ENDED",
   USER_PAUSED_VIDEO = "USER_PAUSED_VIDEO",
-  END_REVIEW="END_REVIEW"
+  END_REVIEW = "END_REVIEW",
 }
 
 export enum SceneType {
   HOTSPOT = "HOTSPOT",
   BRANCH = "BRANCH",
+}
+
+export interface Character {
+  id: string;
+  projectId: string;
+  name: string;
+  dateOfBirth: string;
+  imageUrl: string;
+  imagePath: string;
+  createdAt: string;
+  updatedAt: string;
+  height: string;
+  description: string;
+  strength: string;
+  info?: {
+    brthDay: string;
+    height: string;
+    desc: string;
+    strength: string;
+  };
+  imageSrc: string;
 }

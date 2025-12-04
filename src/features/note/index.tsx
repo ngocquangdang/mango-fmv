@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import NoteLeft from "../../components/note-left";
 import Tab, { type TabBlockConfig } from "../../components/tab";
 import CharacterCard from "./components/character-card";
@@ -9,6 +9,8 @@ import NoteGrid from "./components/note-grid";
 import Banner from "../../components/banner";
 import { DetailDialogProvider } from "../../components/ui/dialog/detail-dialog-context";
 import { useDetailDialog } from "../../components/ui/dialog/use-detail-dialog";
+import { useCharacters } from "../user/hooks";
+import type { Character } from "../../types/chapter";
 
 const tabBlocks: TabBlockConfig[] = [
   {
@@ -205,56 +207,16 @@ const tabContentData: Record<
 };
 
 function Note() {
-  const [activeChar, setActiveChar] = useState<string>("Thái Lê Minh Hiếu");
+  const { data: chars } = useCharacters();
+  const [activeChar, setActiveChar] = useState<string>(chars?.[0]?.id ?? "");
   const [activeTab, setActiveTab] = useState<string>(tabBlocks[0]?.key ?? "");
 
-  const chars = [
-    {
-      name: "Thái Lê Minh Hiếu",
-      info: {
-        brthDay: "12/12/2222",
-        height: "1m2",
-        desc: "Nổi trội với visual và vũ đạo",
-      },
-      imageSrc: "https://picsum.photos/200/300",
-    },
-    {
-      name: "Ngiuyen A",
-      info: {
-        brthDay: "12/12/2222",
-        height: "1m2",
-        desc: "Nổi trội với visual và vũ đạo",
-      },
-      imageSrc: "https://picsum.photos/200/300",
-    },
-    {
-      name: "Ngiuyen B",
-      info: {
-        brthDay: "12/12/2222",
-        height: "1m2",
-        desc: "Nổi trội với visual và vũ đạo",
-      },
-      imageSrc: "https://picsum.photos/200/300",
-    },
-    {
-      name: "Ngiuyen C",
-      info: {
-        brthDay: "12/12/2222",
-        height: "1m2",
-        desc: "Nổi trội với visual và vũ đạo",
-      },
-      imageSrc: "https://picsum.photos/200/300",
-    },
-    {
-      name: "Ngiuyen D",
-      info: {
-        brthDay: "12/12/2222",
-        height: "1m2",
-        desc: "Nổi trội với visual và vũ đạo",
-      },
-      imageSrc: "https://picsum.photos/200/300",
-    },
-  ];
+  // Set default active character when data loads
+  useEffect(() => {
+      if (chars?.length > 0 && !activeChar) {
+      setActiveChar(chars[0].id);
+    }
+  }, [chars, activeChar]);
 
   const { openDetailDialog } = useDetailDialog();
 
@@ -271,7 +233,7 @@ function Note() {
     });
   };
 
-  const selectedChar = chars.find((char) => char.name === activeChar);
+  const selectedChar = chars?.find?.((char: Character) => char.id === activeChar);
   const currentTabContent = tabContentData[activeTab] || [];
 
   return (
@@ -289,7 +251,7 @@ function Note() {
             height={"100%"}
             className="w-full"
             noteImage={
-              <img src={selectedChar?.imageSrc} alt={selectedChar?.name} />
+              <img src={selectedChar?.imageUrl} alt={selectedChar?.name} />
             }
             noteName={selectedChar?.name}
             noteInfo={
@@ -310,18 +272,18 @@ function Note() {
             }
           >
             <div className="flex gap-2 items-end justify-center w-full h-full pb-4">
-              {chars.map((char) =>
-                char.name === activeChar ? (
+              {chars?.map?.((char: Character) =>
+                char.id === activeChar ? (
                   <CharacterActiveCard
                     key={char.name}
-                    src={char.imageSrc}
-                    onClick={() => setActiveChar(char.name)}
+                    src={char.imageUrl}
+                    onClick={() => setActiveChar(char.id)}
                   />
                 ) : (
                   <CharacterCard
                     key={char.name}
-                    src={char.imageSrc}
-                    onClick={() => setActiveChar(char.name)}
+                    src={char.imageUrl}
+                    onClick={() => setActiveChar(char.id)}
                   />
                 )
               )}

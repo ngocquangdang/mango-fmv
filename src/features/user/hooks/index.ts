@@ -7,9 +7,10 @@ import {
   getVideos,
   updateStatus,
   restartChapter,
+  getCharacters,
 } from "../apis";
 import type { UpdateStatusPayload } from "../apis";
-import type { ChapterMapped, Scene } from "../../../types/chapter";
+import type { ChapterMapped, Character, Scene } from "../../../types/chapter";
 
 const mapHotspots = (hotspots: any): any[] => {
   return hotspots.map((hotspot: any) => ({
@@ -166,4 +167,30 @@ export const useRestartChapter = () => {
   return useMutation({
     mutationFn: (chapterId: string) => restartChapter(chapterId),
   });
+};
+
+export const useCharacters = (projectId?: string) => {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["characters", projectId],
+    queryFn: () => getCharacters(projectId),
+    enabled: true,
+  });
+  const transformedData = React.useMemo(() => {
+    if (!data?.data) return undefined;
+    return data?.data.map((character: Character) => ({
+      ...character,
+      info: {
+        brthDay: character.dateOfBirth || "",
+        height: character.height || "",
+        desc: character.description || "",
+        strength: character.strength || "",
+      },
+    }));
+  }, [data?.data]);
+  return {
+    data: transformedData,
+    isLoading,
+    error,
+    refetch,
+  };
 };

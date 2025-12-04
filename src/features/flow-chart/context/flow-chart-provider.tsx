@@ -108,29 +108,13 @@ export const FlowChartContextProvider = ({
   const { nodes: nodes2, edges: edges2 } = React.useMemo(() => {
     const nodeList: any[] = [];
     const edgeList: any[] = [];
+    const processedNodes = new Set<string>();
 
     const startNode = scenes[data?.startSceneId];
-    // const addUnlockNode = (id: string) => {
-    //   nodeList.push({
-    //     id: "unlocked_" + id,
-    //     position: {
-    //       x: (nodeList.length % 4) * 220,
-    //       y: Math.floor(nodeList.length / 4) * 260,
-    //     },
-    //     data: { isActive: true },
-    //     type: "customNode",
-    //   });
-    // };
-    // const addUnlockEdge = (id: string, sourceId: string) => {
-    //   edgeList.push({
-    //     id: "unlocked_" + id,
-    //     source: sourceId,
-    //     target: "unlocked_" + id,
-    //     type: "customEdge",
-    //   });
-    // };
 
     const addNode = (id: string, data: any) => {
+      if (processedNodes.has(id)) return;
+      processedNodes.add(id);
       nodeList.push({
         id,
         position: {
@@ -141,9 +125,16 @@ export const FlowChartContextProvider = ({
         type: "customNode",
       });
     };
-    const addEdge = (id: string, sourceId: string, targetId: string) => {
+    
+    const addEdge = (sourceId: string, targetId: string, index?: number) => {
+      const edgeId = index !== undefined 
+        ? `${sourceId}->${targetId}-${index}` 
+        : `${sourceId}->${targetId}`;
+      if (edgeList.some((e) => e.id === edgeId || (e.source === sourceId && e.target === targetId))) {
+        return;
+      }
       edgeList.push({
-        id,
+        id: edgeId,
         source: sourceId,
         target: targetId,
         animated: false,
@@ -151,49 +142,64 @@ export const FlowChartContextProvider = ({
       });
     };
 
-    const nodes = (id: string, options: BranchOption[] = []) => {
-      // const prevNode = scenes[id];
-      // if (
-      //   options.some((option) => scenes[option.targetSceneId]?.status) ||
-      //   isPreview
-      // ) {
-      options.forEach((option, index) => {
+    const convertHotspotItemsToBranchOptions = (
+      scene: Scene
+    ): BranchOption[] => {
+      if (!scene.hotspots) return [];
+      
+      const investigateHotspots = scene.hotspots.filter(
+        (hotspot) => hotspot.type === "investigate"
+      );
+      
+      const branchOptions: BranchOption[] = [];
+      investigateHotspots.forEach((hotspot) => {
+        hotspot.items.forEach((item) => {
+          if (item.returnToSource) return;
+          branchOptions.push({
+            id: item.id,
+            text: item.title || item.description || "",
+            targetSceneId: item.targetSceneId,
+          });
+        });
+      });
+      
+      return branchOptions;
+    };
+
+    const nodes = (parentId: string, options: BranchOption[] = []) => {
+      const allOptions = options.filter((option) => {
+        const targetScene = scenes[option.targetSceneId];
+        return targetScene && !processedNodes.has(option.targetSceneId);
+      });
+
+      allOptions.forEach((option, index) => {
+        const targetScene = scenes[option.targetSceneId];
+        if (!targetScene || processedNodes.has(option.targetSceneId)) return;
 
         addNode(option.targetSceneId, {
-          ...scenes[option.targetSceneId],
+          ...targetScene,
           ...option,
         });
-        addEdge(
-          `${id}->${option.targetSceneId}-${index}`,
-          id,
-          option.targetSceneId
-        );
-        const nextNode = scenes[option.targetSceneId];
-        if (nextNode && nextNode.branch) {
-          nodes(option.targetSceneId, nextNode.branch?.options || []);
-        } else if (
-          nextNode &&
-          !(nextNode.hotspots?.length || 0) &&
-          !nextNode.branch
-        ) {
-          // if (!nextNode?.status && !isPreview) {
-          //   addUnlockNode(option.targetSceneId);
-          //   addUnlockEdge(option.targetSceneId, prevNode.id);
-          // }
+        addEdge(parentId, option.targetSceneId, index);
+        
+        // Get branch options and investigate hotspots for next node
+        const nextBranchOptions = targetScene.branch?.options || [];
+        const nextInvestigateOptions = convertHotspotItemsToBranchOptions(targetScene);
+        const nextAllOptions = [...nextBranchOptions, ...nextInvestigateOptions];
+        
+        if (nextAllOptions.length > 0) {
+          nodes(option.targetSceneId, nextAllOptions);
         }
-        // }
       });
-      // } else {
-      //   addUnlockNode(id);
-      //   addUnlockEdge(id, id);
-      // }
     };
 
     // DONOT CHECK THIS
     if (startNode) {
-      const options: BranchOption[] = startNode.branch?.options || [];
+      const branchOptions: BranchOption[] = startNode.branch?.options || [];
+      const investigateOptions = convertHotspotItemsToBranchOptions(startNode);
+      const allOptions = [...branchOptions, ...investigateOptions];
       addNode(startNode.id, { ...startNode });
-      nodes(startNode.id, options);
+      nodes(startNode.id, allOptions);
     }
     return { nodes: nodeList, edges: edgeList };
   }, [scenes, data?.startSceneId]);
