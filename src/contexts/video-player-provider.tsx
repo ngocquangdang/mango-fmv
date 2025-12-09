@@ -10,16 +10,17 @@ import {
   saveLocalParams,
 } from "../lib/api/storage";
 import ButtonLighter from "../components/button-lighter";
+import { useToast } from "../components/ui/toast/use-toast";
 
 export interface VideoPlayerContextType {
   type:
-  | "intro"
-  | "interactive"
-  | "story"
-  | "journal"
-  | "ranking"
-  | "playAgain"
-  | "endChapter";
+    | "intro"
+    | "interactive"
+    | "story"
+    | "journal"
+    | "ranking"
+    | "playAgain"
+    | "endChapter";
   setType: (
     type:
       | "intro"
@@ -60,6 +61,7 @@ export const VideoPlayerProvider = ({
 }) => {
   const { api, ready } = useVideoPlayer();
   const { chapter: data, updateSceneStatus } = useUserContext();
+  const { showToast } = useToast();
 
   const [type, setType] = React.useState<
     | "intro"
@@ -167,16 +169,18 @@ export const VideoPlayerProvider = ({
   const handleStart = React.useCallback(
     (sceneId: string) => {
       console.log("🚀 ~ [START] [INPROGRESS]:", sceneId);
-      updateSceneStatus(
-        sceneId,
-        Math.floor(data.scenes[sceneId]?.duration || 0),
-        0,
-        "INPROGRESS"
-      );
+      if (!isReviewScene) {
+        updateSceneStatus(
+          sceneId,
+          Math.floor(data.scenes[sceneId]?.duration || 0),
+          0,
+          "INPROGRESS"
+        );
+      }
       setCurrentSceneId(sceneId);
       setPauseType(null);
     },
-    [updateSceneStatus, data.scenes]
+    [updateSceneStatus, data.scenes, isReviewScene]
   );
 
   const handleStop = React.useCallback(
@@ -186,22 +190,26 @@ export const VideoPlayerProvider = ({
       const currentClip = data.scenes[payload.currentSceneId];
 
       if (payload.actionName === PausedActionName.USER_PAUSED_VIDEO) {
-        updateSceneStatus(
-          payload.currentSceneId,
-          Math.floor(currentClip?.duration || 0),
-          Math.floor(payload.time || 0),
-          "INPROGRESS"
-        );
+        if (!isReviewScene) {
+          updateSceneStatus(
+            payload.currentSceneId,
+            Math.floor(currentClip?.duration || 0),
+            Math.floor(payload.time || 0),
+            "INPROGRESS"
+          );
+        }
         return;
       }
       if (payload.actionName === PausedActionName.DECISION_POINT_REACHED) {
         setPauseType(payload.actionName);
-        updateSceneStatus(
-          payload.currentSceneId,
-          Math.floor(currentClip?.duration || 0),
-          Math.floor(payload.time || 0),
-          "INPROGRESS"
-        );
+        if (!isReviewScene) {
+          updateSceneStatus(
+            payload.currentSceneId,
+            Math.floor(currentClip?.duration || 0),
+            Math.floor(payload.time || 0),
+            "INPROGRESS"
+          );
+        }
       }
       const previousSceneId = getLocalParam("previousSceneId");
       if (
@@ -248,6 +256,7 @@ export const VideoPlayerProvider = ({
       updateSceneStatus,
       handleCollectionItems,
       collectionItems,
+      isReviewScene,
     ]
   );
 
@@ -283,6 +292,27 @@ export const VideoPlayerProvider = ({
         saveLocalParams({ previousSceneId: sceneId });
       } else {
         removeLocalParam("previousSceneId");
+        if (!isReviewScene) {
+          updateSceneStatus(
+            sceneId,
+            Math.floor(data.scenes[sceneId]?.duration || 0),
+            Math.floor(data.scenes[sceneId]?.duration || 0),
+            "COMPLETED"
+          );
+        }
+      }
+
+      setCurrentSceneId(nextSceneId);
+      setPauseType(null);
+      setCurrentStatus(null);
+    },
+    [data.id, updateSceneStatus, isReviewScene]
+  );
+
+  const handleEnded = React.useCallback(
+    (sceneId: string) => {
+      console.log("🚀 ~ [ENDED]", sceneId);
+      if (!isReviewScene) {
         updateSceneStatus(
           sceneId,
           Math.floor(data.scenes[sceneId]?.duration || 0),
@@ -290,25 +320,8 @@ export const VideoPlayerProvider = ({
           "COMPLETED"
         );
       }
-
-      setCurrentSceneId(nextSceneId);
-      setPauseType(null);
-      setCurrentStatus(null);
     },
-    [data.id, updateSceneStatus]
-  );
-
-  const handleEnded = React.useCallback(
-    (sceneId: string) => {
-      console.log("🚀 ~ [ENDED]", sceneId);
-      updateSceneStatus(
-        sceneId,
-        Math.floor(data.scenes[sceneId]?.duration || 0),
-        Math.floor(data.scenes[sceneId]?.duration || 0),
-        "COMPLETED"
-      );
-    },
-    [updateSceneStatus, data.scenes]
+    [updateSceneStatus, data.scenes, isReviewScene]
   );
 
   const quitPlayer = React.useCallback(() => {
@@ -318,6 +331,10 @@ export const VideoPlayerProvider = ({
 
   const onPlayPlayer = React.useCallback(
     (sceneId: string) => {
+      if (!data.scenes[sceneId]?.videoUrl) {
+        showToast({ description: "Player chưa sẵn sàng" });
+        return;
+      }
       setType("interactive");
       onSetCurrentSceneId(sceneId);
       onPlay(sceneId);
@@ -409,11 +426,11 @@ export const VideoPlayerProvider = ({
     );
 
     unsubRef.current.push(
-      offStart ?? (() => { }),
-      offStop ?? (() => { }),
-      offEnded ?? (() => { }),
-      offChoice ?? (() => { }),
-      offCollectionSelected ?? (() => { })
+      offStart ?? (() => {}),
+      offStop ?? (() => {}),
+      offEnded ?? (() => {}),
+      offChoice ?? (() => {}),
+      offCollectionSelected ?? (() => {})
     );
 
     return () => {

@@ -18,7 +18,7 @@ export default function Home() {
 
   const isPlaying = useMemo(() => {
     return (
-      Object.values(chapter.scenes).some(
+      Object.values(chapter.scenes || {})?.some(
         (scene) => scene.status === "COMPLETED"
       ) || chapter.progress?.currentScene?.watchingSecond
     );
@@ -85,7 +85,7 @@ export default function Home() {
           >
             Xếp hạng
           </ButtonLighter>
-          {isPlaying && (
+          {+(isPlaying || 0) > 0 && (
             <ButtonLighter
               className="min-h-[46px] lg:min-h-[66px] max-w-[180px] lg:max-w-[243px] text-white cursor-pointer"
               onClick={() => handleClick("playAgain")}

@@ -12,6 +12,7 @@ import { getLayoutedElements } from "./layout";
 import ImagePreloader from "../image-preload";
 import { useFlowChart } from "../flow-chart/context";
 import { useVideoPlayerContext } from '../../contexts';
+import { useToast } from '../../components/ui/toast/use-toast';
 
 const nodeTypes = {
   pixel: PixelNode,
@@ -30,6 +31,7 @@ const PixelFlow = () => {
     currentStatus,
     setReviewScene
   } = useVideoPlayerContext();
+  const { showToast } = useToast();
 
   const { nodes: layoutedNodes, edges: layoutedEdges } = useMemo(() => {
     const mappedNodes = contextNodes.map((node) => ({
@@ -82,7 +84,10 @@ const PixelFlow = () => {
           const scene = data?.scenes[node.id];
           setReviewScene(false);
 
-          if (!scene.videoUrl) return;
+          if (!scene.videoUrl) {
+            showToast({ description: "Player chưa sẵn sàng" });
+            return;
+          }
           if (!scene.status) return;
           if (node.id !== currentStatus?.currentSceneId) {
             setCurrentStatus(null);

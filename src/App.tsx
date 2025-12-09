@@ -16,7 +16,7 @@ import Note from "./features/note";
 import Loading from "./components/loading";
 import EndChapter from "./features/end-chapter/end-chapter";
 import DialogConfirm from "./components/ui/dialog/dialog-confirm";
-import { useToast } from "./components/ui/toast/use-toast";
+// import { useToast } from "./components/ui/toast/use-toast";
 
 function App() {
   const { loading, updateSceneStatus } = useUserContext();
@@ -28,16 +28,22 @@ function App() {
     pause,
     onPlay,
     currentStatus,
+    isReviewScene,
   } = useVideoPlayerContext();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
-  const { showToast } = useToast();
+  // const { showToast } = useToast();
   const backgroundImage = "/images/bg.png";
 
   const handleBack = () => {
     if (type === "interactive") {
-      setDialogName("quitPlayer");
-      pause();
-      return;
+      if (isReviewScene) {
+        pause();
+        setReviewScene(false);
+      } else {
+        setDialogName("quitPlayer");
+        pause();
+        return;
+      }
     }
     setType("intro");
   };
@@ -58,11 +64,11 @@ function App() {
     setDialogName(null);
     setReviewScene(false);
     setType("story");
-    showToast({
-      description: "Bạn đã mở khóa cảnh mới.",
-      duration: 3000,
-      position: "top-right",
-    });
+    // showToast({
+    //   description: "Bạn đã mở khóa cảnh mới.",
+    //   duration: 3000,
+    //   position: "top-right",
+    // });
   };
   return (
     <div

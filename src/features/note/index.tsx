@@ -236,15 +236,17 @@ function Note() {
   const selectedChar = chars?.find?.((char: Character) => char.id === activeChar);
   const currentTabContent = tabContentData[activeTab] || [];
 
+  const backgroundImage = "/images/journal-bg.png";
+
   return (
-    <div className=" w-full h-full">
+    <div className=" w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})` }}>
       <div className="flex justify-center">
         <Banner
           className="w-[140px]! h-[64px]! lg:w-[280px]! lg:h-[80px]!"
           text="Nhật ký"
         />
       </div>
-      <div className="lg:w-[84%] w-[80%] mt-10 mx-auto flex justify-center items-center">
+      <div className="lg:w-[84%] w-fit my-10 mx-auto flex justify-center items-center">
         <div className="relative w-[32%]">
           <NoteLeft
             width={"100%"}
