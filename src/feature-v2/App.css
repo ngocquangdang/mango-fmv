@@ -1,0 +1,375 @@
+
+.game-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  font-family: 'Patrick Hand', cursive;
+}
+
+/* Khung Modal */
+.game-modal-box {
+  /* Lưu ý: Thay đường dẫn ảnh thật của bạn vào đây */
+  background-image: url('/images/modal.png'); 
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  
+  width: 480px;
+  max-width: 676px;
+  height: 270px;
+  max-height: 290px;
+  position: relative;
+  padding: 16px 20px 44px 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3));
+}
+.game-close-btn {
+  position: absolute;
+  top: -10px;
+  right: -15px;
+  width: 40px;
+  height: 35px;
+  background-color: #ff3b30;
+  border: 2px solid white;
+  border-radius: 5px;
+  color: white;
+  font-size: 20px; /* Size chữ cho trường hợp fallback text */
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.game-title-area {
+  position: relative;
+  /* Bỏ width cố định */
+  width: auto; 
+  /* Đặt chiều rộng tối thiểu để title ngắn trông vẫn đẹp */
+  min-width: 180px; 
+  height: 50px; /* Giữ chiều cao cố định để khớp với ảnh nền (nếu ảnh dạng thanh ngang) */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  
+  /* Thêm padding để text không dính sát mép ảnh nền khi text dài */
+  padding: 0 25px; 
+}
+
+/* Chỉnh lại background title để nó co giãn theo khung cha */
+.game-title-bg {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: url('/images/bg-title.png');
+  
+  /* QUAN TRỌNG: Thay đổi background-size */
+  /* 100% 100% sẽ ép ảnh dãn ra theo khung. 
+     Lưu ý: Nếu ảnh có chi tiết phức tạp, nó có thể bị méo nhẹ. */
+  background-size: 100% 100%; 
+  
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.8;
+  border-radius: 10px; /* Bo góc nhẹ nếu ảnh bị vỡ góc */
+}
+
+.game-title-text {
+  position: relative;
+  z-index: 2;
+  font-size: 28px;
+  color: #333;
+  font-weight: bold;
+  margin: 0;
+  /* Ngăn xuống dòng nếu muốn title luôn nằm ngang */
+  white-space: nowrap; 
+}
+
+
+/* --- SỬA LẠI PHẦN BUTTON --- */
+.game-confirm-btn {
+  background-image: url('/images/button.png');
+  
+  /* Co giãn ảnh nền theo kích thước nút */
+  background-size: 100% 100%; 
+  background-color: transparent;
+  border: none;
+  
+  /* Bỏ width cố định */
+  width: auto;
+  min-width: 140px; /* Đảm bảo nút có độ lớn tối thiểu */
+  height: 50px;     /* Chiều cao cố định (thường button game hay fix height) */
+  
+  /* Padding quan trọng để text dài không lòi ra ngoài */
+  padding: 0 30px; 
+  
+  color: white;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 20px;
+  cursor: pointer;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  transition: transform 0.1s;
+  padding-bottom: 5px; /* Căn chỉnh text quang học */
+  
+  /* Ngăn text xuống dòng làm vỡ layout nút */
+  white-space: nowrap; 
+}
+/* Custom Shadow Box */
+.custom-shadow-box {
+  position: relative;
+  background-image: url('/images/bg-button-home.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 1;
+}
+
+/* Lớp giả lập bóng đổ bằng hình ảnh */
+.custom-shadow-box-shadow {
+  position: absolute;
+  
+  /* Kích thước bằng hệt hộp chính */
+  width: 100%;
+  height: 100%;
+  
+  /* Vị trí lệch (offset) để tạo hiệu ứng bóng đổ */
+  top: 2px;  /* Đẩy xuống dưới 10px */
+  left: 0; /* Đẩy sang phải 10px */
+  
+  /* HÌNH ẢNH BÓNG ĐỔ CỦA BẠN Ở ĐÂY */
+  /* Có thể là một ảnh pattern các nét gạch chéo, hoặc màu nước loang */
+  background-image: url('/images/shadow-button.png'); 
+  z-index: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* --- THANH TRACK (Nền trắng viền cam) --- */
+.progress-track {
+  width: 100%;
+  height: 5px; /* Chiều cao thanh */
+  background-color: #fff;
+  border: 1px solid #E85D35; /* Màu cam giống hình */
+  border-radius: 20px;
+  position: relative;
+  overflow: visible; /* Để quà tặng hiển thị đè lên trên */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* --- THANH FILL (Phần đã chạy) --- */
+.progress-fill {
+  height: 100%;
+  /* Dùng ảnh scribble của bạn làm nền */
+  background-image: url('/images/progress.png'); 
+  background-repeat: repeat-x; /* Lặp lại theo chiều ngang */
+  background-size: auto 100%;
+  background-position: left center;
+  border-radius: 15px;
+  
+  transition: width 0.5s ease-out; /* Hiệu ứng chạy mượt */
+  position: relative;
+  z-index: 1;
+}
+
+/* --- CÁC MỐC QUÀ TẶNG --- */
+.milestones-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2; /* Nằm đè lên thanh bar */
+  pointer-events: none; /* Để click xuyên qua nếu cần */
+}
+
+.milestone-item {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -40%); /* Căn giữa điểm neo */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.2s;
+}
+
+.milestone-item:hover {
+  transform: translate(-50%, -40%) scale(1.1); /* Phóng to nhẹ khi hover */
+}
+
+/* Ảnh hộp quà */
+.gift-icon {
+  width: 28px; /* Điều chỉnh kích thước quà */
+  height: 28px;
+  filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
+}
+
+
+
+.photo-frame-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  /* Tạo độ nghiêng ngẫu nhiên hoặc cố định để giống hình mẫu */
+  transform: rotate(-3deg); 
+  transition: transform 0.3s ease;
+}
+
+.photo-frame-container:hover {
+  transform: rotate(0deg) scale(1.05); /* Hiệu ứng khi di chuột */
+  z-index: 10;
+}
+
+/* --- 1. HÌNH ẢNH NGƯỜI DÙNG (Nằm dưới khung) --- */
+.user-photo {
+  position: absolute;
+  /* Căn chỉnh để ảnh nằm lọt vào lòng khung */
+  /* Bạn có thể cần tinh chỉnh top/left/width/height tùy vào độ dày của viền ảnh frame.png */
+  top: 20px; 
+  left: 20px;
+  width: calc(100% - 40px); /* Trừ đi lề trái phải */
+  height: calc(100% - 60px); /* Trừ đi lề trên dưới (dưới thường dày hơn ở polaroid) */
+  
+  object-fit: cover; /* Đảm bảo ảnh không bị méo */
+  z-index: 1;
+  border-radius: 2px;
+  background-color: #eee; /* Màu nền chờ load ảnh */
+}
+
+/* --- 2. KHUNG ẢNH (Nằm đè lên ảnh user) --- */
+.frame-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none; /* Để vẫn click được vào ảnh bên dưới nếu cần */
+  
+  /* Nếu frame của bạn có lòng trong suốt, ảnh user sẽ hiện ra */
+  filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2)); /* Đổ bóng cho khung */
+}
+
+/* --- 3. ĐIỂM SỐ (+0) --- */
+.score-badge {
+  position: absolute;
+  z-index: 3;
+  /* Xoay nhẹ số cho tự nhiên */
+  transform: rotate(-10deg);
+}
+
+/* --- 4. TRANG TRÍ (Băng dính/Tim) - Optional --- */
+.tape-decoration {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  width: 100px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.6); /* Giả lập băng dính mờ */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transform: translateX(-50%) rotate(2deg);
+}
+
+/* NotebookLayout.css */
+
+/* Container bao quanh, tạo padding để hở ra phần bìa cam */
+.notebook-cover {
+  /* Ảnh bìa màu cam */
+  background-image: url('/images/note-main-bg.png'); 
+  background-size: cover;
+  background-position: center;
+  
+  /* Bo góc cho bìa */
+  border-radius: 15px;
+
+  
+  /* Flexbox để căn giữa nội dung bên trong */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px; /* Độ dày của viền bìa cam */
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Container chứa 2 trang giấy */
+.notebook-spread {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Style chung cho từng trang */
+.notebook-page {
+  flex: 1; /* Chia đều 50-50 */
+  
+  /* Ảnh nền giấy ô ly */
+  background-image: url('/images/page.png');
+  background-size: 100% 100%; /* Co giãn ảnh vừa khung */
+  background-repeat: no-repeat;
+  
+  width: 50%;
+  position: relative;
+}
+
+/* --- GÁY SÁCH (LÒ XO) --- */
+.notebook-binding-container {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 40px; /* Chiều rộng khu vực gáy */
+  transform: translateX(-50%); /* Căn chính giữa */
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 150px; /* Khoảng cách giữa cụm lò xo trên và dưới */
+}
+
+.binding-ring {
+  width: 40px; /* Kích thước ảnh Group 129.png */
+  height: auto;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+}
+
+/* Responsive: Trên mobile thì có thể ẩn 1 trang hoặc xếp chồng (tùy nhu cầu) */
+@media (max-width: 768px) {
+  .notebook-cover {
+    height: auto;
+    flex-direction: column;
+  }
+  .notebook-spread {
+    flex-direction: column;
+  }
+  .notebook-binding-container {
+    display: none; /* Ẩn lò xo trên mobile */
+  }
+  .notebook-page {
+    height: 400px; /* Set chiều cao cố định trên mobile */
+    margin-bottom: 10px;
+  }
+}
