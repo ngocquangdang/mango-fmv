@@ -1,9 +1,18 @@
-const FrameUser = ({ selected }: { selected: boolean }) => {
+const FrameUser = ({
+  selected,
+  onClick,
+}: {
+  selected: boolean;
+  onClick?: () => void;
+}) => {
   const FRAME_UNSELECTED_IMG = "/images/note-box-unselected.png";
   const FRAME_SELECTED_IMG = "/images/note-box-selected.png";
 
   return (
-    <div className={`relative h-auto ${selected ? "w-[64px]" : "w-[42px]"}`}>
+    <div
+      className={`relative h-auto ${selected ? "w-[64px]" : "w-[42px]"}`}
+      onClick={onClick}
+    >
       <img
         src={selected ? FRAME_SELECTED_IMG : FRAME_UNSELECTED_IMG}
         alt="Frame Unselected"

@@ -2,8 +2,8 @@ import React from "react";
 import { FlowChartContext } from ".";
 
 import type { Edge, Node as ReactFlowNode } from "@xyflow/react";
-import { useUserContext } from "../../user/context";
-import type { BranchOption, Scene } from "../../../types/chapter";
+import { useUserContext } from "../../../../features/user/context";
+import type { BranchOption, Scene } from "../../../../types/chapter";
 
 export interface FlowChartContextType {
   nodes: ReactFlowNode[];

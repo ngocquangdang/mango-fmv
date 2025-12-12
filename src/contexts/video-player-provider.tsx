@@ -9,8 +9,7 @@ import {
   removeLocalParam,
   saveLocalParams,
 } from "../lib/api/storage";
-import ButtonLighter from "../components/button-lighter";
-import { useToast } from "../components/ui/toast/use-toast";
+import { useToast } from "../components/ui/toast-v2/use-toast";
 
 export interface VideoPlayerContextType {
   type:
@@ -46,12 +45,14 @@ export interface VideoPlayerContextType {
     React.SetStateAction<Record<string, any> | null>
   >;
   currentStatus: Record<string, any> | null;
-  onPlayPlayer: (sceneId: string) => void;
+  onPlayPlayer: (sceneId: string, isReviewScene?: boolean) => void;
   quitPlayer: () => void;
   setReviewScene: (status: boolean) => void;
   isReviewScene: boolean;
   isPlaying: boolean;
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  isPlayerLoading: boolean;
+  setIsPlayerLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const VideoPlayerProvider = ({
@@ -71,7 +72,7 @@ export const VideoPlayerProvider = ({
     | "ranking"
     | "playAgain"
     | "endChapter"
-  >("endChapter");
+  >("intro");
   const [pauseType, setPauseType] = React.useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = React.useState<Record<
     string,
@@ -86,6 +87,7 @@ export const VideoPlayerProvider = ({
   >({});
   const [isReviewScene, setIsReviewScene] = React.useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
+  const [isPlayerLoading, setIsPlayerLoading] = React.useState(false);
 
   // Ensure we only initialize the VideoPlayer SDK once per api instance
   const initializedRef = React.useRef(false);
@@ -153,11 +155,11 @@ export const VideoPlayerProvider = ({
   );
 
   const onPlay = React.useCallback(
-    (sceneId?: string) => {
+    (sceneId?: string, isReviewScene?: boolean) => {
       if (currentStatus && api && currentStatus?.currentSceneId === sceneId) {
         onSetCurrentSceneId(currentStatus?.currentSceneId);
         setTimeout(() => {
-          seekTo(currentStatus?.time);
+          seekTo(isReviewScene ? 0 : currentStatus?.time);
         }, 50);
       }
       if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
@@ -320,6 +322,26 @@ export const VideoPlayerProvider = ({
           "COMPLETED"
         );
       }
+
+      const scene = data.scenes[sceneId];
+      if (!scene) return;
+
+      const hasNext =
+        scene.branch?.options?.some((o: any) => o.targetSceneId) ||
+        scene.hotspots?.some((h: any) =>
+          h.items?.some((i: any) => i.targetSceneId)
+        ) ||
+        (scene as any).targetSceneId;
+
+      if (!hasNext) {
+        setIsPlayerLoading(true);
+        setIsReviewScene(false);
+        setTimeout(() => {
+          setIsPlayerLoading(false);
+
+          setType("intro");
+        }, 3000);
+      }
     },
     [updateSceneStatus, data.scenes, isReviewScene]
   );
@@ -330,14 +352,14 @@ export const VideoPlayerProvider = ({
   }, [pause]);
 
   const onPlayPlayer = React.useCallback(
-    (sceneId: string) => {
-      if (!data.scenes[sceneId]?.videoUrl) {
+    (sceneId: string, isReviewScene?: boolean) => {
+      if (!data?.id || !data.scenes[sceneId]?.videoUrl) {
         showToast({ description: "Player chưa sẵn sàng" });
         return;
       }
       setType("interactive");
       onSetCurrentSceneId(sceneId);
-      onPlay(sceneId);
+      onPlay(sceneId, isReviewScene);
       autoplay();
     },
     [onSetCurrentSceneId, onPlay, autoplay]
@@ -359,21 +381,21 @@ export const VideoPlayerProvider = ({
     console.log("Init player");
     const params = new URLSearchParams(window.location.search);
 
-    function ChoiceButtonWrapper({
-      choice,
-      onClick,
-      onKeyDown,
-    }: {
-      choice: any;
-      onClick: () => void;
-      onKeyDown: () => void;
-    }) {
-      return (
-        <ButtonLighter onClick={onClick} onKeyDown={onKeyDown}>
-          {choice.text}
-        </ButtonLighter>
-      );
-    }
+    // function ChoiceButtonWrapper({
+    //   choice,
+    //   onClick,
+    //   onKeyDown,
+    // }: {
+    //   choice: any;
+    //   onClick: () => void;
+    //   onKeyDown: () => void;
+    // }) {
+    //   return (
+    //     <ButtonLighter onClick={onClick} onKeyDown={onKeyDown}>
+    //       {choice.text}
+    //     </ButtonLighter>
+    //   );
+    // }
 
     api.onInit?.({
       container: "#interactive-video",
@@ -384,7 +406,10 @@ export const VideoPlayerProvider = ({
             base: "",
           },
           choices: {
-            buttonComponent: ChoiceButtonWrapper,
+            // buttonComponent: ChoiceButtonWrapper,
+            button:
+              "bg-[url(/images/paper-button.png)] bg-repeat-round min-w-[150px] px-6 py-2 text-white text-sm font-semibold",
+            buttonContainer: "flex flex-row !justify-evenly",
           },
           ping: {
             enabled: false,
@@ -468,6 +493,8 @@ export const VideoPlayerProvider = ({
     isReviewScene,
     isPlaying,
     setIsPlaying,
+    isPlayerLoading,
+    setIsPlayerLoading,
   };
   return (
     <VideoPlayerContext.Provider value={value}>

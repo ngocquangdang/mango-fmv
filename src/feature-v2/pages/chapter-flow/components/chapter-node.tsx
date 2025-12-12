@@ -47,7 +47,7 @@ const ChapterNode = ({ data }: NodeProps) => {
           <div className="w-full h-full p-1">
             <img
               src={
-                (data.thumbnail as string) || "https://picsum.photos/200/120"
+                (data.thumbUrl as string) || "https://picsum.photos/200/120"
               }
               alt={data.title as string}
               className="w-full h-full object-cover"

@@ -1,4 +1,4 @@
-import { BaseEdge, type EdgeProps, getBezierPath } from "@xyflow/react";
+import { BaseEdge, type EdgeProps, getBezierPath, getSmoothStepPath  } from "@xyflow/react";
 import { memo } from "react";
 
 const ChapterEdge = ({
@@ -18,14 +18,15 @@ const ChapterEdge = ({
   const isHorizontal = Math.abs(sourceY - targetY) < 1;
   const adjustedTargetY = isHorizontal ? targetY + 1 : targetY;
 
-  const [edgePath] = getBezierPath({
+  const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
     targetX,
     targetY: adjustedTargetY,
     targetPosition,
-    curvature: 0.1,
+    // curvature: 0.1,
+    borderRadius: 50,
   });
 
   const isLocked = data?.status === 'locked';

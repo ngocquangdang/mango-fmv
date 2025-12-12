@@ -2,11 +2,35 @@ import HookButton from "../../components/ui/hook-button";
 import PhotoFrame from "../../components/ui/photo-frame";
 import RewardProgress from "../../components/ui/progress";
 import ChapterFlow from "./chapter-flow";
+import { useVideoPlayerContext } from "../../../contexts";
+import { useUserContext } from "../../../features/user/context";
+import { FlowChartContextProvider } from "./context/flow-chart-provider";
+import Banner from '../../components/banner';
 
 export default function ChapterPage() {
+  const { onPlayPlayer, setType } = useVideoPlayerContext();
+  const { chapter } = useUserContext();
+
+  const handlePlay = () => {
+    const sceneId =
+      chapter.progress?.currentScene?.sceneId || chapter.startSceneId;
+    onPlayPlayer(sceneId);
+  };
+
   return (
     <div className="w-full h-screen">
       <div className="w-full h-[100px] ">
+        <div
+          className="fixed top-0 left-0 p-4 z-10 cursor-pointer"
+          onClick={() => setType("intro")}
+        >
+          <img
+            src="/images/back-icon.png"
+            alt="back-icon"
+            className="w-9 h-9"
+          />
+        </div>
+        <Banner text='Cốt truyện' />
         <div className="fixed top-0 right-0 flex items-center gap-2 p-4">
           <div
             className="w-20 h-10 bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs"
@@ -17,12 +41,20 @@ export default function ChapterPage() {
           <img
             src="/images/book-with-bg-icon.png"
             alt="book-icon"
-            className="w-9 h-9"
+            className="w-9 h-9 cursor-pointer"
+            onClick={() => setType("journal")}
           />
-          <img src="/images/ask-icon.png" alt="ask-icon" className="w-9 h-9" />
+          <img
+            src="/images/ask-icon.png"
+            alt="ask-icon"
+            className="w-9 h-9 cursor-pointer"
+          />
         </div>
       </div>
-      <ChapterFlow />
+      <FlowChartContextProvider>
+        <ChapterFlow />
+      </FlowChartContextProvider>
+
       <div
         className=" fixed bottom-0 h-[150px] w-full pb-4"
         style={{
@@ -65,7 +97,7 @@ export default function ChapterPage() {
         </div>
 
         <div className="fixed bottom-0 right-12 w-[134px] h-[116px]">
-          <HookButton label="Tiếp tục" onClick={() => {}} />
+          <HookButton label="Tiếp tục" onClick={handlePlay} />
         </div>
       </div>
     </div>

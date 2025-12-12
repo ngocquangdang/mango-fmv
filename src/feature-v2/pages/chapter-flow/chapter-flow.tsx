@@ -1,20 +1,19 @@
-import { useCallback, useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import {
   ReactFlow,
   useNodesState,
   useEdgesState,
   Background,
-  Controls,
-  Position,
-  type Edge,
-  type Node,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
 import ChapterNode from "./components/chapter-node";
 import ChapterEdge from "./components/chapter-edge";
+import { getLayoutedElements } from "../../../features/pixel-flow/layout";
+import { useFlowChart } from "./context";
+import { useVideoPlayerContext } from "../../../contexts";
+import { useToast } from "../../../components/ui/toast-v2/use-toast";
 
-// Node and Edge Types
 const nodeTypes = {
   chapter: ChapterNode,
 };
@@ -23,121 +22,66 @@ const edgeTypes = {
   chapter: ChapterEdge,
 };
 
-// Initial Data based on the image
-// Structure: Start -> [Split] -> Top/Bottom -> End
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    type: "chapter",
-    position: { x: 0, y: 150 },
-    data: {
-      title: "01. Gặp gỡ",
-      status: "unlocked",
-      thumbnail: "https://picsum.photos/id/10/200/120", // Placeholder
-    },
-  },
-  {
-    id: "2",
-    type: "chapter",
-    position: { x: 300, y: 150 },
-    data: {
-      title: "02. Title title",
-      status: "unlocked",
-      thumbnail: "https://picsum.photos/id/20/200/120",
-    },
-  },
-  {
-    id: "3", // Top Locked
-    type: "chapter",
-    position: { x: 700, y: 0 },
-    data: {
-      title: "Locked Chapter",
-      status: "locked",
-    },
-  },
-  {
-    id: "4", // Bottom Locked
-    type: "chapter",
-    position: { x: 700, y: 300 },
-    data: {
-      title: "Locked Chapter",
-      status: "locked",
-    },
-  },
-  {
-    id: "5", // Final
-    type: "chapter",
-    position: { x: 1000, y: 150 },
-    data: {
-      title: "Final Chapter",
-      status: "locked",
-      thumbnail: "https://picsum.photos/id/30/200/120",
-    },
-  },
-];
-
-const initialEdges: Edge[] = [
-  {
-    id: "e1-2",
-    source: "1",
-    target: "2",
-    type: "chapter",
-    data: { status: "unlocked" },
-  },
-  {
-    id: "e2-3",
-    source: "2",
-    target: "3",
-    type: "chapter",
-    data: { status: "unlocked" },
-  },
-  {
-    id: "e2-4",
-    source: "2",
-    target: "4",
-    type: "chapter",
-    data: { status: "locked" },
-  },
-  {
-    id: "e3-5",
-    source: "3",
-    target: "5",
-    type: "chapter",
-    data: { status: "unlocked" },
-  },
-  {
-    id: "e4-5",
-    source: "4",
-    target: "5",
-    type: "chapter",
-    data: { status: "locked" },
-  },
-];
-
 const ChapterFlow = () => {
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
-  console.log("🚀 ~ ChapterFlow ~ nodes:", nodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const { nodes: contextNodes, edges: contextEdges, data } = useFlowChart();
+  const {
+    setCurrentStatus,
+    setPauseType,
+    onPlayPlayer,
+    currentStatus,
+    setReviewScene,
+  } = useVideoPlayerContext();
+  const { showToast } = useToast();
 
-  // Background style from image (Blue sky/clouds)
-  // We can use a CSS class or inline style on the container
+  const { nodes: layoutedNodes, edges: layoutedEdges } = useMemo(() => {
+    const mappedNodes = contextNodes.map((node) => ({
+      ...node,
+      type: "chapter",
+      data: {
+        ...node.data,
+        title: node.data.name || node.data.text || node.data.title,
+      },
+    }));
+    const mappedEdges = contextEdges.map((edge) => ({
+      ...edge,
+      type: "chapter",
+    }));
+    return getLayoutedElements(mappedNodes, mappedEdges);
+  }, [contextNodes, contextEdges]);
+
+  // Save original Y positions into node data (copied from PixelFlow logic)
+  const nodesWithOriginalY = useMemo(
+    () =>
+      layoutedNodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          originalY: node.position.y,
+        },
+      })),
+    [layoutedNodes]
+  );
+
+  const [nodes, setNodes] = useNodesState(nodesWithOriginalY);
+  const [edges, setEdges] = useEdgesState(layoutedEdges);
+
+  useEffect(() => {
+    setNodes(nodesWithOriginalY);
+    setEdges(layoutedEdges);
+  }, [nodesWithOriginalY, layoutedEdges, setNodes, setEdges]);
 
   return (
-    <div className="w-full h-[270px]">
-      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+    <div className="w-full h-full">
+      <svg style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
           <filter id="scribble-filter">
-            <feTurbulence 
-                type="fractalNoise" 
-                baseFrequency="0.5" 
-                numOctaves="1" 
-                result="noise" 
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.5"
+              numOctaves="1"
+              result="noise"
             />
-            <feDisplacementMap 
-                in="SourceGraphic" 
-                in2="noise" 
-                scale="3" 
-            />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
           </filter>
         </defs>
       </svg>
@@ -146,17 +90,39 @@ const ChapterFlow = () => {
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        // onNodesChange={onNodesChange}
-        // onEdgesChange={onEdgesChange}
-        // fitView
-        defaultViewport={{ x: 22, y: 35, zoom: 0.5 }}
-        className="z-10"
         minZoom={0.5}
         maxZoom={0.5}
+        defaultViewport={{
+          x: 100,
+          y: 0,
+          zoom: 0.5,
+        }}
+        onNodeClick={(_, node) => {
+          const scene = data?.scenes[node.id];
+          setReviewScene(false);
+
+          if (!scene?.videoUrl) {
+            showToast({ description: "Player chưa sẵn sàng" });
+            return;
+          }
+          // Assuming we want to allow playing any node for now, or check status
+          // if (!scene.status) return; 
+          
+          if (node.id !== currentStatus?.currentSceneId) {
+            setCurrentStatus(null);
+            setPauseType(null);
+          }
+          if (scene.status === "COMPLETED") {
+            setReviewScene(true);
+            onPlayPlayer(node.id, true);
+            return;
+          }
+          onPlayPlayer(node.id);
+        }}
+        proOptions={{ hideAttribution: true }}
       >
         <Background color="transparent" />
       </ReactFlow>
-
     </div>
   );
 };

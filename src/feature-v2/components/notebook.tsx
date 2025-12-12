@@ -30,7 +30,11 @@ const NotebookLayout = ({
       </div>
       <div className="absolute -right-25 top-4 flex flex-col gap-4">
         {[1, 2, 3, 4, 5].map((tab) => (
-          <div key={tab} className={`relative ${selectedTab === tab ? "z-2" : "z-0"}`}>
+          <div
+            key={tab}
+            className={`relative ${selectedTab === tab ? "z-2" : "z-0"}`}
+            onClick={() => setSelectedTab(tab)}
+          >
             <img
               src={
                 selectedTab === tab

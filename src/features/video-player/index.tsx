@@ -1,6 +1,6 @@
 import { useVideoPlayerContext } from "../../contexts";
 import MediaPlayerControl from "../../components/media-player-control";
-import { DetailDialogProvider } from "../../components/ui/dialog/detail-dialog-context";
+import { DetailDialogProvider } from "../../components/ui/dialog-v2/detail-dialog-context";
 
 export default function VideoPlayer() {
   const { type, isReviewScene } = useVideoPlayerContext();
