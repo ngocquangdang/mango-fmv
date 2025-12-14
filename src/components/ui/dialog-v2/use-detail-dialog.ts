@@ -1,11 +1,7 @@
 import React from "react";
 
-type DetailDialogType = "image" | "collection";
-
 export type DetailDialogOptions = {
-  type: DetailDialogType;
-  rowLabel?: string;
-  sectionLabel?: string;
+  data: any;
   onClose?: () => void;
 };
 

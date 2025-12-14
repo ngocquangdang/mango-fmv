@@ -53,6 +53,15 @@ export interface VideoPlayerContextType {
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   isPlayerLoading: boolean;
   setIsPlayerLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  openGiftSelection: () => void;
+  closeGiftSelection: () => void;
+  isGiftSelectionOpen: boolean;
+  dialogInfoState: {
+    isOpen: boolean;
+    data: any;
+  };
+  openDialogInfo: (data: any) => void;
+  closeDialogInfo: () => void;
 }
 
 export const VideoPlayerProvider = ({
@@ -88,6 +97,14 @@ export const VideoPlayerProvider = ({
   const [isReviewScene, setIsReviewScene] = React.useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isPlayerLoading, setIsPlayerLoading] = React.useState(false);
+  const [isGiftSelectionOpen, setIsGiftSelectionOpen] = React.useState(false);
+  const [dialogInfoState, setDialogInfoState] = React.useState<{
+    isOpen: boolean;
+    data: any;
+  }>({
+    isOpen: false,
+    data: null,
+  });
 
   // Ensure we only initialize the VideoPlayer SDK once per api instance
   const initializedRef = React.useRef(false);
@@ -266,6 +283,11 @@ export const VideoPlayerProvider = ({
     (collectionItemId: string) => {
       console.log("🚀 ~ [HOTSPOT COLLECTION ITEM]", collectionItemId);
       const [hotspotId] = collectionItemId.split("_item_");
+      openDialogInfo({
+        hotspotId: hotspotId,
+        title: "Thông báo",
+        description: "Bạn đã chọn câu hỏi này",
+      });
       const items = {
         ...collectionItems,
         [hotspotId]: {
@@ -280,12 +302,24 @@ export const VideoPlayerProvider = ({
       };
       setCollectionItems(items);
       api?.setCollectionItems?.(items);
-      if (items[hotspotId].isCompleted) {
-        play();
-      }
+      // if (items[hotspotId].isCompleted) {
+      //   play();
+      // }
     },
     [api, collectionItems]
   );
+
+  const openDialogInfo = React.useCallback((data: any) => {
+    setDialogInfoState({ isOpen: true, data });
+  }, []);
+
+  const closeDialogInfo = React.useCallback(() => {
+    setDialogInfoState((prev) => ({ ...prev, isOpen: false }));
+    const hotspotId = dialogInfoState?.data?.hotspotId;
+    if (hotspotId && collectionItems[hotspotId]?.isCompleted) {
+      play();
+    }
+  }, [collectionItems, play, dialogInfoState?.data?.hotspotId]);
 
   const handleChoiceSelected = React.useCallback(
     (sceneId: string, nextSceneId: string) => {
@@ -411,6 +445,12 @@ export const VideoPlayerProvider = ({
               "bg-[url(/images/paper-button.png)] bg-repeat-round min-w-[150px] px-6 py-2 text-white text-sm font-semibold",
             buttonContainer: "flex flex-row !justify-evenly",
           },
+          hotspots: {
+            label: {
+              className: "hotspot-label-connector pr-10 text-white! text-sm font-semibold top-0 right-0 !bottom-auto !left-auto -mt-2 -mr-2",
+              isShowLabel: true,
+            }
+          },
           ping: {
             enabled: false,
             showLabel: false,
@@ -426,6 +466,15 @@ export const VideoPlayerProvider = ({
       },
     });
   }, [api, data?.id]);
+
+  React.useEffect(() => {
+    if (Object.values(collectionItems).some((item) => item.isCompleted)) {
+      showToast({
+        description: "Bạn đã thu thập được vật phẩm X/Y",
+        position: "bottom-left",
+      });
+    }
+  }, [showToast, collectionItems]);
 
   // One-time initialization when api is ready (only re-run when api/data change)
   React.useEffect(() => {
@@ -471,6 +520,14 @@ export const VideoPlayerProvider = ({
     handleCollectionSelected,
   ]);
 
+  const openGiftSelection = React.useCallback(() => {
+    setIsGiftSelectionOpen(true);
+  }, []);
+
+  const closeGiftSelection = React.useCallback(() => {
+    setIsGiftSelectionOpen(false);
+  }, []);
+
   const value: VideoPlayerContextType = {
     type,
     setType,
@@ -495,6 +552,12 @@ export const VideoPlayerProvider = ({
     setIsPlaying,
     isPlayerLoading,
     setIsPlayerLoading,
+    openGiftSelection,
+    closeGiftSelection,
+    isGiftSelectionOpen,
+    dialogInfoState,
+    openDialogInfo,
+    closeDialogInfo,
   };
   return (
     <VideoPlayerContext.Provider value={value}>

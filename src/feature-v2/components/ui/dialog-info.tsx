@@ -1,13 +1,4 @@
-import React from "react";
-import FrameUser from "../../pages/journal/frame-user";
 import FramedStoryline from "../../pages/journal/frame-story";
-// Import các assets đã có
-
-// Bạn nên thay thế các biến này bằng đường dẫn ảnh sticker thật của bạn
-const CLOUD_STICKER = "https://cdn-icons-png.flaticon.com/512/1165/1165646.png"; // Ví dụ placeholder
-const STAR_STICKER = "https://cdn-icons-png.flaticon.com/512/1828/1828884.png"; // Ví dụ placeholder
-const CLIP_STICKER = "https://cdn-icons-png.flaticon.com/512/3081/3081096.png"; // Ví dụ placeholder (Kẹp giấy)
-const CLOSE_BTN_IMG = "https://cdn-icons-png.flaticon.com/512/1828/1828778.png"; // Ví dụ nút Close đỏ
 
 const DialogInfo = ({
   isOpen = true,
@@ -42,11 +33,12 @@ const DialogInfo = ({
         className="relative w-full max-w-[370px] h-[294px] ml-[240px] bg-contain bg-center bg-no-repeat shadow-2xl"
         style={{ backgroundImage: `url(${BG_PAPER_IMG})` }}
       >
-        <button
-          onClick={onClose}
-          className="absolute -top-2 -right-2 md:top-4 md:right-4 z-50 transition-transform hover:scale-110"
-        >
-          X
+        <button className="absolute top-0 -right-6 w-12 h-12" onClick={onClose}>
+          <img
+            src="/images/close-icon.png"
+            alt="close"
+            className="w-full h-full object-cover"
+          />
         </button>
 
         <div className="absolute z-10 top-8 -left-[60%]">
@@ -62,9 +54,11 @@ const DialogInfo = ({
         <div className="pl-[124px] pr-[50px] pt-7">
           <div className="pl-14 ">
             <img src={FLOWER_IMAGE} alt="flower" className="w-12 h-15" />
-            <h2 className="text-sm font-bold text-[#F76933]">{data.title}</h2>
+            <h2 className="text-sm font-bold text-[#F76933] mt-2">
+              {data.title}
+            </h2>
           </div>
-          <p className="text-[10px] text-[#667085] mt-4">{data.description}</p>
+          <p className="text-[10px] text-[#667085] mt-6">{data.description}</p>
         </div>
       </div>
     </div>

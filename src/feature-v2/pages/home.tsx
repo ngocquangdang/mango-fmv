@@ -1,13 +1,13 @@
 import React, { useMemo } from "react";
 import HookButton from "../components/ui/hook-button";
 import HomeButton from "../components/ui/home-button";
+import GameModal from "../components/ui/dialog";
 import { useVideoPlayerContext } from "../../contexts";
 import { useUserContext } from "../../features/user/context";
 import { useRestartChapter } from "../../features/user/hooks";
-import GameModal from "../components/ui/dialog";
 
 export default function Home() {
-  const { setType, onPlayPlayer } = useVideoPlayerContext();
+  const { setType } = useVideoPlayerContext();
   const { chapter, refetch } = useUserContext();
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);

@@ -1,10 +1,7 @@
-import NotebookLayout from "../../components/notebook";
 import { useVideoPlayerContext } from "../../../contexts";
-import LeftSide from "./left-side";
-import RightSide from "./right-side";
-import Banner from "../../components/banner";
+import RankLayout from "./rank-layout";
 
-export default function Journal() {
+export default function Rank() {
   const { setType } = useVideoPlayerContext();
 
   return (
@@ -15,8 +12,7 @@ export default function Journal() {
       >
         <img src="/images/back-icon.png" alt="back-icon" className="w-9 h-9" />
       </div>
-      <Banner text="Nhật ký" className='absolute! top-4 left-4' />
-      <NotebookLayout leftContent={<LeftSide />} rightContent={<RightSide />} />
+      <RankLayout />
     </div>
   );
 }

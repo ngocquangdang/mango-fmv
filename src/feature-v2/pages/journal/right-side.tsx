@@ -7,7 +7,10 @@ export default function RightSide() {
   const [currentPage, setCurrentPage] = useState(0);
 
   // Giả lập danh sách items (ví dụ 20 items)
-  const items = useMemo(() => new Array(20).fill(0).map((_, i) => ({ id: i })), []);
+  const items = useMemo(
+    () => new Array(20).fill(0).map((_, i) => ({ id: i })),
+    []
+  );
 
   const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
 
@@ -32,8 +35,10 @@ export default function RightSide() {
     <div className="relative w-full h-full">
       <div className="flex flex-row items-center justify-center h-full">
         {/* Nút Prev - ẩn nếu ở trang đầu */}
-        <div 
-          className={`cursor-pointer ${currentPage === 0 ? "opacity-0 pointer-events-none" : ""}`}
+        <div
+          className={`cursor-pointer ${
+            currentPage === 0 ? "opacity-0 pointer-events-none" : ""
+          }`}
           onClick={handlePrevPage}
           style={{ zIndex: 50 }}
         >
@@ -45,7 +50,7 @@ export default function RightSide() {
         </div>
 
         <div className="grid grid-cols-3 gap-2 min-w-[200px] min-h-[220px]">
-          {currentItems.map((item, index) => (
+          {currentItems.map((item) => (
             <div key={item.id}>
               <FramedStoryline
                 className="w-[54px] h-[64px] -rotate-12"
@@ -62,8 +67,10 @@ export default function RightSide() {
         </div>
 
         {/* Nút Next - ẩn nếu ở trang cuối */}
-        <div 
-          className={`cursor-pointer ${currentPage >= totalPages - 1 ? "opacity-0 pointer-events-none" : ""}`}
+        <div
+          className={`cursor-pointer ${
+            currentPage >= totalPages - 1 ? "opacity-0 pointer-events-none" : ""
+          }`}
           onClick={handleNextPage}
           style={{ zIndex: 50 }}
         >

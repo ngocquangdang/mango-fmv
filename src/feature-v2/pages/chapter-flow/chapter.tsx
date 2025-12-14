@@ -65,13 +65,13 @@ export default function ChapterPage() {
         }}
       >
         <div className="fixed bottom-4 flex items-end justify-between w-[74%] mt-auto">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             {[1, 2, 3, 4, 5].map((item) => (
               <PhotoFrame
                 key={item}
                 imageSrc={`https://picsum.photos/id/${item}/200/120`}
                 score={item}
-                className={`w-[48px] h-[48px]`}
+                className={`w-10 h-10`}
               />
             ))}
           </div>

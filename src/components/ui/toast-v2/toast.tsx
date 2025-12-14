@@ -27,13 +27,6 @@ const positionClasses: Record<ToastPosition, string> = {
   center: "top-6 left-1/2 -translate-x-1/2",
 };
 
-const BASE_WIDTH = 534;
-const BASE_HEIGHT = 91;
-const SCALE_FACTOR = 0.7;
-
-const scaledWidth = BASE_WIDTH * SCALE_FACTOR;
-const scaledHeight = BASE_HEIGHT * SCALE_FACTOR;
-
 const Toast = ({
   description,
   isOpen,
@@ -65,9 +58,13 @@ const Toast = ({
       style={{
         backgroundImage: `url(/images/toast-bg.png)`,
         padding: "4px 40px",
+        backgroundSize: "contain",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        fontStyle: "italic",
       }}
     >
-      <span className="text-sm font-bold">{description}</span>
+      <span className="text-sm font-bold text-[#F76933]">{description}</span>
     </div>
   );
 };

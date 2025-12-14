@@ -4,8 +4,8 @@ import LockIcon from "../../../../components/icon/lock-icon";
 
 const ChapterNode = ({ data }: NodeProps) => {
   const isLocked = data.status === "locked";
-  const isCompleted = data.status === "completed";
-  const isUnlocked = data.status === "unlocked";
+  // const isCompleted = data.status === "completed";
+  // const isUnlocked = data.status === "unlocked";
 
   // Styles based on the image analysis
   const frameColor = isLocked ? "border-blue-300" : "border-yellow-400";

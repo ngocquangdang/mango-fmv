@@ -5,8 +5,6 @@ type HookButtonProps = {
   className?: string;
 };
 
-const HOOK_BG = "/images/hook-button.png";
-
 export default function HookButton({
   label,
   onClick,
@@ -16,7 +14,6 @@ export default function HookButton({
   return (
     <div
       className={`relative min-w-[134px] min-h-[116px] ${className}`}
-      // style={{ backgroundImage: `url(${HOOK_BG})` }}
       aria-label={label}
       role="button"
       tabIndex={0}

@@ -1,8 +1,7 @@
-import { BaseEdge, type EdgeProps, getBezierPath, getSmoothStepPath  } from "@xyflow/react";
+import { BaseEdge, type EdgeProps, getSmoothStepPath  } from "@xyflow/react";
 import { memo } from "react";
 
 const ChapterEdge = ({
-  id,
   sourceX,
   sourceY,
   targetX,

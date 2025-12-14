@@ -1,9 +1,13 @@
 import React from "react";
 import DetailDialog from "./detail-dialog";
-import { DetailDialogContext, type DetailDialogOptions } from "./use-detail-dialog";
+import {
+  DetailDialogContext,
+  type DetailDialogOptions,
+} from "./use-detail-dialog";
 
 type DetailDialogState = DetailDialogOptions & {
   isOpen: boolean;
+  data: any;
 };
 
 export const DetailDialogProvider = ({
@@ -13,27 +17,25 @@ export const DetailDialogProvider = ({
 }) => {
   const [state, setState] = React.useState<DetailDialogState>({
     isOpen: false,
-    type: "image",
+    data: {},
   });
 
   const closeDetailDialog = React.useCallback(() => {
     setState((prev) => {
       prev.onClose?.();
       return {
-      ...prev,
-      isOpen: false,
+        ...prev,
+        isOpen: false,
         onClose: undefined,
       };
     });
   }, []);
 
   const openDetailDialog = React.useCallback(
-    ({ type, rowLabel, sectionLabel, onClose }: DetailDialogOptions) => {
+    ({ data, onClose }: DetailDialogOptions) => {
       setState({
         isOpen: true,
-        type,
-        rowLabel,
-        sectionLabel,
+        data,
         onClose,
       });
     },
@@ -53,9 +55,7 @@ export const DetailDialogProvider = ({
       {children}
       <DetailDialog
         isOpen={state.isOpen}
-        type={state.type}
-        rowLabel={state.rowLabel}
-        sectionLabel={state.sectionLabel}
+        data={state.data}
         onClose={closeDetailDialog}
       />
     </DetailDialogContext.Provider>

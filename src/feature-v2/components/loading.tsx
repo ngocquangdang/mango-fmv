@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const LoadingBar = ({ isLoading = true }: { isLoading?: boolean }) => {
   const loadingTrackImg = "/images/loading-bar.png";
-  // State để tạo hiệu ứng dấu chấm động (...)
   const [dots, setDots] = useState("");
   const [progress, setProgress] = useState(0);
 
-  // Hiệu ứng "..." chạy liên tục
   useEffect(() => {
     const interval = setInterval(() => {
       setDots((prev) => (prev.length < 3 ? prev + "." : ""));
@@ -14,7 +12,6 @@ const LoadingBar = ({ isLoading = true }: { isLoading?: boolean }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // Fake progress effect
   useEffect(() => {
     if (!isLoading) {
       setProgress(100);

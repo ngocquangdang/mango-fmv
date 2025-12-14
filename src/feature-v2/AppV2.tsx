@@ -12,8 +12,10 @@ import GameModal from "./components/ui/dialog";
 import Home from "./pages/home";
 import ChapterPage from "./pages/chapter-flow/chapter";
 import Journal from "./pages/journal";
-import LoadingBar from './components/loading';
-
+import LoadingBar from "./components/loading";
+import Rank from "./pages/rank";
+import GiftSelection from "./components/gift-selection";
+import DialogInfo from "./components/ui/dialog-info";
 
 const useIsLandscapeMobile = () => {
   const [isLandscape, setIsLandscape] = React.useState(true);
@@ -56,6 +58,9 @@ function AppV2Content() {
     currentStatus,
     isReviewScene,
     isPlayerLoading,
+    isGiftSelectionOpen,
+    dialogInfoState,
+    closeDialogInfo,
   } = useVideoPlayerContext();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
 
@@ -124,6 +129,7 @@ function AppV2Content() {
               case "journal":
                 return <Journal />;
               case "ranking":
+                return <Rank />;
               case "playAgain":
               case "intro":
                 return <Home />;
@@ -158,6 +164,15 @@ function AppV2Content() {
         onConfirm={onConfirm}
         title="Rời khỏi"
         message="Bạn chưa hoàn thành xong nhiệm vụ. Bạn có chắc chắn muốn thoát khỏi màn này?"
+      />
+
+      {isGiftSelectionOpen && <GiftSelection />}
+
+      {/* Dialog Info */}
+      <DialogInfo
+        isOpen={dialogInfoState.isOpen}
+        onClose={closeDialogInfo}
+        data={dialogInfoState.data}
       />
     </div>
   );
