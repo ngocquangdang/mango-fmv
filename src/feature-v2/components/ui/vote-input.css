@@ -1,0 +1,46 @@
+
+/* --- INPUT SỐ LƯỢNG (Bình chọn) --- */
+.vote-input {
+  /* Ảnh nền cho input */
+  background-image: url('/images/input-bg.png'); 
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  
+  /* Reset style mặc định của input */
+  background-color: transparent;
+  border: none;
+  outline: none; /* Bỏ viền xanh khi focus */
+  
+  /* Typography */
+  font-family: 'Patrick Hand', cursive;
+  font-size: 32px; /* Số to rõ */
+  font-weight: bold;
+  color: #1e3a8a; /* Màu xanh đậm (blue-900) */
+  text-align: center; /* Căn giữa số */
+  
+  /* Kích thước */
+  width: 140px; 
+  height: 60px;
+  
+  /* Padding để số không bị dính mép (nếu cần) */
+  padding: 0 10px;
+}
+
+/* Ẩn nút tăng giảm mặc định của input number trên Chrome/Safari/Edge */
+.vote-input::-webkit-outer-spin-button,
+.vote-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Ẩn nút tăng giảm mặc định của input number trên Firefox */
+.vote-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Placeholder styling (Optional) */
+.vote-input::placeholder {
+  color: rgba(30, 58, 138, 0.4);
+  font-size: 24px;
+}
