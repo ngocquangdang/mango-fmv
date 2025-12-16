@@ -8,7 +8,7 @@ export default function HomeButton({
   onClick?: () => void;
 }) {
   return (
-    <div className="relative w-[120px] cursor-pointer" onClick={onClick}>
+    <div className="relative w-[132px] cursor-pointer" onClick={onClick}>
       <div className="flex items-center custom-shadow-box w-full py-2 px-3.5">
         <img
           src={icon}

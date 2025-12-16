@@ -1,9 +1,11 @@
 const FrameUser = ({
   selected,
   onClick,
+  avatar,
 }: {
   selected: boolean;
   onClick?: () => void;
+  avatar?: string;
 }) => {
   const FRAME_UNSELECTED_IMG = "/images/note-box-unselected.png";
   const FRAME_SELECTED_IMG = "/images/note-box-selected.png";
@@ -20,7 +22,7 @@ const FrameUser = ({
       />
 
       <img
-        src={"https://picsum.photos/200/120"}
+        src={avatar || "https://picsum.photos/200/120"}
         alt="User Avatar"
         className="absolute z-1 top-[7.5%] left-[6%] w-[88%] h-[85%]"
       />

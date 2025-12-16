@@ -1,13 +1,13 @@
 import React, { useMemo } from "react";
 import HookButton from "../components/ui/hook-button";
 import HomeButton from "../components/ui/home-button";
-import GameModal from "../components/ui/dialog";
 import { useVideoPlayerContext } from "../../contexts";
 import { useUserContext } from "../../features/user/context";
 import { useRestartChapter } from "../../features/user/hooks";
+import GameModal from "../components/ui/dialog";
 
 export default function Home() {
-  const { setType } = useVideoPlayerContext();
+  const { setType, openGiftSelection, setCollectionItems } = useVideoPlayerContext();
   const { chapter, refetch } = useUserContext();
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
@@ -35,6 +35,7 @@ export default function Home() {
     //   chapter.progress?.currentScene?.sceneId || chapter.startSceneId;
     // onPlayPlayer(sceneId);
     setType("story");
+    setCollectionItems({})
   };
 
   const onConfirm = async () => {
@@ -77,6 +78,7 @@ export default function Home() {
             onClick={() => handleClick("playAgain")}
           />
         )}
+        <button onClick={openGiftSelection}>Open Gift Selection</button>
       </div>
       <div className="fixed bottom-0 right-12 w-[134px] h-[116px]">
         <HookButton

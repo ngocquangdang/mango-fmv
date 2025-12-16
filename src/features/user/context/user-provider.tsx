@@ -6,11 +6,13 @@ import {
   useUpdateStatus,
   useUserProgress,
   useVideos,
+  useCollectedRewards,
 } from "../hooks";
 import { useMgSdk } from "../../../hooks/useMgSdk";
 import type { MgUserInfo } from "../../../types/user";
 import type { ChapterMapped } from "../../../types/chapter";
 import { getLocalParam, saveLocalParams } from "../../../lib/api/storage";
+import type { CollectedRewardCharacter } from "../apis";
 
 export interface UserContextType {
   chapter: ChapterMapped;
@@ -22,6 +24,7 @@ export interface UserContextType {
     watchingSecond: number,
     status: string
   ) => void;
+  collectedRewards?: Record<string, CollectedRewardCharacter>;
 }
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -80,6 +83,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const { data: videos, isLoading: isVideosLoading } = useVideos(sceneIds);
 
+  const { data: collectedRewards, isLoading: isCollectedRewardsLoading } =
+    useCollectedRewards();
+
   const chapterMapped = React.useMemo(() => {
     if (!chapter) return null;
     return mapChapter(chapter, progress?.scenes || {}, videos || {});
@@ -120,8 +126,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [chapterValues, updateStatus, refetch, progress?.currentScene]);
 
   React.useEffect(() => {
-    setLoading(isChapterLoading || isProgressLoading || isVideosLoading);
-  }, [isChapterLoading, isProgressLoading, isVideosLoading]);
+    setLoading(
+      isChapterLoading ||
+        isProgressLoading ||
+        isVideosLoading ||
+        isCollectedRewardsLoading
+    );
+  }, [
+    isChapterLoading,
+    isProgressLoading,
+    isVideosLoading,
+    isCollectedRewardsLoading,
+  ]);
 
   const onLogin = React.useCallback((mgUserInfo: MgUserInfo) => {
     saveLocalParams({
@@ -178,8 +194,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       loading,
       refetch,
       updateSceneStatus,
+      collectedRewards,
     }),
-    [chapterMapped, progress, loading, refetch, updateSceneStatus]
+    [chapterMapped, progress, loading, refetch, updateSceneStatus, collectedRewards]
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

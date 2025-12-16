@@ -30,7 +30,7 @@ export default function HookButton({
         type="button"
         onClick={() => !disabled && onClick?.()}
         disabled={disabled}
-        className="text-[22px] font-regular text-white absolute z-10 h-fit top-[38%] left-[40%] -translate-x-1/2 -translate-y-1/2 -rotate-5"
+        className="text-[22px] w-[92px] font-regular text-white absolute z-10 h-fit top-[38%] left-[40%] -translate-x-1/2 -translate-y-1/2 -rotate-5"
       >
         {label}
       </button>
