@@ -78,10 +78,10 @@ const RewardCollection = ({
       >
         <div
           className="relative flex flex-col items-center animate-scale-up"
-          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking content
+          onClick={handleCloseDetail} // Prevent closing when clicking content
         >
           {/* Title */}
-          <h2 className="text-xl md:text-2xl text-white font-bold mb-4 text-center drop-shadow-md px-4">
+          <h2 className="text-lg text-white font-bold mb-4 text-center drop-shadow-md px-4">
             {description ||
               "Hình ảnh đã được lưu vào Phần thưởng trong Nhật ký của bạn"}
           </h2>
@@ -89,7 +89,7 @@ const RewardCollection = ({
           {/* Polaroid Frame */}
           <div
             className="relative w-[364px] h-[284px] transition-transform hover:scale-105 duration-300 cursor-pointer"
-            onClick={handleCloseDetail}
+            // onClick={handleCloseDetail}
           >
             {/* Frame Image */}
             <img
@@ -134,14 +134,14 @@ const RewardCollection = ({
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking grid content
       >
         {/* Title Section */}
-        <div className="relative mb-6 h-[60px] flex items-center justify-center">
+        <div className="relative mb-6 h-[90px] flex items-center justify-center">
           <img
             src="/images/bg-title.png"
             alt="bg-title"
             className="absolute inset-0 w-full h-full "
           />
           <h2 className="relative z-10 text-xl text-white font-bold drop-shadow-sm px-4 py-8">
-            {title || "Hãy Chọn 1 Món Quà"}
+            {title || ""}
           </h2>
           {/* Stars */}
           <div className="absolute top-0 left-4 text-yellow-400 text-3xl rotate-[-15deg] drop-shadow-md">
@@ -153,7 +153,7 @@ const RewardCollection = ({
         </div>
 
         {/* Grid Section */}
-        <div className="grid grid-cols-3 gap-x-6 gap-y-6">
+        <div className="flex flex-row justify-center gap-6">
           {items.map((item, index) => {
             return (
               <div

@@ -28,6 +28,7 @@ export interface UserContextType {
     callback?: (params: any) => void
   ) => void;
   collectedRewards?: Record<string, CollectedRewardCharacter>;
+  refetchCollectedRewards: () => void;
 }
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -86,8 +87,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const { data: videos, isLoading: isVideosLoading } = useVideos(sceneIds);
 
-  const { data: collectedRewards, isLoading: isCollectedRewardsLoading } =
-    useCollectedRewards();
+  const {
+    data: collectedRewards,
+    isLoading: isCollectedRewardsLoading,
+    refetch: refetchCollectedRewards,
+  } = useCollectedRewards(projectIdFromUrl);
 
   const chapterMapped = React.useMemo(() => {
     if (!chapter) return null;
@@ -172,12 +176,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         {
           onSuccess: (data: any) => {
             refetch();
+            refetchCollectedRewards();
             if (callback) callback(data.data);
           },
         }
       );
     },
-    [updateStatus, refetch, chapter]
+    [updateStatus, refetch, refetchCollectedRewards, chapter]
   );
 
   React.useEffect(() => {
@@ -203,6 +208,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       refetch,
       updateSceneStatus,
       collectedRewards,
+      refetchCollectedRewards,
     }),
     [
       chapterMapped,
@@ -211,6 +217,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       refetch,
       updateSceneStatus,
       collectedRewards,
+      refetchCollectedRewards,
     ]
   );
 

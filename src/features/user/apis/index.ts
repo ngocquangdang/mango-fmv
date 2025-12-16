@@ -318,10 +318,18 @@ export const getCharacters = async (
   return response;
 };
 
-export const getCollectedRewards = async () => {
-  const response = await apiClientVideoProgress.get(`/diary/collected-rewards`, {
-    "X-Ticket": getLocalParam("ticket") || "",
-  });
+export const getCollectedRewards = async (projectId?: string) => {
+  const params = new URLSearchParams();
+  if (projectId) {
+    params.append("projectId", projectId);
+  }
+
+  const response = await apiClientVideoProgress.get(
+    `/diary/collected-rewards?${params.toString()}`,
+    {
+      "X-Ticket": getLocalParam("ticket") || "",
+    }
+  );
 
   return response;
   // return mockCollectedRewards;

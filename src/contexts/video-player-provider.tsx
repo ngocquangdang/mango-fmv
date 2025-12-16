@@ -222,7 +222,6 @@ export const VideoPlayerProvider = ({
 
   const triggerDisplayReward = React.useCallback(
     (data: any) => {
-      console.log("🚀 ~ VideoPlayerProvider ~ data:", data.relationships);
 
       if (data?.relationships?.length > 0) {
         showRelationshipPoint(data.relationships);
@@ -233,9 +232,11 @@ export const VideoPlayerProvider = ({
         if (!data.moments || index >= data.moments.length) {
           showRewardCollection([]);
           closeGiftSelection();
+          play();
           return;
         }
 
+        pause();
         // Show current moment and schedule next one on close
         showRewardCollection(
           data.moments[index].rewards,
@@ -253,7 +254,7 @@ export const VideoPlayerProvider = ({
         handleShowMoments(0);
       }
     },
-    [showRelationshipPoint, showRewardCollection, closeGiftSelection]
+    [showRelationshipPoint, showRewardCollection, closeGiftSelection, pause]
   );
 
   const handleCollectionItems = React.useCallback(

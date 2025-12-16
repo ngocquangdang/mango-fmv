@@ -7,8 +7,8 @@ import { useRestartChapter } from "../../features/user/hooks";
 import GameModal from "../components/ui/dialog";
 
 export default function Home() {
-  const { setType, openGiftSelection, setCollectionItems } = useVideoPlayerContext();
-  const { chapter, refetch } = useUserContext();
+  const { setType, setCollectionItems } = useVideoPlayerContext();
+  const { chapter, refetch, refetchCollectedRewards } = useUserContext();
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
 
@@ -28,6 +28,7 @@ export default function Home() {
       return;
     }
     setType(actionName);
+    refetchCollectedRewards();
   };
 
   const handleStart = () => {
@@ -78,7 +79,6 @@ export default function Home() {
             onClick={() => handleClick("playAgain")}
           />
         )}
-        <button onClick={openGiftSelection}>Open Gift Selection</button>
       </div>
       <div className="fixed bottom-0 right-12 w-[134px] h-[116px]">
         <HookButton

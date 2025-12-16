@@ -12,6 +12,7 @@ const ChapterEdge = ({
   markerEnd,
   data
 }: EdgeProps) => {
+  console.log("🚀 ~ ChapterEdge ~ data:", data)
   // Fix for horizontal edges disappearing with filters (due to 0 height bounding box)
   // We apply a tiny offset to targetY if it's practically equal to sourceY
   const isHorizontal = Math.abs(sourceY - targetY) < 1;
@@ -28,7 +29,7 @@ const ChapterEdge = ({
     borderRadius: 50,
   });
 
-  const isLocked = data?.status === 'locked';
+  const isLocked = !data?.status;
   const color = isLocked ? '#3b82f6' : '#f97316';
 
   return (

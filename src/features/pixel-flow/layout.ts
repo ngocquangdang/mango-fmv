@@ -13,7 +13,7 @@ export const getLayoutedElements = (
   direction = "LR"
 ) => {
   const isHorizontal = direction === "LR";
-  dagreGraph.setGraph({ rankdir: direction, ranksep: 250, nodesep: 100 });
+  dagreGraph.setGraph({ rankdir: direction, ranksep: 0, nodesep: 100 });
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
@@ -74,7 +74,7 @@ export const getLayoutedElements = (
       }
     } else {
       // Multiple children: distribute evenly around parent center
-      const verticalSpacing = 350; // Space between children centers
+      const verticalSpacing = 250; // Space between children centers
 
       // Calculate total vertical span of all children
       const totalSpan = verticalSpacing * (children.length - 1);

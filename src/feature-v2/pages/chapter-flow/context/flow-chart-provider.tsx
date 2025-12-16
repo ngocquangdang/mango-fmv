@@ -125,12 +125,23 @@ export const FlowChartContextProvider = ({
         type: "customNode",
       });
     };
-    
-    const addEdge = (sourceId: string, targetId: string, index?: number) => {
-      const edgeId = index !== undefined 
-        ? `${sourceId}->${targetId}-${index}` 
-        : `${sourceId}->${targetId}`;
-      if (edgeList.some((e) => e.id === edgeId || (e.source === sourceId && e.target === targetId))) {
+
+    const addEdge = (
+      sourceId: string,
+      targetId: string,
+      index?: number,
+      edgeData?: any
+    ) => {
+      const edgeId =
+        index !== undefined
+          ? `${sourceId}->${targetId}-${index}`
+          : `${sourceId}->${targetId}`;
+      if (
+        edgeList.some(
+          (e) =>
+            e.id === edgeId || (e.source === sourceId && e.target === targetId)
+        )
+      ) {
         return;
       }
       edgeList.push({
@@ -139,6 +150,7 @@ export const FlowChartContextProvider = ({
         target: targetId,
         animated: false,
         type: "customEdge",
+        data: edgeData,
       });
     };
 
@@ -146,11 +158,11 @@ export const FlowChartContextProvider = ({
       scene: Scene
     ): BranchOption[] => {
       if (!scene.hotspots) return [];
-      
+
       const investigateHotspots = scene.hotspots.filter(
         (hotspot) => hotspot.type === "investigate"
       );
-      
+
       const branchOptions: BranchOption[] = [];
       investigateHotspots.forEach((hotspot) => {
         hotspot.items.forEach((item) => {
@@ -162,7 +174,7 @@ export const FlowChartContextProvider = ({
           });
         });
       });
-      
+
       return branchOptions;
     };
 
@@ -180,13 +192,20 @@ export const FlowChartContextProvider = ({
           ...targetScene,
           ...option,
         });
-        addEdge(parentId, option.targetSceneId, index);
-        
+        addEdge(parentId, option.targetSceneId, index, {
+          ...option,
+          status: targetScene.status,
+        });
+
         // Get branch options and investigate hotspots for next node
         const nextBranchOptions = targetScene.branch?.options || [];
-        const nextInvestigateOptions = convertHotspotItemsToBranchOptions(targetScene);
-        const nextAllOptions = [...nextBranchOptions, ...nextInvestigateOptions];
-        
+        const nextInvestigateOptions =
+          convertHotspotItemsToBranchOptions(targetScene);
+        const nextAllOptions = [
+          ...nextBranchOptions,
+          ...nextInvestigateOptions,
+        ];
+
         if (nextAllOptions.length > 0) {
           nodes(option.targetSceneId, nextAllOptions);
         }

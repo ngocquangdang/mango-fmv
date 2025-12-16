@@ -196,10 +196,10 @@ export const useCharacters = (projectId?: string) => {
   };
 };
 
-export const useCollectedRewards = () => {
+export const useCollectedRewards = (projectId?: string) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["collected-rewards"],
-    queryFn: () => getCollectedRewards(),
+    queryKey: ["collected-rewards", projectId],
+    queryFn: () => getCollectedRewards(projectId),
     enabled: true,
   });
   const transformedData = React.useMemo(() => {
