@@ -1,5 +1,5 @@
 const RewardProgress = ({
-  currentPoints = 25, // Điểm hiện tại
+  currentPoints = 0, // Điểm hiện tại
   maxPoints = 100, // Tổng điểm
   onClaimReward, // Hàm callback khi bấm nhận quà
   className = "",
@@ -9,6 +9,7 @@ const RewardProgress = ({
   onClaimReward: (value: number) => void;
   className?: string;
 }) => {
+  console.log("🚀 ~ RewardProgress ~ currentPoints:", currentPoints)
   // Tính phần trăm độ rộng thanh progress
   const percentage = Math.min((currentPoints / maxPoints) * 100, 100);
 

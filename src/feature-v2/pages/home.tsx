@@ -50,7 +50,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden">
       <img
         src="/images/LOGO_GCNMN.png"
         alt="home-bg"
@@ -80,7 +80,7 @@ export default function Home() {
           />
         )}
       </div>
-      <div className="fixed bottom-0 right-12 w-[134px] h-[116px]">
+      <div className="absolute bottom-0 right-10 w-[134px] h-[116px]">
         <HookButton
           label={isPlaying ? "Tiếp tục" : "Bắt đầu"}
           onClick={handleStart}

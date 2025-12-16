@@ -22,7 +22,7 @@ export default function ChapterPage() {
     <div className="w-full h-screen">
       <div className="w-full h-[100px] ">
         <div
-          className="fixed top-0 left-0 p-4 z-10 cursor-pointer"
+          className="absolute top-0 left-0 p-4 z-10 cursor-pointer"
           onClick={() => setType("intro")}
         >
           <img
@@ -32,7 +32,7 @@ export default function ChapterPage() {
           />
         </div>
         <Banner text='Cốt truyện' />
-        <div className="fixed top-0 right-0 flex items-center gap-2 p-4">
+        <div className="absolute top-0 right-0 flex items-center gap-2 p-4">
           <div
             className="w-20 h-10 bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs"
             style={{ backgroundImage: `url(/images/score-banner.png)` }}
@@ -57,7 +57,7 @@ export default function ChapterPage() {
       </FlowChartContextProvider>
 
       <div
-        className=" fixed bottom-0 h-[150px] w-full pb-4"
+        className=" absolute bottom-0 h-[150px] w-full pb-4"
         style={{
           backgroundImage: `url(/images/bottom-bg.png)`,
           backgroundSize: "cover",
@@ -65,7 +65,7 @@ export default function ChapterPage() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <div className="fixed bottom-4 flex items-end justify-between w-[74%] mt-auto">
+        <div className="absolute bottom-4 flex items-end justify-between w-[74%] mt-auto">
           <div className="flex items-center">
             {progress?.characters?.map((item: any) => (
               <PhotoFrame
@@ -86,18 +86,18 @@ export default function ChapterPage() {
                 tiến độ hiện tại
               </span>
             </div>
-            <span className="text-3xl font-bold text-[#F76933]">{(progress as any)?.milestone || 0}%</span>
+            <span className="text-3xl font-bold text-[#F76933]">{progress?.milestone || 0}%</span>
           </div>
 
           <RewardProgress
-            currentPoints={progress?.milestones || 0}
+            currentPoints={progress?.milestone || 0}
             maxPoints={100}
             onClaimReward={() => {}}
             className="pb-4"
           />
         </div>
 
-        <div className="fixed bottom-0 right-12 w-[134px] h-[116px]">
+        <div className="absolute bottom-0 right-8 w-[134px] h-[116px]">
           <HookButton label="Tiếp tục" onClick={handlePlay} />
         </div>
       </div>

@@ -71,7 +71,7 @@ const ChapterFlow = () => {
   }, [nodesWithOriginalY, layoutedEdges, setNodes, setEdges]);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-[calc(100vh-100px)]">
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
           <filter id="scribble-filter">
@@ -106,7 +106,7 @@ const ChapterFlow = () => {
             return;
           }
           // Assuming we want to allow playing any node for now, or check status
-          // if (!scene.status) return; 
+          if (!scene.status) return; 
           
           if (node.id !== currentStatus?.currentSceneId) {
             setCurrentStatus(null);

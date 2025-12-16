@@ -34,6 +34,6 @@ export interface UserProgress {
     imageUrl: string;
     points: number;
   }[];
-  milestones: number;
+  milestone: number;
   points: number;
 }
