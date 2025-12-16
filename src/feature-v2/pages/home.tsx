@@ -7,7 +7,7 @@ import { useRestartChapter } from "../../features/user/hooks";
 import GameModal from "../components/ui/dialog";
 
 export default function Home() {
-  const { setType, onPlayPlayer, openGiftSelection, setCollectionItems } = useVideoPlayerContext();
+  const { setType, openGiftSelection, setCollectionItems } = useVideoPlayerContext();
   const { chapter, refetch } = useUserContext();
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
