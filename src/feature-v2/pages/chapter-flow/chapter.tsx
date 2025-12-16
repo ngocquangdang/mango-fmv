@@ -9,11 +9,12 @@ import Banner from '../../components/banner';
 
 export default function ChapterPage() {
   const { onPlayPlayer, setType } = useVideoPlayerContext();
-  const { chapter } = useUserContext();
+  const { chapter,  } = useUserContext();
+  const { progress } = chapter;
 
   const handlePlay = () => {
     const sceneId =
-      chapter.progress?.currentScene?.sceneId || chapter.startSceneId;
+      progress?.currentScene?.sceneId || chapter.startSceneId;
     onPlayPlayer(sceneId);
   };
 
@@ -36,7 +37,7 @@ export default function ChapterPage() {
             className="w-20 h-10 bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs"
             style={{ backgroundImage: `url(/images/score-banner.png)` }}
           >
-            100
+            {progress?.points || 0}
           </div>
           <img
             src="/images/book-with-bg-icon.png"
@@ -85,7 +86,7 @@ export default function ChapterPage() {
                 tiến độ hiện tại
               </span>
             </div>
-            <span className="text-3xl font-bold text-[#F76933]">30%</span>
+            <span className="text-3xl font-bold text-[#F76933]">{progress?.milestone || 0}%</span>
           </div>
 
           <RewardProgress

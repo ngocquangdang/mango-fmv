@@ -1,41 +1,22 @@
-import { useState } from "react";
 import FramedStoryline from "./frame-story";
 import FrameUser from "./frame-user";
 
-export default function LeftSide() {
-  const [selectedUser, setSelectedUser] = useState<any>({
-    id: 0,
-    name: "User 1",
-    avatar: "https://picsum.photos/200/120",
-  });
+interface LeftSideProps {
+  selectedUser: any;
+  setSelectedUser: (user: any) => void;
+  users: Array<{
+    id: string;
+    name: string;
+    avatar: string;
+  }>;
+}
 
-  const users = [
-    {
-      id: 0,
-      name: "User 1",
-      avatar: "https://picsum.photos/200/120",
-    },
-    {
-      id: 1,
-      name: "User 2",
-      avatar: "https://picsum.photos/200/120",
-    },
-    {
-      id: 2,
-      name: "User 3",
-      avatar: "https://picsum.photos/200/120",
-    },
-    {
-      id: 3,
-      name: "User 4",
-      avatar: "https://picsum.photos/200/120",
-    },
-    {
-      id: 4,
-      name: "User 5",
-      avatar: "https://picsum.photos/200/120",
-    },
-  ];
+export default function LeftSide({ 
+  selectedUser, 
+  setSelectedUser,
+  users 
+}: LeftSideProps) {
+  console.log("🚀 ~ LeftSide ~ users:", users)
 
   return (
     <div
@@ -45,15 +26,20 @@ export default function LeftSide() {
         alignItems: "center",
       }}
     >
-      <FramedStoryline info={selectedUser} className="w-[202px] h-[158px]  top-10 right-2 " />
+      {selectedUser && selectedUser.id && (
+        <FramedStoryline info={selectedUser} className="w-[202px] h-[158px]  top-10 right-2 " />
+      )}
       <div className="relative w-[274px] h-[154px] right-10">
         <div className="w-full h-full flex items-center justify-center gap-2">
-          <FrameUser key={selectedUser.id} selected={true}  />
+          {selectedUser && selectedUser.id && (
+            <FrameUser key={selectedUser.id} selected={true} avatar={selectedUser.avatar} />
+          )}
           {users
             .filter((user) => user.id !== selectedUser.id)
             .map((user) => (
               <FrameUser
                 key={user.id}
+                avatar={user.avatar}
                 selected={false}
                 onClick={() => setSelectedUser(user)}
               />

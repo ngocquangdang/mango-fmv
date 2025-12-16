@@ -62,6 +62,7 @@ export interface VideoPlayerContextType {
   };
   openDialogInfo: (data: any) => void;
   closeDialogInfo: () => void;
+  setCollectionItems: React.Dispatch<React.SetStateAction<Record<string, any>>>;
 }
 
 export const VideoPlayerProvider = ({
@@ -94,6 +95,7 @@ export const VideoPlayerProvider = ({
   const [collectionItems, setCollectionItems] = React.useState<
     Record<string, any>
   >({});
+  console.log("🚀 ~ VideoPlayerProvider ~ collectionItems:", collectionItems)
   const [isReviewScene, setIsReviewScene] = React.useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isPlayerLoading, setIsPlayerLoading] = React.useState(false);
@@ -469,8 +471,10 @@ export const VideoPlayerProvider = ({
 
   React.useEffect(() => {
     if (Object.values(collectionItems).some((item) => item.isCompleted)) {
+      const completedItems = Object.values(collectionItems).filter((item) => item.isCompleted).length;
+      const totalItems = Object.values(collectionItems).length;
       showToast({
-        description: "Bạn đã thu thập được vật phẩm X/Y",
+        description: `Bạn đã thu thập được vật phẩm ${completedItems}/${totalItems}`,
         position: "bottom-left",
       });
     }
@@ -558,6 +562,7 @@ export const VideoPlayerProvider = ({
     dialogInfoState,
     openDialogInfo,
     closeDialogInfo,
+    setCollectionItems,
   };
   return (
     <VideoPlayerContext.Provider value={value}>

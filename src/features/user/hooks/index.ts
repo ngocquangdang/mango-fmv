@@ -8,6 +8,7 @@ import {
   updateStatus,
   restartChapter,
   getCharacters,
+  getCollectedRewards,
 } from "../apis";
 import type { UpdateStatusPayload } from "../apis";
 import type { ChapterMapped, Character, Scene } from "../../../types/chapter";
@@ -186,6 +187,27 @@ export const useCharacters = (projectId?: string) => {
         strength: character.strength || "",
       },
     }));
+  }, [data?.data]);
+  return {
+    data: transformedData,
+    isLoading,
+    error,
+    refetch,
+  };
+};
+
+export const useCollectedRewards = () => {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["collected-rewards"],
+    queryFn: () => getCollectedRewards(),
+    enabled: true,
+  });
+  const transformedData = React.useMemo(() => {
+    if (!data?.data) return undefined;
+    return data?.data?.characters?.reduce((acc: any, character: any) => {
+      acc[character.id] = character;
+      return acc;
+    }, {});
   }, [data?.data]);
   return {
     data: transformedData,

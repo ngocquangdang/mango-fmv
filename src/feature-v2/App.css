@@ -1,3 +1,15 @@
+@font-face {
+  font-family: "CondensedDisplay";
+  src: url("/font/1FTV-VIP-DK-Cool-Crayon.otf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+html,
+body {
+  font-family: "CondensedDisplay", sans-serif;
+}
 
 .game-modal-overlay {
   position: fixed;
@@ -7,7 +19,6 @@
   align-items: center;
   justify-content: center;
   z-index: 999;
-  font-family: 'Patrick Hand', cursive;
 }
 
 /* Khung Modal */
@@ -113,7 +124,6 @@
   padding: 0 30px; 
   
   color: white;
-  font-family: 'Patrick Hand', cursive;
   font-size: 20px;
   cursor: pointer;
   

@@ -1,23 +1,22 @@
 import { useState, useMemo } from "react";
 import FramedStoryline from "./frame-story";
+import type { MomentReward } from "../../../features/user/apis";
+
+interface RightSideProps {
+  collectedRewards?: MomentReward[];
+}
 
 const ITEMS_PER_PAGE = 9;
 
-export default function RightSide() {
+export default function RightSide({ collectedRewards = [] }: RightSideProps) {
   const [currentPage, setCurrentPage] = useState(0);
 
-  // Giả lập danh sách items (ví dụ 20 items)
-  const items = useMemo(
-    () => new Array(20).fill(0).map((_, i) => ({ id: i })),
-    []
-  );
-
-  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(collectedRewards.length / ITEMS_PER_PAGE);
 
   const currentItems = useMemo(() => {
     const start = currentPage * ITEMS_PER_PAGE;
-    return items.slice(start, start + ITEMS_PER_PAGE);
-  }, [currentPage, items]);
+    return collectedRewards.slice(start, start + ITEMS_PER_PAGE);
+  }, [currentPage, collectedRewards]);
 
   const handlePrevPage = () => {
     if (currentPage > 0) {
@@ -50,11 +49,15 @@ export default function RightSide() {
         </div>
 
         <div className="grid grid-cols-3 gap-2 min-w-[200px] min-h-[220px]">
-          {currentItems.map((item) => (
-            <div key={item.id}>
+          {currentItems.map((reward) => (
+            <div key={reward.rewardId}>
               <FramedStoryline
                 className="w-[54px] h-[64px] -rotate-12"
                 bgImg="/images/note-gift-card.png"
+                info={{
+                  avatar: reward.rewardImageUrl,
+                  name: reward.name || "",
+                }}
               />
             </div>
           ))}
@@ -83,7 +86,8 @@ export default function RightSide() {
       </div>
       <div className="absolute bottom-2 left-4">
         <span className="text-[10px]">
-          Bạn đã sưu tầm được {items.length}/{items.length} vật phẩm
+          Bạn đã sưu tầm được {collectedRewards.length}/
+          {collectedRewards.length} vật phẩm
         </span>
       </div>
     </div>

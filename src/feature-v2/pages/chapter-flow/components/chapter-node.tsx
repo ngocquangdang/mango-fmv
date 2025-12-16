@@ -8,9 +8,6 @@ const ChapterNode = ({ data }: NodeProps) => {
   // const isUnlocked = data.status === "unlocked";
 
   // Styles based on the image analysis
-  const frameColor = isLocked ? "border-blue-300" : "border-yellow-400";
-  const bgColor = isLocked ? "bg-blue-100" : "bg-white";
-
   return (
     <div className="relative group">
       <Handle
@@ -27,8 +24,6 @@ const ChapterNode = ({ data }: NodeProps) => {
         <div
           className={`
           w-[200px] h-[120px] 
-          border-4 ${frameColor} 
-          ${bgColor}
           flex items-center justify-center
           relative
           shadow-lg
@@ -37,14 +32,13 @@ const ChapterNode = ({ data }: NodeProps) => {
           rounded-sm
         `}
           style={{
-            // Add a slight rotation to mimic "hand drawn" or imperfect placement if desired,
-            // but for now keep it straight as per React Flow standard.
-            borderStyle: "solid",
-            // Simulate brush stroke slightly with box-shadow or irregular border if possible
-            // For now standard border.
+            backgroundImage: "url(/images/flow-node.png)",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
           }}
         >
-          <div className="w-full h-full p-1">
+          <div className="w-full h-full p-3">
             <img
               src={
                 (data.thumbUrl as string) || "https://picsum.photos/200/120"
@@ -74,3 +68,4 @@ const ChapterNode = ({ data }: NodeProps) => {
 };
 
 export default memo(ChapterNode);
+
