@@ -67,11 +67,11 @@ export default function ChapterPage() {
       >
         <div className="fixed bottom-4 flex items-end justify-between w-[74%] mt-auto">
           <div className="flex items-center">
-            {[1, 2, 3, 4, 5].map((item) => (
+            {progress?.characters?.map((item: any) => (
               <PhotoFrame
-                key={item}
-                imageSrc={`https://picsum.photos/id/${item}/200/120`}
-                score={item}
+                key={item.id}
+                imageSrc={item.imageUrl}
+                score={item.relationshipPoints}
                 className={`w-10 h-10`}
               />
             ))}
@@ -90,7 +90,7 @@ export default function ChapterPage() {
           </div>
 
           <RewardProgress
-            currentPoints={60}
+            currentPoints={progress?.milestones || 0}
             maxPoints={100}
             onClaimReward={() => {}}
             className="pb-4"

@@ -33,7 +33,7 @@ const LoadingBar = ({ isLoading = true }: { isLoading?: boolean }) => {
     <div className="flex flex-col w-full max-w-[500px] gap-1">
       {/* 1. Label Text: "Tải xuống..." */}
       <div className="ml-2">
-        <span className="font-['Patrick_Hand'] text-xs text-white font-bold drop-shadow-[2px_2px_0_rgba(0,0,0,0.6)] tracking-wide">
+        <span className=" text-xs text-white font-bold drop-shadow-[2px_2px_0_rgba(0,0,0,0.6)] tracking-wide">
           Tải xuống{dots}
         </span>
       </div>

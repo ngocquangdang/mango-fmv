@@ -29,4 +29,11 @@ export interface UserProgress {
     completedAt: string | null;
     updatedAt: string;
   }[];
+  characters: {
+    id: string;
+    imageUrl: string;
+    points: number;
+  }[];
+  milestones: number;
+  points: number;
 }

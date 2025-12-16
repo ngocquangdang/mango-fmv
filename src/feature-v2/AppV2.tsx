@@ -61,7 +61,9 @@ function AppV2Content() {
     isGiftSelectionOpen,
     dialogInfoState,
     closeDialogInfo,
+    clips,
   } = useVideoPlayerContext();
+
   const [dialogName, setDialogName] = React.useState<string | null>(null);
 
   const loading = userLoading || isPlayerLoading;
@@ -86,13 +88,23 @@ function AppV2Content() {
   };
 
   const onConfirm = () => {
+    const sceneId = currentStatus?.currentSceneId || "";
+    const scene = clips?.[sceneId];
+
     quitPlayer();
-    updateSceneStatus(
-      currentStatus?.currentSceneId || "",
-      Math.floor(currentStatus?.totalDuration || 0),
-      Math.floor(currentStatus?.watchingSecond || 0),
-      "INPROGRESS"
-    );
+    updateSceneStatus({
+      sceneId: currentStatus?.currentSceneId || "",
+      totalDuration: Math.floor(
+        scene?.duration ||
+          currentStatus?.totalDuration ||
+          currentStatus?.time ||
+          0
+      ),
+      watchingSecond: Math.floor(
+        currentStatus?.watchingSecond || currentStatus?.time || 0
+      ),
+      status: "INPROGRESS",
+    });
     setDialogName(null);
     setReviewScene(false);
     setType("story");

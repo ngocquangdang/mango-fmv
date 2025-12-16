@@ -56,7 +56,7 @@ export default function RightSide({ collectedRewards = [] }: RightSideProps) {
                 bgImg="/images/note-gift-card.png"
                 info={{
                   avatar: reward.rewardImageUrl,
-                  name: reward.name || "",
+                  name: "",
                 }}
               />
             </div>

@@ -10,26 +10,21 @@ import {
   saveLocalParams,
 } from "../lib/api/storage";
 import { useToast } from "../components/ui/toast-v2/use-toast";
-
+import RewardCollection, {
+  type RewardItem,
+} from "../feature-v2/components/reward-collection";
+import RelationshipPoint from "../feature-v2/components/relationship-point";
+export type VideoPlayerType =
+  | "intro"
+  | "interactive"
+  | "story"
+  | "journal"
+  | "ranking"
+  | "playAgain"
+  | "endChapter";
 export interface VideoPlayerContextType {
-  type:
-    | "intro"
-    | "interactive"
-    | "story"
-    | "journal"
-    | "ranking"
-    | "playAgain"
-    | "endChapter";
-  setType: (
-    type:
-      | "intro"
-      | "interactive"
-      | "story"
-      | "journal"
-      | "ranking"
-      | "playAgain"
-      | "endChapter"
-  ) => void;
+  type: VideoPlayerType;
+  setType: (type: VideoPlayerType) => void;
   currentSceneId: string | null;
   clips: Record<string, Scene>;
   play: () => void;
@@ -63,6 +58,15 @@ export interface VideoPlayerContextType {
   openDialogInfo: (data: any) => void;
   closeDialogInfo: () => void;
   setCollectionItems: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  showRewardCollection: (
+    items: RewardItem[],
+    onClose?: () => void,
+    title?: string,
+    description?: string
+  ) => void;
+  showRelationshipPoint: (
+    items: { imageUrl: string; points: number }[]
+  ) => void;
 }
 
 export const VideoPlayerProvider = ({
@@ -95,7 +99,7 @@ export const VideoPlayerProvider = ({
   const [collectionItems, setCollectionItems] = React.useState<
     Record<string, any>
   >({});
-  console.log("🚀 ~ VideoPlayerProvider ~ collectionItems:", collectionItems)
+
   const [isReviewScene, setIsReviewScene] = React.useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isPlayerLoading, setIsPlayerLoading] = React.useState(false);
@@ -106,6 +110,25 @@ export const VideoPlayerProvider = ({
   }>({
     isOpen: false,
     data: null,
+  });
+
+  const [rewardCollectionState, setRewardCollectionState] = React.useState<{
+    isOpen: boolean;
+    items: RewardItem[];
+    title?: string;
+    description?: string;
+  }>({
+    isOpen: false,
+    items: [],
+  });
+  const rewardCollectionOnCloseRef = React.useRef<(() => void) | null>(null);
+
+  const [relationshipPointState, setRelationshipPointState] = React.useState<{
+    items: { imageUrl: string; points: number }[];
+    isVisible: boolean;
+  }>({
+    items: [],
+    isVisible: false,
   });
 
   // Ensure we only initialize the VideoPlayer SDK once per api instance
@@ -154,6 +177,85 @@ export const VideoPlayerProvider = ({
     [api]
   );
 
+  const showRewardCollection = React.useCallback(
+    (
+      items: RewardItem[],
+      onClose?: () => void,
+      title?: string,
+      description?: string
+    ) => {
+      rewardCollectionOnCloseRef.current = onClose || null;
+      setRewardCollectionState({
+        isOpen: true,
+        items: items || [],
+        title,
+        description,
+      });
+    },
+    []
+  );
+
+  const showRelationshipPoint = React.useCallback(
+    (items: { imageUrl: string; points: number }[]) => {
+      setRelationshipPointState({
+        items,
+        isVisible: true,
+      });
+    },
+    []
+  );
+
+  const handleRelationshipPointClose = React.useCallback(() => {
+    setRelationshipPointState((prev) => ({
+      ...prev,
+      isVisible: false,
+    }));
+  }, []);
+
+  const openGiftSelection = React.useCallback(() => {
+    setIsGiftSelectionOpen(true);
+  }, []);
+
+  const closeGiftSelection = React.useCallback(() => {
+    setIsGiftSelectionOpen(false);
+  }, []);
+
+  const triggerDisplayReward = React.useCallback(
+    (data: any) => {
+      console.log("🚀 ~ VideoPlayerProvider ~ data:", data.relationships);
+
+      if (data?.relationships?.length > 0) {
+        showRelationshipPoint(data.relationships);
+      }
+
+      const handleShowMoments = (index: number) => {
+        // Stop recursion if no more moments
+        if (!data.moments || index >= data.moments.length) {
+          showRewardCollection([]);
+          closeGiftSelection();
+          return;
+        }
+
+        // Show current moment and schedule next one on close
+        showRewardCollection(
+          data.moments[index].rewards,
+          () => {
+            setTimeout(() => {
+              handleShowMoments(index + 1);
+            }, 200);
+          },
+          data.moments[index].title,
+          data.moments[index].description
+        );
+      };
+
+      if (data.moments && data.moments.length > 0) {
+        handleShowMoments(0);
+      }
+    },
+    [showRelationshipPoint, showRewardCollection, closeGiftSelection]
+  );
+
   const handleCollectionItems = React.useCallback(
     (hotspot: any, currentSceneId: string) => {
       if (!api) return;
@@ -192,16 +294,19 @@ export const VideoPlayerProvider = ({
       console.log("🚀 ~ [START] [INPROGRESS]:", sceneId);
       if (!isReviewScene) {
         updateSceneStatus(
-          sceneId,
-          Math.floor(data.scenes[sceneId]?.duration || 0),
-          0,
-          "INPROGRESS"
+          {
+            sceneId,
+            totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
+            watchingSecond: 0,
+            status: "INPROGRESS",
+          },
+          (data: any) => triggerDisplayReward(data)
         );
       }
       setCurrentSceneId(sceneId);
       setPauseType(null);
     },
-    [updateSceneStatus, data.scenes, isReviewScene]
+    [updateSceneStatus, data.scenes, isReviewScene, triggerDisplayReward]
   );
 
   const handleStop = React.useCallback(
@@ -212,12 +317,12 @@ export const VideoPlayerProvider = ({
 
       if (payload.actionName === PausedActionName.USER_PAUSED_VIDEO) {
         if (!isReviewScene) {
-          updateSceneStatus(
-            payload.currentSceneId,
-            Math.floor(currentClip?.duration || 0),
-            Math.floor(payload.time || 0),
-            "INPROGRESS"
-          );
+          updateSceneStatus({
+            sceneId: payload.currentSceneId,
+            totalDuration: Math.floor(currentClip?.duration || 0),
+            watchingSecond: Math.floor(payload.time || 0),
+            status: "INPROGRESS",
+          });
         }
         return;
       }
@@ -225,10 +330,13 @@ export const VideoPlayerProvider = ({
         setPauseType(payload.actionName);
         if (!isReviewScene) {
           updateSceneStatus(
-            payload.currentSceneId,
-            Math.floor(currentClip?.duration || 0),
-            Math.floor(payload.time || 0),
-            "INPROGRESS"
+            {
+              sceneId: payload.currentSceneId,
+              totalDuration: Math.floor(currentClip?.duration || 0),
+              watchingSecond: Math.floor(payload.time || 0),
+              status: "INPROGRESS",
+            },
+            (data: any) => triggerDisplayReward(data)
           );
         }
       }
@@ -278,6 +386,7 @@ export const VideoPlayerProvider = ({
       handleCollectionItems,
       collectionItems,
       isReviewScene,
+      triggerDisplayReward,
     ]
   );
 
@@ -331,12 +440,12 @@ export const VideoPlayerProvider = ({
       } else {
         removeLocalParam("previousSceneId");
         if (!isReviewScene) {
-          updateSceneStatus(
+          updateSceneStatus({
             sceneId,
-            Math.floor(data.scenes[sceneId]?.duration || 0),
-            Math.floor(data.scenes[sceneId]?.duration || 0),
-            "COMPLETED"
-          );
+            totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
+            watchingSecond: Math.floor(data.scenes[sceneId]?.duration || 0),
+            status: "COMPLETED",
+          });
         }
       }
 
@@ -352,10 +461,13 @@ export const VideoPlayerProvider = ({
       console.log("🚀 ~ [ENDED]", sceneId);
       if (!isReviewScene) {
         updateSceneStatus(
-          sceneId,
-          Math.floor(data.scenes[sceneId]?.duration || 0),
-          Math.floor(data.scenes[sceneId]?.duration || 0),
-          "COMPLETED"
+          {
+            sceneId,
+            totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
+            watchingSecond: Math.floor(data.scenes[sceneId]?.duration || 0),
+            status: "COMPLETED",
+          },
+          (params: any) => triggerDisplayReward(params)
         );
       }
 
@@ -370,16 +482,15 @@ export const VideoPlayerProvider = ({
         (scene as any).targetSceneId;
 
       if (!hasNext) {
-        setIsPlayerLoading(true);
+        // setIsPlayerLoading(true);
         setIsReviewScene(false);
-        setTimeout(() => {
-          setIsPlayerLoading(false);
-
-          setType("intro");
-        }, 3000);
+        // setTimeout(() => {
+        //   setIsPlayerLoading(false);
+        //   setType("intro");
+        // }, 3000);
       }
     },
-    [updateSceneStatus, data.scenes, isReviewScene]
+    [updateSceneStatus, data.scenes, isReviewScene, triggerDisplayReward]
   );
 
   const quitPlayer = React.useCallback(() => {
@@ -449,9 +560,10 @@ export const VideoPlayerProvider = ({
           },
           hotspots: {
             label: {
-              className: "hotspot-label-connector pr-10 text-white! text-sm font-semibold top-0 right-0 !bottom-auto !left-auto -mt-2 -mr-2",
+              className:
+                "hotspot-label-connector pr-10 text-white! text-sm font-semibold top-0 right-0 !bottom-auto !left-auto -mt-2 -mr-2",
               isShowLabel: true,
-            }
+            },
           },
           ping: {
             enabled: false,
@@ -471,7 +583,9 @@ export const VideoPlayerProvider = ({
 
   React.useEffect(() => {
     if (Object.values(collectionItems).some((item) => item.isCompleted)) {
-      const completedItems = Object.values(collectionItems).filter((item) => item.isCompleted).length;
+      const completedItems = Object.values(collectionItems).filter(
+        (item) => item.isCompleted
+      ).length;
       const totalItems = Object.values(collectionItems).length;
       showToast({
         description: `Bạn đã thu thập được vật phẩm ${completedItems}/${totalItems}`,
@@ -524,14 +638,6 @@ export const VideoPlayerProvider = ({
     handleCollectionSelected,
   ]);
 
-  const openGiftSelection = React.useCallback(() => {
-    setIsGiftSelectionOpen(true);
-  }, []);
-
-  const closeGiftSelection = React.useCallback(() => {
-    setIsGiftSelectionOpen(false);
-  }, []);
-
   const value: VideoPlayerContextType = {
     type,
     setType,
@@ -563,10 +669,34 @@ export const VideoPlayerProvider = ({
     openDialogInfo,
     closeDialogInfo,
     setCollectionItems,
+    showRewardCollection,
+    showRelationshipPoint,
   };
   return (
     <VideoPlayerContext.Provider value={value}>
       {children}
+      {rewardCollectionState.isOpen && (
+        <RewardCollection
+          items={rewardCollectionState.items}
+          title={rewardCollectionState.title}
+          description={rewardCollectionState.description}
+          onClose={() => {
+            if (rewardCollectionOnCloseRef.current) {
+              rewardCollectionOnCloseRef.current();
+              rewardCollectionOnCloseRef.current = null;
+            }
+            setRewardCollectionState((prev) => ({
+              ...prev,
+              isOpen: false,
+            }));
+          }}
+        />
+      )}
+      <RelationshipPoint
+        items={relationshipPointState.items}
+        isVisible={relationshipPointState.isVisible}
+        onClose={handleRelationshipPointClose}
+      />
     </VideoPlayerContext.Provider>
   );
 };

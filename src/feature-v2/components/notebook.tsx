@@ -40,12 +40,14 @@ const NotebookLayout = ({
           </div>
         </div>
       </div>
-      <div className="absolute -right-25 top-4 flex flex-col gap-4">
+      <div className="absolute -right-26 top-4 flex flex-col gap-4">
         {categories.map((category) => {
           return (
             <div
               key={category.id}
-              className={`relative ${selectedTab === category.id ? "z-2" : "z-0"}`}
+              className={`relative ${
+                selectedTab === category.id ? "z-2" : "z-0"
+              }`}
               onClick={() => setSelectedTab(category.id)}
             >
               <img
@@ -58,10 +60,14 @@ const NotebookLayout = ({
                 className={
                   selectedTab === category.id
                     ? "w-[130px] h-[62px]"
-                    : "w-[120px] h-[40px]"
+                    : "w-[130px] h-[40px]"
                 }
               />
-              <button className="absolute top-0 left-0 w-full h-full">
+              <button
+                className={`absolute top-0 left-0 w-full h-full ${
+                  selectedTab === category.id ? "text-[13px]" : "text-[12px]"
+                }`}
+              >
                 {category.name}
               </button>
             </div>

@@ -19,10 +19,13 @@ export interface UserContextType {
   loading: boolean;
   refetch: () => void;
   updateSceneStatus: (
-    sceneId: string,
-    totalDuration: number,
-    watchingSecond: number,
-    status: string
+    data: {
+      sceneId: string;
+      totalDuration: number;
+      watchingSecond: number;
+      status: string;
+    },
+    callback?: (params: any) => void
   ) => void;
   collectedRewards?: Record<string, CollectedRewardCharacter>;
 }
@@ -148,11 +151,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const updateSceneStatus = React.useCallback(
     (
-      sceneId: string,
-      totalDuration: number,
-      watchingSecond: number,
-      status: string
+      data: {
+        sceneId: string;
+        totalDuration: number;
+        watchingSecond: number;
+        status: string;
+      },
+      callback?: (params: any) => void
     ) => {
+      const { sceneId, totalDuration, watchingSecond, status } = data;
       updateStatus(
         {
           projectId: chapter?.id || "",
@@ -163,8 +170,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           status,
         },
         {
-          onSuccess: () => {
+          onSuccess: (data: any) => {
             refetch();
+            if (callback) callback(data.data);
           },
         }
       );
@@ -196,7 +204,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       updateSceneStatus,
       collectedRewards,
     }),
-    [chapterMapped, progress, loading, refetch, updateSceneStatus, collectedRewards]
+    [
+      chapterMapped,
+      progress,
+      loading,
+      refetch,
+      updateSceneStatus,
+      collectedRewards,
+    ]
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

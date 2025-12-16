@@ -77,7 +77,7 @@ export default function RankLayout() {
                 <div className="w-8 flex justify-center">
                   {/* Crown icon or simple number styled */}
                   <span
-                    className={`font-['Patrick_Hand'] text-3xl font-bold ${
+                    className={`text-3xl font-bold ${
                       index === 0
                         ? "text-yellow-500 scale-125"
                         : "text-slate-500"

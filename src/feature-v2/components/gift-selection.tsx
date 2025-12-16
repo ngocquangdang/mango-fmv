@@ -71,7 +71,7 @@ const GiftSelection = () => {
   if (showRewardModal && revealedGiftImage) {
     return (
       <div
-        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 font-['Patrick_Hand']"
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80"
         onClick={closeGiftSelection} // Close everything when clicking backdrop
       >
         <div
@@ -124,7 +124,7 @@ const GiftSelection = () => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 font-['Patrick_Hand'] transition-opacity duration-500 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 transition-opacity duration-500 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
       onClick={closeGiftSelection} // Close when clicking grid backdrop

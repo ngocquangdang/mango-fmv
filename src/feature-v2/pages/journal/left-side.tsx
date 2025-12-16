@@ -16,7 +16,6 @@ export default function LeftSide({
   setSelectedUser,
   users 
 }: LeftSideProps) {
-  console.log("🚀 ~ LeftSide ~ users:", users)
 
   return (
     <div
