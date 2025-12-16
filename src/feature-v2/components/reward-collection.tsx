@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useVideoPlayerContext } from "../../contexts";
+import RewardDetail from "./ui/reward-detail";
 
 export type RewardItem = {
   imageUrl: string;
@@ -69,56 +70,6 @@ const RewardCollection = ({
 
   if (!items || items.length === 0) return null;
 
-  // If reward modal is open, show full-screen overlay (detail view)
-  if (showRewardModal && revealedGiftImage) {
-    return (
-      <div
-        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80"
-        onClick={handleCloseDetail} // Close detail modal when clicking backdrop
-      >
-        <div
-          className="relative flex flex-col items-center animate-scale-up"
-          onClick={handleCloseDetail} // Prevent closing when clicking content
-        >
-          {/* Title */}
-          <h2 className="text-lg text-white font-bold mb-4 text-center drop-shadow-md px-4">
-            {description ||
-              "Hình ảnh đã được lưu vào Phần thưởng trong Nhật ký của bạn"}
-          </h2>
-
-          {/* Polaroid Frame */}
-          <div
-            className="relative w-[364px] h-[284px] transition-transform hover:scale-105 duration-300 cursor-pointer"
-            // onClick={handleCloseDetail}
-          >
-            {/* Frame Image */}
-            <img
-              src="/images/note-frame.png"
-              alt="frame"
-              className="absolute inset-0 w-full h-full object-fill z-20 pointer-events-none shadow-2xl"
-            />
-
-            {/* Inner Content (Image) */}
-            <div className="absolute top-[6%] left-[4.5%] right-[4.5%] bottom-[22%] z-10 overflow-hidden bg-gray-100">
-              <img
-                src={revealedGiftImage}
-                alt="reward"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Hearts / Decor */}
-            <div className="absolute bottom-[4%] left-0 w-full z-30 flex justify-center gap-3">
-              <img src="/images/heart-icon.png" alt="heart" className="w-10 h-10" />
-              <img src="/images/heart-icon.png" alt="heart" className="w-10 h-10" />
-              <img src="/images/heart-icon.png" alt="heart" className="w-10 h-10" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Main grid view
   return (
     <div
@@ -183,6 +134,13 @@ const RewardCollection = ({
           })}
         </div>
       </div>
+
+      <RewardDetail
+        isOpen={showRewardModal}
+        imageUrl={revealedGiftImage}
+        description={description}
+        onClose={handleCloseDetail}
+      />
     </div>
   );
 };

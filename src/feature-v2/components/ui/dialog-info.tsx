@@ -42,13 +42,17 @@ const DialogInfo = ({
         </button>
 
         <div className="absolute z-10 top-8 -left-[60%]">
-          <FramedStoryline className="w-[318px] h-[248px] -rotate-12" />
+          <FramedStoryline className="w-[318px] h-[248px] -rotate-12 bg-white" />
+          <img src="/images/elements/cloud-element.png" alt="main-image" className="w-[54px] h-10 absolute top-15 -left-10" />
+          <img src="/images/elements/start-bold-element.png" alt="main-image" className="w-16 h-16 absolute bottom-10 z-50 right-0" />
+          <img src="/images/elements/sound-element.png" alt="main-image" className="w-7 h-7 absolute bottom-10 -right-4" />
         </div>
         <div className="absolute w-fit left-[16%] z-20">
           <FramedStoryline
             className="w-[110px] h-[134px]"
             bgImg="/images/note-gift-card.png"
           />
+          <img src="/images/elements/tag-element.png" alt="main-image" className="w-[54px] h-[40px] absolute top-2 z-50 -left-2 rotate-120" />
         </div>
 
         <div className="pl-[124px] pr-[50px] pt-7">

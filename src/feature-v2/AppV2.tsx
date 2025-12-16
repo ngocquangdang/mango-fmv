@@ -73,6 +73,9 @@ function AppV2Content() {
       if (isReviewScene) {
         pause();
         setReviewScene(false);
+        setType("story");
+        return;
+
       } else {
         setDialogName("quitPlayer");
         pause();

@@ -5,10 +5,16 @@ import LeftSide from "./left-side";
 import RightSide from "./right-side";
 import Banner from "../../components/banner";
 import { useUserContext } from "../../../features/user/context";
+import RewardDetail from "../../components/ui/reward-detail";
+import type { MomentReward } from "../../../features/user/apis";
 
 export default function Journal() {
   const { setType } = useVideoPlayerContext();
   const { collectedRewards } = useUserContext();
+  const [isRewardDetailOpen, setIsRewardDetailOpen] = useState(false);
+  const [selectedRewardImage, setSelectedRewardImage] = useState<string | null>(
+    null
+  );
 
   const users = useMemo(() => {
     return Object.values(collectedRewards || {}).map((character: any) => ({
@@ -47,29 +53,53 @@ export default function Journal() {
       (category: any) => category.id === selectedTab
     )?.momentRewards || [];
   }, [collectedRewards, selectedUser.id, selectedTab]);
+
+  const handleOpenRewardDetail = (reward: MomentReward) => {
+    if (!reward?.rewardImageUrl) {
+      return;
+    }
+
+    setSelectedRewardImage(reward.rewardImageUrl);
+    setIsRewardDetailOpen(true);
+  };
+
+  const handleCloseRewardDetail = () => {
+    setIsRewardDetailOpen(false);
+    setSelectedRewardImage(null);
+  };
   
   return (
-    <div className="w-full h-full flex items-center justify-center relative">
-      <div
-        className="absolute top-4 left-4 z-50 cursor-pointer w-9 h-9"
-        onClick={() => setType("intro")}
-      >
-        <img src="/images/back-icon.png" alt="back-icon" className="w-9 h-9" />
+    <>
+      <div className="w-full h-full flex items-center justify-center relative">
+        <div
+          className="absolute top-4 left-4 z-50 cursor-pointer w-9 h-9"
+          onClick={() => setType("intro")}
+        >
+          <img src="/images/back-icon.png" alt="back-icon" className="w-9 h-9" />
+        </div>
+        <Banner text="Nhật ký" className="absolute! top-4 left-4" />
+        <NotebookLayout
+          categories={categories}
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+          leftContent={
+            <LeftSide
+              selectedUser={selectedUser}
+              setSelectedUser={setSelectedUser}
+              users={users}
+            />
+          }
+          rightContent={
+            <RightSide collectedRewards={items} onRewardClick={handleOpenRewardDetail} />
+          }
+        />
       </div>
-      <Banner text="Nhật ký" className="absolute! top-4 left-4" />
-      <NotebookLayout
-        categories={categories}
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
-        leftContent={
-          <LeftSide
-            selectedUser={selectedUser}
-            setSelectedUser={setSelectedUser}
-            users={users}
-          />
-        }
-        rightContent={<RightSide collectedRewards={items} />}
+
+      <RewardDetail
+        isOpen={isRewardDetailOpen}
+        imageUrl={selectedRewardImage}
+        onClose={handleCloseRewardDetail}
       />
-    </div>
+    </>
   );
 }

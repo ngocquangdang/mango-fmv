@@ -4,11 +4,15 @@ import type { MomentReward } from "../../../features/user/apis";
 
 interface RightSideProps {
   collectedRewards?: MomentReward[];
+  onRewardClick?: (reward: MomentReward) => void;
 }
 
 const ITEMS_PER_PAGE = 9;
 
-export default function RightSide({ collectedRewards = [] }: RightSideProps) {
+export default function RightSide({
+  collectedRewards = [],
+  onRewardClick,
+}: RightSideProps) {
   const [currentPage, setCurrentPage] = useState(0);
 
   const totalPages = Math.ceil(collectedRewards.length / ITEMS_PER_PAGE);
@@ -30,10 +34,16 @@ export default function RightSide({ collectedRewards = [] }: RightSideProps) {
     }
   };
 
+  const handleSelectReward = (reward: MomentReward) => {
+    if (!reward?.rewardImageUrl) {
+      return;
+    }
+    onRewardClick?.(reward);
+  };
+
   return (
     <div className="relative w-full h-full">
       <div className="flex flex-row items-center justify-center h-full">
-        {/* Nút Prev - ẩn nếu ở trang đầu */}
         <div
           className={`cursor-pointer ${
             currentPage === 0 ? "opacity-0 pointer-events-none" : ""
@@ -50,7 +60,20 @@ export default function RightSide({ collectedRewards = [] }: RightSideProps) {
 
         <div className="grid grid-cols-3 gap-2 min-w-[200px] min-h-[220px]">
           {currentItems.map((reward) => (
-            <div key={reward.rewardId}>
+            <div
+              key={reward.rewardId}
+              className="w-[54px] h-[64px] cursor-pointer"
+              role="button"
+              tabIndex={0}
+              aria-label="Xem chi tiết phần thưởng"
+              onClick={() => handleSelectReward(reward)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  handleSelectReward(reward);
+                }
+              }}
+            >
               <FramedStoryline
                 className="w-[54px] h-[64px] -rotate-12"
                 bgImg="/images/note-gift-card.png"
@@ -61,7 +84,6 @@ export default function RightSide({ collectedRewards = [] }: RightSideProps) {
               />
             </div>
           ))}
-          {/* Fill empty slots if current page has less than 9 items to maintain layout */}
           {Array.from({ length: ITEMS_PER_PAGE - currentItems.length }).map(
             (_, index) => (
               <div key={`empty-${index}`} className="w-[54px] h-[64px]" />
@@ -69,7 +91,6 @@ export default function RightSide({ collectedRewards = [] }: RightSideProps) {
           )}
         </div>
 
-        {/* Nút Next - ẩn nếu ở trang cuối */}
         <div
           className={`cursor-pointer ${
             currentPage >= totalPages - 1 ? "opacity-0 pointer-events-none" : ""

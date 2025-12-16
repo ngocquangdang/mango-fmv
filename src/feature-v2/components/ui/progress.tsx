@@ -9,11 +9,7 @@ const RewardProgress = ({
   onClaimReward: (value: number) => void;
   className?: string;
 }) => {
-  console.log("🚀 ~ RewardProgress ~ currentPoints:", currentPoints)
-  // Tính phần trăm độ rộng thanh progress
   const percentage = Math.min((currentPoints / maxPoints) * 100, 100);
-
-  // Cấu hình các mốc quà (bạn có thể truyền prop vào nếu muốn động)
   const milestones = [
     { value: 25, label: "25%" },
     { value: 50, label: "50%" },
@@ -27,7 +23,6 @@ const RewardProgress = ({
   return (
     <div className={`relative w-[192px] ${className}`}>
       <div className="progress-track">
-        {/* Thanh đã chạy (Fill) */}
         <div
           className="progress-fill"
           style={{ width: `${percentage}%` }}
