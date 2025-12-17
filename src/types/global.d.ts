@@ -3,7 +3,7 @@ export {};
 declare global {
   interface Window {
     MgtvApi?: {
-      login?: (cb: (mgUserInfo: MgUserInfo) => void) => void;
+      login?: (cb: (mgUserInfo: string) => void) => void;
     };
     VideoPlayer?: {
       onInit?: (params?: unknown, done?: () => void) => void;

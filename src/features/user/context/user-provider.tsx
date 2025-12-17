@@ -147,21 +147,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     isCollectedRewardsLoading,
   ]);
 
-  const handleGetToken = React.useCallback((mgUserInfo: MgUserInfo) => {
+  const handleGetToken = React.useCallback((mgUserInfo: string) => {
     logInfo(
       "UserProvider - handleGetToken called",
       {
-        userId: mgUserInfo.userId,
-        userName: mgUserInfo.userName,
-        ticket: mgUserInfo.ticket,
-        fullData: mgUserInfo,
+        mgUserInfo,
       },
       "UserProvider"
     );
-
-    console.log("mgUserInfo",Object.keys({...mgUserInfo}), mgUserInfo["ticket"]);
+    const mgUserInfoObject = JSON.parse(mgUserInfo || "{}");
     saveLocalParams({
-      ticket: mgUserInfo.ticket,
+      ticket: mgUserInfoObject?.ticket,
     });
     setLoading(true);
   }, []);
