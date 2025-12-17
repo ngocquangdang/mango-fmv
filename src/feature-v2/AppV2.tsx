@@ -127,7 +127,7 @@ function AppV2Content() {
 
   return (
     <div
-      className="w-full h-screen bg-cover bg-center"
+      className="w-full h-screen bg-cover bg-center app-container"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       {loading ? (
