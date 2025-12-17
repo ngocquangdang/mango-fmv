@@ -4,14 +4,6 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./feature-v2/AppV2";
 import { ToastProvider } from "./components/ui/toast-v2/toast-context.tsx";
-import VConsole from "vconsole";
-
-// Khởi tạo vConsole (có thể điều kiện hóa theo môi trường)
-if (import.meta.env.DEV || new URLSearchParams(window.location.search).get("vconsole") === "true") {
-  new VConsole({
-    theme: "light",
-  });
-}
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

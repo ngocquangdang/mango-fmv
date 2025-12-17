@@ -2,7 +2,7 @@ import Button from "./button";
 
 type GameModalProps = {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   onConfirm: () => void;
   title?: string;
   message?: string;
@@ -39,13 +39,18 @@ const GameModal = ({
           className="w-[60px] h-[60px] object-cover absolute top-30 -right-10"
         />
 
-        <button className="absolute top-0 -right-6 w-12 h-12" onClick={onClose}>
-          <img
-            src="/images/close-icon.png"
-            alt="close"
-            className="w-full h-full object-cover"
-          />
-        </button>
+        {onClose && (
+          <button
+            className="absolute top-0 -right-6 w-12 h-12"
+            onClick={onClose}
+          >
+            <img
+              src="/images/close-icon.png"
+              alt="close"
+              className="w-full h-full object-cover"
+            />
+          </button>
+        )}
         {title && (
           <div className="game-title-area">
             <div className="game-title-bg"></div>

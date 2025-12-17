@@ -45,6 +45,7 @@ const useIsLandscapeMobile = () => {
 
 function AppV2Content() {
   const isLandscapeMobile = useIsLandscapeMobile();
+  console.log("🚀 ~ AppV2Content ~ isLandscapeMobile:", isLandscapeMobile)
   const backgroundImage = "/images/new-bg.png";
 
   const { loading: userLoading, updateSceneStatus } = useUserContext();
@@ -75,7 +76,6 @@ function AppV2Content() {
         setReviewScene(false);
         setType("story");
         return;
-
       } else {
         setDialogName("quitPlayer");
         pause();
@@ -113,18 +113,13 @@ function AppV2Content() {
     setType("story");
   };
 
-  if (!isLandscapeMobile) {
-    return (
-      <div className="w-full min-h-screen flex flex-col items-center justify-center text-center px-6 bg-black/50">
-        <p className="text-lg font-semibold text-white">
-          Vui lòng xoay ngang màn hình để tiếp tục trải nghiệm.
-        </p>
-        <p className="text-sm text-white">
-          Player ưu tiên hiển thị ngang trên điện thoại.
-        </p>
-      </div>
-    );
-  }
+  // React.useEffect(() => {
+  //   if (isLandscapeMobile) {
+  //     pause();
+  //   } else {
+  //     onPlay();
+  //   }
+  // }, [isLandscapeMobile, pause, onPlay]);
 
   return (
     <div
@@ -171,6 +166,15 @@ function AppV2Content() {
           />
         </div>
       )}
+
+      {/* Orientation Dialog - Hiển thị khi mobile dọc */}
+      {/* <GameModal
+        isOpen={!isLandscapeMobile}
+        onConfirm={() => {}}
+        title=""
+        message="Vui lòng xoay ngang màn hình để tiếp tục trải nghiệm. Player ưu tiên hiển thị ngang trên điện thoại."
+        displayAction={false}
+      /> */}
 
       {/* Confirmation Dialog */}
       <GameModal
