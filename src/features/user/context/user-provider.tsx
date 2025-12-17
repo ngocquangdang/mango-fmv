@@ -9,7 +9,6 @@ import {
   useCollectedRewards,
 } from "../hooks";
 import { useMgSdk } from "../../../hooks/useMgSdk";
-import type { MgUserInfo } from "../../../types/user";
 import type { ChapterMapped } from "../../../types/chapter";
 import { saveLocalParams } from "../../../lib/api/storage";
 import type { CollectedRewardCharacter } from "../apis";
