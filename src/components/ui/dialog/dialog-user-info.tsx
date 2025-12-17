@@ -16,7 +16,7 @@ const DialogUserInfo = ({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "#00000099" }}
+      style={{ background: "#fff" }}
       onClick={onClose}
     >
       <div

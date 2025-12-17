@@ -150,6 +150,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   ]);
 
   const handleGetToken = React.useCallback((mgUserInfo: MgUserInfo) => {
+    console.log("[SERVER LOG] UserProvider - handleGetToken called", {
+      timestamp: new Date().toISOString(),
+      userId: mgUserInfo.userId,
+      userName: mgUserInfo.userName,
+      ticket: mgUserInfo.ticket,
+      fullData: mgUserInfo,
+    });
     console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo);
     setMgUserInfo(mgUserInfo);
     setIsDialogOpen(true);
@@ -203,7 +210,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
   React.useEffect(() => {
-    if (!mgApi) return;
+    if (!mgApi) {
+      console.log("[SERVER LOG] UserProvider - mgApi is not available");
+      return;
+    }
+
+    console.log("[SERVER LOG] UserProvider - mgApi initialized, setting up login callback", {
+      timestamp: new Date().toISOString(),
+      hasLoginMethod: !!mgApi.login,
+    });
 
     mgApi.login?.(handleGetToken);
   }, [mgApi, handleGetToken]);
