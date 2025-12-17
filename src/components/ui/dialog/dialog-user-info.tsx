@@ -1,4 +1,3 @@
-import React from "react";
 import type { MgUserInfo } from "../../../types/user";
 
 type DialogUserInfoProps = {
@@ -24,7 +23,10 @@ const DialogUserInfo = ({
         className="bg-white rounded-lg p-6 max-w-md w-full"
         onClick={(e) => e.stopPropagation()}
       >
-        <textarea className="w-full h-full" value={JSON.stringify(mgUserInfo)} />
+        <textarea
+          className="w-full h-full"
+          value={JSON.stringify(mgUserInfo)}
+        />
       </div>
     </div>
   );
