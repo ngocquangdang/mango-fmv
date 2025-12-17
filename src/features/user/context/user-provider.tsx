@@ -13,7 +13,6 @@ import type { MgUserInfo } from "../../../types/user";
 import type { ChapterMapped } from "../../../types/chapter";
 import { getLocalParam, saveLocalParams } from "../../../lib/api/storage";
 import type { CollectedRewardCharacter } from "../apis";
-import DialogUserInfo from "../../../components/ui/dialog/dialog-user-info";
 import { logInfo } from "../../../lib/utils/logger";
 
 export interface UserContextType {
@@ -38,8 +37,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mutate: updateStatus } = useUpdateStatus();
 
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [isDialogOpen, setIsDialogOpen] = React.useState<boolean>(false);
-  const [mgUserInfo, setMgUserInfo] = React.useState<MgUserInfo | null>(null);
 
   const { chapterId: chapterIdFromUrl, projectId: projectIdFromUrl } =
     React.useMemo(() => {
@@ -158,16 +155,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       fullData: mgUserInfo,
     }, "UserProvider");
     console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo);
-    setMgUserInfo(mgUserInfo);
-    setIsDialogOpen(true);
     saveLocalParams({
       ticket: mgUserInfo.ticket || "50BA27D21B1830C2A9E1328624D0EC52",
     });
     setLoading(true);
-  }, []);
-
-  const handleCloseDialog = React.useCallback(() => {
-    setIsDialogOpen(false);
   }, []);
 
   const updateSceneStatus = React.useCallback(
@@ -245,14 +236,5 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     ]
   );
 
-  return (
-    <>
-      <UserContext.Provider value={value}>{children}</UserContext.Provider>
-      <DialogUserInfo
-        isOpen={isDialogOpen}
-        onClose={handleCloseDialog}
-        mgUserInfo={mgUserInfo}
-      />
-    </>
-  );
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
