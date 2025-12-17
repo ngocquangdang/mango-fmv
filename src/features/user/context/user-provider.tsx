@@ -13,6 +13,7 @@ import type { MgUserInfo } from "../../../types/user";
 import type { ChapterMapped } from "../../../types/chapter";
 import { getLocalParam, saveLocalParams } from "../../../lib/api/storage";
 import type { CollectedRewardCharacter } from "../apis";
+import DialogUserInfo from "../../../components/ui/dialog/dialog-user-info";
 
 export interface UserContextType {
   chapter: ChapterMapped;
@@ -36,6 +37,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mutate: updateStatus } = useUpdateStatus();
 
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [isDialogOpen, setIsDialogOpen] = React.useState<boolean>(false);
+  const [mgUserInfo, setMgUserInfo] = React.useState<MgUserInfo | null>(null);
 
   const { chapterId: chapterIdFromUrl, projectId: projectIdFromUrl } =
     React.useMemo(() => {
@@ -146,12 +149,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     isCollectedRewardsLoading,
   ]);
 
-  const onLogin = React.useCallback((mgUserInfo: MgUserInfo) => {
-    console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo)
+  const handleGetToken = React.useCallback((mgUserInfo: MgUserInfo) => {
+    console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo);
+    setMgUserInfo(mgUserInfo);
+    setIsDialogOpen(true);
     saveLocalParams({
       ticket: mgUserInfo.ticket || "50BA27D21B1830C2A9E1328624D0EC52",
     });
     setLoading(true);
+  }, []);
+
+  const handleCloseDialog = React.useCallback(() => {
+    setIsDialogOpen(false);
   }, []);
 
   const updateSceneStatus = React.useCallback(
@@ -196,8 +205,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   React.useEffect(() => {
     if (!mgApi) return;
 
-    mgApi.login?.(onLogin);
-  }, [mgApi, onLogin]);
+    mgApi.login?.(handleGetToken);
+  }, [mgApi, handleGetToken]);
 
   // Memoize value object to prevent unnecessary re-renders
   const value: UserContextType = React.useMemo(
@@ -222,5 +231,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     ]
   );
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+  return (
+    <>
+      <UserContext.Provider value={value}>{children}</UserContext.Provider>
+      <DialogUserInfo
+        isOpen={isDialogOpen}
+        onClose={handleCloseDialog}
+        mgUserInfo={mgUserInfo}
+      />
+    </>
+  );
 };
