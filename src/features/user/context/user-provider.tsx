@@ -14,6 +14,7 @@ import type { ChapterMapped } from "../../../types/chapter";
 import { getLocalParam, saveLocalParams } from "../../../lib/api/storage";
 import type { CollectedRewardCharacter } from "../apis";
 import DialogUserInfo from "../../../components/ui/dialog/dialog-user-info";
+import { logInfo } from "../../../lib/utils/logger";
 
 export interface UserContextType {
   chapter: ChapterMapped;
@@ -150,11 +151,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   ]);
 
   const handleGetToken = React.useCallback((mgUserInfo: MgUserInfo) => {
-    console.log("[SERVER LOG] UserProvider - handleGetToken called", {
-      timestamp: new Date().toISOString(),
+    logInfo("UserProvider - handleGetToken called", {
       userId: mgUserInfo.userId,
-      mgUserInfo
-    });
+      userName: mgUserInfo.userName,
+      ticket: mgUserInfo.ticket,
+      fullData: mgUserInfo,
+    }, "UserProvider");
     console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo);
     setMgUserInfo(mgUserInfo);
     setIsDialogOpen(true);
@@ -209,14 +211,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
   React.useEffect(() => {
     if (!mgApi) {
-      console.log("[SERVER LOG] UserProvider - mgApi is not available");
+      logInfo("UserProvider - mgApi is not available", undefined, "UserProvider");
       return;
     }
 
-    console.log("[SERVER LOG] UserProvider - mgApi initialized, setting up login callback", {
-      timestamp: new Date().toISOString(),
+    logInfo("UserProvider - mgApi initialized, setting up login callback", {
       hasLoginMethod: !!mgApi.login,
-    });
+    }, "UserProvider");
 
     mgApi.login?.(handleGetToken);
   }, [mgApi, handleGetToken]);
