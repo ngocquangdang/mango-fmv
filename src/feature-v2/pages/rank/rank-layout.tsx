@@ -47,12 +47,16 @@ export default function RankLayout() {
       {/* LEFT SIDE: Featured */}
       <div className="w-[40%] relative le -rotate-6">
         <FramedStoryline
-          className="w-[234px] h-[184px]"
+          className="w-[234px] h-[184px] text-[#26396C] relative z-20"
           info={{
             avatar: "https://picsum.photos/id/64/100/100",
             name: "Nhân Vật Được Yêu Thích Nhất",
           }}
         />
+        <img src="/images/elements/cloud-element.png" alt="cloud" className="w-12 h-10 absolute top-15 -left-10" />
+        <img src="/images/elements/start-bold-element.png" alt="start-bold" className="w-16 h-16 absolute top-0 right-0" />
+        <img src="/images/elements/sound-element.png" alt="sound" className="w-7 h-7 absolute bottom-0 left-0" />
+        <img src="/images/elements/tag-element.png" alt="tag" className="w-[54px] h-[40px] absolute top-2 z-50 -left-2 rotate-120" />
       </div>
 
       {/* RIGHT SIDE: List */}
@@ -101,7 +105,7 @@ export default function RankLayout() {
                     {user.name}
                   </span>
                   <span className="text-[#f97316] text-[10px] font-bold flex items-center gap-1">
-                    ♥ {user.score}
+                    <img src="/images/elements/heart-element.png" alt="heart" className="w-4 h-4" /> {user.score}
                   </span>
                 </div>
               </div>
@@ -124,7 +128,6 @@ export default function RankLayout() {
           onClose={() => setSelectedUser(null)}
           data={selectedUser}
           onVote={() => {
-            console.log("Voted for:", selectedUser.name);
             setSelectedUser(null);
           }}
         />

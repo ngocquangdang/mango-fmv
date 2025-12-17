@@ -6,14 +6,16 @@ type GameModalProps = {
   onConfirm: () => void;
   title?: string;
   message?: string;
+  displayAction?: boolean;
 };
 
 const GameModal = ({
   isOpen,
   onClose,
   onConfirm,
-  title = "Rời Khỏi",
+  title = "",
   message = "Bạn chưa hoàn thành xong nhiệm vụ. Bạn có chắc chắn muốn thoát khỏi màn này?",
+  displayAction = true,
 }: GameModalProps) => {
   if (!isOpen) return null;
 
@@ -44,27 +46,36 @@ const GameModal = ({
             className="w-full h-full object-cover"
           />
         </button>
-        <div className="game-title-area">
-          <div className="game-title-bg"></div>
-          <h2 className="game-title-text">{title}</h2>
-          <img
-            src="/images/elements/start-bold-element.png"
-            alt="modal"
-            className="w-[18px] h-[18px] object-cover absolute top-2 right-0"
-          />
-          <img
-            src="/images/elements/start-bold-element.png"
-            alt="modal"
-            className="w-[28px] h-[28px] object-cover absolute top-0 left-0"
-          />
-          <img
-            src="/images/elements/start-bold-element.png"
-            alt="modal"
-            className="w-[28px] h-[28px] object-cover absolute top-4 right-4"
-          />
+        {title && (
+          <div className="game-title-area">
+            <div className="game-title-bg"></div>
+            <h2 className="game-title-text">{title}</h2>
+            <img
+              src="/images/elements/start-bold-element.png"
+              alt="modal"
+              className="w-[18px] h-[18px] object-cover absolute top-2 right-0"
+            />
+            <img
+              src="/images/elements/start-bold-element.png"
+              alt="modal"
+              className="w-[28px] h-[28px] object-cover absolute top-0 left-0"
+            />
+            <img
+              src="/images/elements/start-bold-element.png"
+              alt="modal"
+              className="w-[28px] h-[28px] object-cover absolute top-4 right-4"
+            />
+          </div>
+        )}
+
+        <div className="flex flex-1 flex-col items-center justify-center px-10">
+          <p className="text-[#3667EF] text-center">{message}</p>
+          {displayAction && (
+            <div className="mt-4">
+              <Button label="Xác nhận" onClick={onConfirm} size="small" />
+            </div>
+          )}
         </div>
-        <p className="game-modal-message pl-10 pr-8">{message}</p>
-        <Button label="Xác nhận" onClick={onConfirm} size="small" />
       </div>
     </div>
   );

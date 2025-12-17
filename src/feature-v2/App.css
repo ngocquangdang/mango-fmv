@@ -97,7 +97,7 @@ body {
 .game-title-text {
   position: relative;
   z-index: 2;
-  font-size: 28px;
+  font-size: 20px;
   color: #333;
   font-weight: bold;
   margin: 0;
