@@ -115,11 +115,11 @@ function AppV2Content() {
 
   if (!isLandscapeMobile) {
     return (
-      <div className="w-full min-h-screen flex flex-col items-center justify-center text-center px-6">
-        <p className="text-lg font-semibold text-gray-800">
+      <div className="w-full min-h-screen flex flex-col items-center justify-center text-center px-6 bg-black/50">
+        <p className="text-lg font-semibold text-white">
           Vui lòng xoay ngang màn hình để tiếp tục trải nghiệm.
         </p>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-white">
           Player ưu tiên hiển thị ngang trên điện thoại.
         </p>
       </div>

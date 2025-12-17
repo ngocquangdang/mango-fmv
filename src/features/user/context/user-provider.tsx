@@ -147,6 +147,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   ]);
 
   const onLogin = React.useCallback((mgUserInfo: MgUserInfo) => {
+    console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo)
     saveLocalParams({
       ticket: mgUserInfo.ticket || "50BA27D21B1830C2A9E1328624D0EC52",
     });
