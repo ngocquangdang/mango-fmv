@@ -2,6 +2,7 @@ import { useState } from "react";
 import Button from "../../components/ui/button";
 import FramedStoryline from "../journal/frame-story";
 import DialogVote from "../../components/ui/dialog-vote";
+import { useUserContext } from "../../../features/user/context";
 
 const users = [
   {
@@ -37,7 +38,11 @@ const users = [
 ];
 
 export default function RankLayout() {
-  const [selectedUser, setSelectedUser] = useState<typeof users[0] | null>(null);
+  const [selectedUser, setSelectedUser] = useState<(typeof users)[0] | null>(
+    null
+  );
+  const { chapter } = useUserContext();
+  const totalVotes = chapter?.progress?.points || 0;
 
   return (
     <div
@@ -49,14 +54,30 @@ export default function RankLayout() {
         <FramedStoryline
           className="w-[234px] h-[184px] text-[#26396C] relative z-20"
           info={{
-            avatar: "https://picsum.photos/id/64/100/100",
+            avatar: users[0].avatar,
             name: "Nhân Vật Được Yêu Thích Nhất",
           }}
         />
-        <img src="/images/elements/cloud-element.png" alt="cloud" className="w-12 h-10 absolute top-15 -left-10" />
-        <img src="/images/elements/start-bold-element.png" alt="start-bold" className="w-16 h-16 absolute top-0 right-0" />
-        <img src="/images/elements/sound-element.png" alt="sound" className="w-7 h-7 absolute bottom-0 left-0" />
-        <img src="/images/elements/tag-element.png" alt="tag" className="w-[54px] h-[40px] absolute top-2 z-50 -left-2 rotate-120" />
+        <img
+          src="/images/elements/crown-1-element.png"
+          alt="cloud"
+          className="w-12 h-10 absolute top-0 left-0 z-20"
+        />
+        <img
+          src="/images/elements/cloud-element.png"
+          alt="cloud"
+          className="w-12 h-10 absolute bottom-10 left-0 z-20"
+        />
+        <img
+          src="/images/elements/cloud-element.png"
+          alt="start-bold"
+          className="w-16 h-16 absolute top-15 right-0 z-20"
+        />
+        <img
+          src="/images/elements/tag-element.png"
+          alt="tag"
+          className="w-[54px] h-[40px] absolute top-15 z-50 -left-4 rotate-60"
+        />
       </div>
 
       {/* RIGHT SIDE: List */}
@@ -67,7 +88,7 @@ export default function RankLayout() {
             className="w-20 h-10 bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs"
             style={{ backgroundImage: `url(/images/score-banner.png)` }}
           >
-            100
+            {totalVotes}
           </div>
         </div>
 
@@ -77,11 +98,11 @@ export default function RankLayout() {
               key={user.id}
               className="flex items-center justify-between w-full"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex pl-4 pt-2 items-center gap-3 relative">
                 <div className="w-8 flex justify-center">
                   {/* Crown icon or simple number styled */}
                   <span
-                    className={`text-3xl font-bold ${
+                    className={`relative z-10 text-2xl font-bold ${
                       index === 0
                         ? "text-yellow-500 scale-125"
                         : "text-slate-500"
@@ -90,9 +111,23 @@ export default function RankLayout() {
                     {index + 1}
                   </span>
                 </div>
+                <img
+                  src={
+                    index < 3
+                      ? `/images/elements/crown-${index + 1}-element.png`
+                      : `/images/elements/crown-element.png`
+                  }
+                  alt="crown"
+                  className={
+                    "absolute top-0 left-0 " +
+                    (index < 3 ? `w-${11 - index} h-${8 - index}` : "w-8 h-6")
+                  }
+                />
                 <div
                   className="w-8 h-8 bg-cover bg-center bg-no-repeat flex items-center justify-center"
-                  style={{ backgroundImage: `url('/images/avatar-border.png')` }}
+                  style={{
+                    backgroundImage: `url('/images/avatar-border.png')`,
+                  }}
                 >
                   <img
                     src={user.avatar}
@@ -105,7 +140,12 @@ export default function RankLayout() {
                     {user.name}
                   </span>
                   <span className="text-[#f97316] text-[10px] font-bold flex items-center gap-1">
-                    <img src="/images/elements/heart-element.png" alt="heart" className="w-4 h-4" /> {user.score}
+                    <img
+                      src="/images/heart-icon.png"
+                      alt="heart"
+                      className="w-4 h-4"
+                    />{" "}
+                    {user.score}
                   </span>
                 </div>
               </div>
@@ -120,7 +160,7 @@ export default function RankLayout() {
           ))}
         </div>
       </div>
-      
+
       {/* Vote Dialog */}
       {selectedUser && (
         <DialogVote

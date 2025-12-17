@@ -19,9 +19,9 @@ const DialogVote = ({
   isOpen = true,
   onClose,
   data = {
-    avatar: "https://picsum.photos/id/64/100/100",
-    name: "THÁI LÊ MINH HIẾU",
-    score: 100,
+    avatar: "",
+    name: "",
+    score: 0,
   },
   onVote,
 }: DialogVoteProps) => {
