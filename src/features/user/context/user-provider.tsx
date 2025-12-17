@@ -11,7 +11,7 @@ import {
 import { useMgSdk } from "../../../hooks/useMgSdk";
 import type { MgUserInfo } from "../../../types/user";
 import type { ChapterMapped } from "../../../types/chapter";
-import { getLocalParam, saveLocalParams } from "../../../lib/api/storage";
+import { saveLocalParams } from "../../../lib/api/storage";
 import type { CollectedRewardCharacter } from "../apis";
 import { logInfo } from "../../../lib/utils/logger";
 
@@ -148,12 +148,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   ]);
 
   const handleGetToken = React.useCallback((mgUserInfo: MgUserInfo) => {
-    logInfo("UserProvider - handleGetToken called", {
-      userId: mgUserInfo.userId,
-      userName: mgUserInfo.userName,
-      ticket: mgUserInfo.ticket,
-      fullData: mgUserInfo,
-    }, "UserProvider");
+    logInfo(
+      "UserProvider - handleGetToken called",
+      {
+        userId: mgUserInfo.userId,
+        userName: mgUserInfo.userName,
+        ticket: mgUserInfo.ticket,
+        fullData: mgUserInfo,
+      },
+      "UserProvider"
+    );
     console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo);
     saveLocalParams({
       ticket: mgUserInfo.ticket || "50BA27D21B1830C2A9E1328624D0EC52",
@@ -193,22 +197,30 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     [updateStatus, refetch, refetchCollectedRewards, chapter]
   );
 
-  React.useEffect(() => {
-    if (!getLocalParam("ticket")) {
-      saveLocalParams({
-        ticket: "0E7B0A603841309CAF9E3B5D0366C812",
-      });
-    }
-  }, []);
+  // React.useEffect(() => {
+  //   if (!getLocalParam("ticket")) {
+  //     saveLocalParams({
+  //       ticket: "0E7B0A603841309CAF9E3B5D0366C812",
+  //     });
+  //   }
+  // }, []);
   React.useEffect(() => {
     if (!mgApi) {
-      logInfo("UserProvider - mgApi is not available", undefined, "UserProvider");
+      logInfo(
+        "UserProvider - mgApi is not available",
+        undefined,
+        "UserProvider"
+      );
       return;
     }
 
-    logInfo("UserProvider - mgApi initialized, setting up login callback", {
-      hasLoginMethod: !!mgApi.login,
-    }, "UserProvider");
+    logInfo(
+      "UserProvider - mgApi initialized, setting up login callback",
+      {
+        hasLoginMethod: !!mgApi.login,
+      },
+      "UserProvider"
+    );
 
     mgApi.login?.(handleGetToken);
   }, [mgApi, handleGetToken]);

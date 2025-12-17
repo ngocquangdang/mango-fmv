@@ -22,7 +22,7 @@ const FramedStoryline = ({
 
       <img
         src={info?.avatar || "https://picsum.photos/200/120"}
-        alt="Cốt truyện"
+        alt={info?.name}
         className="absolute z-1 top-[7.5%] left-[4%] w-[91%] h-[85%]"
       />
       <div className="absolute z-10 bottom-1 left-0 w-full flex items-center justify-center">

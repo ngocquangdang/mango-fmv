@@ -1,7 +1,8 @@
 import { useVideoPlayerContext } from "../../../contexts";
+import { RankProvider } from "./context/rank-provider";
 import RankLayout from "./rank-layout";
 
-export default function Rank() {
+function RankContent() {
   const { setType } = useVideoPlayerContext();
 
   return (
@@ -14,5 +15,13 @@ export default function Rank() {
       </div>
       <RankLayout />
     </div>
+  );
+}
+
+export default function Rank() {
+  return (
+    <RankProvider>
+      <RankContent />
+    </RankProvider>
   );
 }

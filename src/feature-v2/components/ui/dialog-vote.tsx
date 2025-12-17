@@ -2,12 +2,14 @@ import React from "react";
 import Button from "./button";
 import GameModal from "./dialog";
 import { useUserContext } from "../../../features/user/context";
+import { useRankContext } from "../../pages/rank/context";
 import "./vote-input.css";
 
 type DialogVoteProps = {
   isOpen: boolean;
   onClose: () => void;
   data: {
+    id?: string;
     avatar: string;
     name: string;
     score: number | string;
@@ -19,6 +21,7 @@ const DialogVote = ({
   isOpen = true,
   onClose,
   data = {
+    id: "",
     avatar: "",
     name: "",
     score: 0,
@@ -26,7 +29,14 @@ const DialogVote = ({
   onVote,
 }: DialogVoteProps) => {
   const { chapter } = useUserContext();
+  const { voteCharacter, isVoting } = useRankContext();
   const availablePoints = chapter?.progress?.points || 0;
+  
+  // Lấy chapterId từ URL params hoặc từ chapter
+  const chapterId = React.useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("chapterId") || "";
+  }, []);
 
   const [voteValue, setVoteValue] = React.useState<string>("100");
   const [isNotEnoughOpen, setIsNotEnoughOpen] = React.useState<boolean>(false);
@@ -61,7 +71,7 @@ const DialogVote = ({
     onClose();
   };
 
-  const handleVoteClick = () => {
+  const handleVoteClick = async () => {
     if (!isOpen) return;
 
     const amount = Number(voteValue);
@@ -76,7 +86,23 @@ const DialogVote = ({
       return;
     }
 
-    setIsSuccessOpen(true);
+    // Gọi API vote
+    if (!data.id || !chapterId) {
+      setIsNotEnoughOpen(true);
+      return;
+    }
+
+    try {
+      await voteCharacter({
+        characterId: data.id,
+        chapterId: chapterId,
+        points: amount,
+      });
+      setIsSuccessOpen(true);
+    } catch (error) {
+      console.error("Vote error:", error);
+      setIsNotEnoughOpen(true);
+    }
   };
 
   if (!isOpen) return null;
@@ -138,7 +164,12 @@ const DialogVote = ({
                 onChange={handleChangeVote}
               />
 
-              <Button label="Bình chọn" onClick={handleVoteClick} size="small" />
+              <Button 
+                label={isVoting ? "Đang bình chọn..." : "Bình chọn"} 
+                onClick={handleVoteClick} 
+                size="small"
+                disabled={isVoting}
+              />
             </div>
           </div>
           <img
