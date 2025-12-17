@@ -159,6 +159,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       "UserProvider"
     );
 
+    console.log("mgUserInfo",Object.keys({...mgUserInfo}), mgUserInfo["ticket"]);
     saveLocalParams({
       ticket: mgUserInfo.ticket,
     });

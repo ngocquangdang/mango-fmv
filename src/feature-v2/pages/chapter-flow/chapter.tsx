@@ -19,7 +19,7 @@ export default function ChapterPage() {
   };
 
   return (
-    <div className="w-full h-screen">
+    <div className="w-full h-full">
       <div className="w-full h-[100px] ">
         <div
           className="absolute top-0 left-0 p-4 z-10 cursor-pointer"

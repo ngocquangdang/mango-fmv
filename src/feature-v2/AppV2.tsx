@@ -131,7 +131,7 @@ function AppV2Content() {
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       {loading ? (
-        <div className="flex flex-col gap-2 items-center pb-8 justify-end h-screen bg-black/50">
+        <div className="flex flex-col gap-2 items-center pb-8 justify-end h-full bg-black/50">
           <LoadingBar />
         </div>
       ) : (
