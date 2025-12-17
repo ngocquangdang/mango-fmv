@@ -158,9 +158,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       },
       "UserProvider"
     );
-    console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo);
+
     saveLocalParams({
-      ticket: mgUserInfo.ticket || "50BA27D21B1830C2A9E1328624D0EC52",
+      ticket: mgUserInfo.ticket,
     });
     setLoading(true);
   }, []);
@@ -197,13 +197,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     [updateStatus, refetch, refetchCollectedRewards, chapter]
   );
 
-  // React.useEffect(() => {
-  //   if (!getLocalParam("ticket")) {
-  //     saveLocalParams({
-  //       ticket: "0E7B0A603841309CAF9E3B5D0366C812",
-  //     });
-  //   }
-  // }, []);
   React.useEffect(() => {
     if (!mgApi) {
       logInfo(

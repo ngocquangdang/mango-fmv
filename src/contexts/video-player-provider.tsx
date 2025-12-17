@@ -67,6 +67,8 @@ export interface VideoPlayerContextType {
   showRelationshipPoint: (
     items: { imageUrl: string; points: number }[]
   ) => void;
+  isEndingScene: boolean;
+  setIsEndingScene: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const VideoPlayerProvider = ({
@@ -111,6 +113,8 @@ export const VideoPlayerProvider = ({
     isOpen: false,
     data: null,
   });
+
+  const [isEndingScene, setIsEndingScene] = React.useState(false);
 
   const [rewardCollectionState, setRewardCollectionState] = React.useState<{
     isOpen: boolean;
@@ -482,6 +486,12 @@ export const VideoPlayerProvider = ({
         ) ||
         (scene as any).targetSceneId;
 
+      if ((scene as any)?.endingScene) {
+        setIsEndingScene(true);
+        pause();
+        return;
+      }
+
       if (!hasNext) {
         // setIsPlayerLoading(true);
         setIsReviewScene(false);
@@ -491,7 +501,14 @@ export const VideoPlayerProvider = ({
         // }, 3000);
       }
     },
-    [updateSceneStatus, data.scenes, isReviewScene, triggerDisplayReward]
+    [
+      updateSceneStatus,
+      data.scenes,
+      isReviewScene,
+      triggerDisplayReward,
+      pause,
+      setIsEndingScene,
+    ]
   );
 
   const quitPlayer = React.useCallback(() => {
@@ -561,8 +578,11 @@ export const VideoPlayerProvider = ({
           },
           hotspots: {
             label: {
+              // Only define typography and connector styles here so
+              // the player SDK can freely apply its own positional
+              // classes for all 4 directions around the hotspot.
               className:
-                "hotspot-label-connector pr-10 text-white! text-sm font-semibold top-0 right-0 !bottom-auto !left-auto -mt-2 -mr-2",
+                "pr-10 text-white! text-sm font-semibold",
               isShowLabel: true,
             },
           },
@@ -672,6 +692,8 @@ export const VideoPlayerProvider = ({
     setCollectionItems,
     showRewardCollection,
     showRelationshipPoint,
+    isEndingScene,
+    setIsEndingScene,
   };
   return (
     <VideoPlayerContext.Provider value={value}>

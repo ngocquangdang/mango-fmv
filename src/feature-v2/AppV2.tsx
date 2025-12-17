@@ -65,6 +65,8 @@ function AppV2Content() {
     dialogInfoState,
     closeDialogInfo,
     clips,
+    isEndingScene,
+    setIsEndingScene,
   } = useVideoPlayerContext();
 
   const [dialogName, setDialogName] = React.useState<string | null>(null);
@@ -188,6 +190,20 @@ function AppV2Content() {
         onConfirm={onConfirm}
         title="Rời khỏi"
         message="Bạn chưa hoàn thành xong nhiệm vụ. Bạn có chắc chắn muốn thoát khỏi màn này?"
+      />
+
+      {/* Ending Scene Dialog */}
+      <GameModal
+        isOpen={isEndingScene}
+        onClose={() => {
+          setIsEndingScene(false);
+        }}
+        onConfirm={() => {
+          setIsEndingScene(false);
+          quitPlayer();
+        }}
+        title="Kết thúc chương"
+        message="Bạn đã hoàn thành chương này. Quay lại màn hình chính nhé."
       />
 
       {isGiftSelectionOpen && <GiftSelection />}

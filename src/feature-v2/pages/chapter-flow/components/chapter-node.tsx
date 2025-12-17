@@ -36,9 +36,10 @@ const ChapterNode = ({ data }: NodeProps) => {
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
+            filter: !data.status ? "grayscale(100%)" : "none",
           }}
         >
-          <div className="w-full h-full p-3">
+          <div className="w-full h-full p-4">
             <img
               src={
                 (data.thumbUrl as string) || "https://picsum.photos/200/120"
