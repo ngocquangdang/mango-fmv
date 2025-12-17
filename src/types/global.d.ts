@@ -2,7 +2,7 @@ export {};
 
 declare global {
   interface Window {
-    MgApi?: {
+    MgtvApi?: {
       login?: (cb: (mgUserInfo: MgUserInfo) => void) => void;
     };
     VideoPlayer?: {

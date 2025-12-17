@@ -153,9 +153,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     console.log("[SERVER LOG] UserProvider - handleGetToken called", {
       timestamp: new Date().toISOString(),
       userId: mgUserInfo.userId,
-      userName: mgUserInfo.userName,
-      ticket: mgUserInfo.ticket,
-      fullData: mgUserInfo,
+      mgUserInfo
     });
     console.log("🚀 ~ UserProvider ~ mgUserInfo:", mgUserInfo);
     setMgUserInfo(mgUserInfo);

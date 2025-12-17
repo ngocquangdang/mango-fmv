@@ -5,14 +5,14 @@ export const useMgSdk = () => {
     pollMs = 50;
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<Error | null>(null);
-  const [mgApi, setMgApi] = React.useState<Window["MgApi"] | null>(null);
+  const [mgApi, setMgApi] = React.useState<Window["MgtvApi"] | null>(null);
 
   React.useEffect(() => {
     let cancelled = false;
     const start = Date.now();
     const tick = () => {
       if (cancelled) return;
-      const found = (window as Window)?.MgApi ?? null;
+      const found = (window as Window)?.MgtvApi ?? null;
       if (found) {
         setMgApi(found);
         setLoading(false);
