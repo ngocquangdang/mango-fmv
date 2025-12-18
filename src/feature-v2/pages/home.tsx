@@ -179,7 +179,7 @@ export default function Home() {
           </div>
         )}
       </div>
-      <div className="absolute bottom-0 top-[103%] left-40 right-40 w-full h-full">
+      <div className="absolute bottom-0 top-[103%] left-30 w-full h-full">
         <div
           style={{
             transform: `translateY(${paperOffset * 0.9}px)`,
@@ -187,58 +187,9 @@ export default function Home() {
           }}
         >
           <img
-            src={`/images/home/paper-HDQ.png?v=${IMAGE_VERSION}`}
+            src={`/images/home/charactor.png?v=${IMAGE_VERSION}`}
             alt="paper-HDQ"
-            className="w-[168px] h-[216px] absolute bottom-0 left-0 z-10"
-          />
-        </div>
-        <div
-          style={{
-            transform: `translateY(${paperOffset * 1.1}px)`,
-            transition: "transform 120ms linear",
-          }}
-        >
-          <img
-            src={`/images/home/paper-LA.png?v=${IMAGE_VERSION}`}
-            alt="bottom-bg-home"
-            className="w-[174px] h-[206px] absolute bottom-0 left-25 z-20"
-          />
-        </div>
-        <div
-          style={{
-            transform: `translateY(${paperOffset * 1.2}px)`,
-            transition: "transform 120ms linear",
-          }}
-        >
-          <img
-            src={`/images/home/paper-CB.png?v=${IMAGE_VERSION}`}
-            alt="bottom-bg-home"
-            className="w-[177px] h-[230px] absolute bottom-0 left-48 z-30"
-          />
-        </div>
-
-        <div
-          style={{
-            transform: `translateY(${paperOffset * 0.8}px)`,
-            transition: "transform 120ms linear",
-          }}
-        >
-          <img
-            src={`/images/home/paper-TLMH.png?v=${IMAGE_VERSION}`}
-            alt="bottom-bg-home"
-            className="w-[224px] h-[179px] absolute bottom-0 left-83 z-10"
-          />
-        </div>
-        <div
-          style={{
-            transform: `translateY(${paperOffset * 1.05}px)`,
-            transition: "transform 120ms linear",
-          }}
-        >
-          <img
-            src={`/images/home/paper-PN.png?v=${IMAGE_VERSION}`}
-            alt="bottom-bg-home"
-            className="w-[147px] h-[206px] absolute bottom-0 left-80 z-20"
+            className="w-[70%] h-[224px] absolute bottom-0 left-0 z-10"
           />
         </div>
       </div>
