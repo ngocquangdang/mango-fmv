@@ -13,7 +13,8 @@ export const getLayoutedElements = (
   direction = "LR"
 ) => {
   const isHorizontal = direction === "LR";
-  dagreGraph.setGraph({ rankdir: direction, ranksep: 0, nodesep: 100 });
+  // Giảm khoảng cách giữa các node một chút (nodesep nhỏ hơn)
+  dagreGraph.setGraph({ rankdir: direction, ranksep: 0, nodesep: 70 });
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
@@ -32,8 +33,8 @@ export const getLayoutedElements = (
     const nodeWithPosition = dagreGraph.node(node.id);
     const newNode = {
       ...node,
-      targetPosition: isHorizontal ? Position.Left : Position.Top,
-      sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
+      targetPosition: !isHorizontal ? Position.Left : Position.Top,
+      sourcePosition: !isHorizontal ? Position.Right : Position.Bottom,
       position: {
         x: nodeWithPosition.x - nodeWidth / 2 + 100,
         y: nodeWithPosition.y - nodeHeight / 2,
@@ -101,7 +102,9 @@ export const getLayoutedElements = (
         processedChildren.add(child.id);
       }
     } else {
-      const verticalSpacing = 250;
+      const verticalSpacing = 180; // Space between children centers
+
+      // Calculate total vertical span of all children
       const totalSpan = verticalSpacing * (children.length - 1);
       const firstChildCenterY = parentCenterY - totalSpan / 2;
 

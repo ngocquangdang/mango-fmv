@@ -1,11 +1,12 @@
 import HookButton from "../../components/ui/hook-button";
 import PhotoFrame from "../../components/ui/photo-frame";
 import RewardProgress from "../../components/ui/progress";
-import ChapterFlow from "./chapter-flow";
+import ChapterFlowV2 from "./chapter-flow-v2";
 import { useVideoPlayerContext } from "../../../contexts";
 import { useUserContext } from "../../../features/user/context";
 import { FlowChartContextProvider } from "./context/flow-chart-provider";
 import Banner from '../../components/banner';
+import ChapterFlow from './chapter-flow';
 
 export default function ChapterPage() {
   const { onPlayPlayer, setType } = useVideoPlayerContext();
@@ -53,6 +54,7 @@ export default function ChapterPage() {
         </div>
       </div>
       <FlowChartContextProvider>
+        <ChapterFlowV2 />
         <ChapterFlow />
       </FlowChartContextProvider>
 
