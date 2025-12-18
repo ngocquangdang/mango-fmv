@@ -37,17 +37,25 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [loading, setLoading] = React.useState<boolean>(false);
 
-  const { chapterId: chapterIdFromUrl, projectId: projectIdFromUrl } =
-    React.useMemo(() => {
-      const params = new URLSearchParams(window.location.search);
-      const chapterIdFromUrl = params.get("chapterId");
-      const projectIdFromUrl = params.get("projectId");
+  const {
+    chapterId: chapterIdFromUrl,
+    projectId: projectIdFromUrl,
+    isPreview,
+    ticket: ticketFromUrl,
+  } = React.useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    const chapterIdFromUrl = params.get("chapterId");
+    const projectIdFromUrl = params.get("projectId");
+    const isPreviewParam = params.get("isPreview");
+    const ticketParam = params.get("ticket");
 
-      return {
-        chapterId: chapterIdFromUrl || "",
-        projectId: projectIdFromUrl || "",
-      };
-    }, [window.location.search]);
+    return {
+      chapterId: chapterIdFromUrl || "",
+      projectId: projectIdFromUrl || "",
+      isPreview: isPreviewParam === "true",
+      ticket: ticketParam || "",
+    };
+  }, []);
 
   const { data: chapter, isLoading: isChapterLoading } = useChapter(
     projectIdFromUrl,
@@ -160,6 +168,25 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     });
     setLoading(true);
   }, []);
+
+  React.useEffect(() => {
+    if (!isPreview || !ticketFromUrl) {
+      return;
+    }
+
+    logInfo(
+      "UserProvider - isPreview is true, setting ticket from URL",
+      {
+        ticketFromUrl,
+      },
+      "UserProvider"
+    );
+
+    saveLocalParams({
+      ticket: ticketFromUrl,
+    });
+    setLoading(true);
+  }, [isPreview, ticketFromUrl]);
 
   const updateSceneStatus = React.useCallback(
     (

@@ -33,9 +33,9 @@ const DialogVote = ({
   const availablePoints = chapter?.progress?.points || 0;
   
   // Lấy chapterId từ URL params hoặc từ chapter
-  const chapterId = React.useMemo(() => {
+  const projectId = React.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get("chapterId") || "";
+    return params.get("projectId") || "";
   }, []);
 
   const [voteValue, setVoteValue] = React.useState<string>("100");
@@ -87,7 +87,7 @@ const DialogVote = ({
     }
 
     // Gọi API vote
-    if (!data.id || !chapterId) {
+    if (!data.id || !projectId) {
       setIsNotEnoughOpen(true);
       return;
     }
@@ -95,7 +95,7 @@ const DialogVote = ({
     try {
       await voteCharacter({
         characterId: data.id,
-        chapterId: chapterId,
+        projectId: projectId,
         points: amount,
       });
       setIsSuccessOpen(true);

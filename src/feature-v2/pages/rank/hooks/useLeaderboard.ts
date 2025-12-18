@@ -10,12 +10,12 @@ export const useLeaderboard = (params?: LeaderboardParams) => {
   const leaderboardParams: LeaderboardParams = React.useMemo(() => {
     if (params) return params;
 
-    // Get chapterId from URL params if not provided
+    // Get projectId from URL params if not provided
     const urlParams = new URLSearchParams(window.location.search);
-    const chapterId = urlParams.get("chapterId");
+    const projectId = urlParams.get("projectId");
     return {
       limit: 10,
-      chapterId: chapterId || undefined,
+      projectId: projectId || undefined,
     };
   }, [params]);
 
