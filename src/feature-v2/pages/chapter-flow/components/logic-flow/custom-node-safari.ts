@@ -106,7 +106,29 @@ class SafariChapterNode extends RectNode {
       );
     }
 
-    return h("g", {}, groupChildren);
+    // Thêm onClick handler vào group để trigger LogicFlow node click event
+    const handleClick = (e: MouseEvent | TouchEvent) => {
+      // e.stopPropagation();
+      // Trigger LogicFlow's node:click event thông qua graphModel
+      console.log("handleClick", e);
+      const graphModel = (this as any).graphModel || (this.props as any).graphModel;
+      if (graphModel && graphModel.eventCenter) {
+        graphModel.eventCenter.emit("node:click", {
+          data: model,
+          e,
+        });
+      }
+    };
+
+    return h(
+      "g",
+      {
+        onClick: handleClick,
+        onTouchEnd: handleClick,
+        style: { cursor: "pointer" },
+      },
+      groupChildren
+    );
   }
 }
 
