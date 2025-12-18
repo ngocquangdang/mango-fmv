@@ -6,6 +6,8 @@ import { useUserContext } from "../../features/user/context";
 import { useRestartChapter } from "../../features/user/hooks";
 import GameModal from "../components/ui/dialog";
 
+const IMAGE_VERSION = "1";
+
 export default function Home() {
   const { setType, setCollectionItems } = useVideoPlayerContext();
   const { chapter, refetch, refetchCollectedRewards } = useUserContext();
@@ -117,7 +119,7 @@ export default function Home() {
   return (
     <div className="relative w-full h-full overflow-hidden">
       <img
-        src="/images/LOGO_GCNMN.png"
+        src={`/images/LOGO_GCNMN.png?v=${IMAGE_VERSION}`}
         alt="home-bg"
         className="absolute top-8 left-[50%] translate-x-[-50%] w-[263px] h-[120px] object-cover"
       />
@@ -131,7 +133,7 @@ export default function Home() {
           }}
         >
           <HomeButton
-            icon="/images/window-icon.png"
+            icon={`/images/window-icon.png?v=${IMAGE_VERSION}`}
             label="Cốt truyện"
             onClick={() => handleClick("story")}
           />
@@ -145,7 +147,7 @@ export default function Home() {
           }}
         >
           <HomeButton
-            icon="/images/book-icon.png"
+            icon={`/images/book-icon.png?v=${IMAGE_VERSION}`}
             label="Nhật ký"
             onClick={() => handleClick("journal")}
           />
@@ -159,7 +161,7 @@ export default function Home() {
           }}
         >
           <HomeButton
-            icon="/images/rank-icon.png"
+            icon={`/images/rank-icon.png?v=${IMAGE_VERSION}`}
             label="Xếp hạng"
             onClick={() => handleClick("ranking")}
           />
@@ -174,7 +176,7 @@ export default function Home() {
             }}
           >
             <HomeButton
-              icon="/images/reload-icon.png"
+              icon={`/images/reload-icon.png?v=${IMAGE_VERSION}`}
               label="Chơi lại"
               onClick={() => handleClick("playAgain")}
             />
@@ -189,7 +191,7 @@ export default function Home() {
           }}
         >
           <img
-            src="/images/home/paper-HDQ.png"
+            src={`/images/home/paper-HDQ.png?v=${IMAGE_VERSION}`}
             alt="paper-HDQ"
             className="w-[168px] h-[216px] absolute bottom-0 left-0 z-10"
           />
@@ -201,7 +203,7 @@ export default function Home() {
           }}
         >
           <img
-            src="/images/home/paper-LA.png"
+            src={`/images/home/paper-LA.png?v=${IMAGE_VERSION}`}
             alt="bottom-bg-home"
             className="w-[174px] h-[206px] absolute bottom-0 left-25 z-20"
           />
@@ -213,7 +215,7 @@ export default function Home() {
           }}
         >
           <img
-            src="/images/home/paper-CB.png"
+            src={`/images/home/paper-CB.png?v=${IMAGE_VERSION}`}
             alt="bottom-bg-home"
             className="w-[177px] h-[230px] absolute bottom-0 left-48 z-30"
           />
@@ -226,7 +228,7 @@ export default function Home() {
           }}
         >
           <img
-            src="/images/home/paper-TLMH.png"
+            src={`/images/home/paper-TLMH.png?v=${IMAGE_VERSION}`}
             alt="bottom-bg-home"
             className="w-[224px] h-[179px] absolute bottom-0 left-83 z-10"
           />
@@ -238,7 +240,7 @@ export default function Home() {
           }}
         >
           <img
-            src="/images/home/paper-PN.png"
+            src={`/images/home/paper-PN.png?v=${IMAGE_VERSION}`}
             alt="bottom-bg-home"
             className="w-[147px] h-[206px] absolute bottom-0 left-83 z-20"
           />
@@ -249,7 +251,7 @@ export default function Home() {
         style={{
           width: "100%",
           height: "116px",
-          backgroundImage: "url('/images/home/bottom-bg-home.png')",
+          backgroundImage: `url('/images/home/bottom-bg-home.png?v=${IMAGE_VERSION}')`,
           backgroundSize: "100% 100%",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
