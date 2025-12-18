@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo } from "react";
 import LogicFlow from "@logicflow/core";
 import CustomChapterNode from "./components/logic-flow/custom-node";
+import SafariChapterNode from "./components/logic-flow/custom-node-safari";
 import CustomChapterEdge from "./components/logic-flow/custom-edge";
 import { useFlowChart } from "./context";
 import { getLayoutedElements } from "../../../features/pixel-flow/layout";
@@ -68,6 +69,10 @@ const ChapterFlowV2 = () => {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const isSafari =
+      typeof navigator !== "undefined" &&
+      /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
     const lf = new LogicFlow({
       container: containerRef.current,
       grid: false,
@@ -85,7 +90,12 @@ const ChapterFlowV2 = () => {
     });
 
     // Register Custom Elements
-    lf.register(CustomChapterNode);
+    // Safari có vấn đề với HtmlNode/foreignObject, nên dùng SVG node fallback
+    if (isSafari) {
+      lf.register(SafariChapterNode);
+    } else {
+      lf.register(CustomChapterNode);
+    }
     lf.register(CustomChapterEdge);
 
     // CRITICAL: Override getPointByClient for 90deg Rotated UI

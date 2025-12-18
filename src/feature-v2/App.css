@@ -29,12 +29,18 @@ body {
   .app-container {
     transform: rotate(-90deg);
     transform-origin: left top;
-    width: 100vh;
-    height: 100vw;
+    /* width: 100vh;
+    height: 100vw; */
+    width: 100dvh; 
+  height: 100dvw;
     overflow-x: hidden;
     position: absolute;
     top: 100%;
     left: 0;
+
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   .flow-v1 {
