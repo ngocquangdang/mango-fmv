@@ -3,7 +3,7 @@ import { getLocalParam } from "../../../../../lib/api/storage";
 
 export interface VotePayload {
   characterId: string;
-  chapterId: string;
+  projectId: string;
   points: number;
 }
 
@@ -43,7 +43,7 @@ export interface LeaderboardResponse {
 
 export interface LeaderboardParams {
   limit?: number;
-  chapterId?: string;
+  projectId?: string;
 }
 
 export const getLeaderboard = async (
@@ -53,8 +53,8 @@ export const getLeaderboard = async (
   if (params?.limit) {
     queryParams.append("limit", params.limit.toString());
   }
-  if (params?.chapterId) {
-    queryParams.append("chapterId", params.chapterId);
+  if (params?.projectId) {
+    queryParams.append("projectId", params.projectId);
   }
 
   const url = `/voting/leaderboard${
