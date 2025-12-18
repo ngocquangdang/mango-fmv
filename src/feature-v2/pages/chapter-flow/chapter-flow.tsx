@@ -71,7 +71,7 @@ const ChapterFlow = () => {
   }, [nodesWithOriginalY, layoutedEdges, setNodes, setEdges]);
 
   return (
-    <div className="w-full h-[calc(100vh-100px)]">
+    <div className="w-full h-[calc(100vh-100px)] flow-v1">
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
           <filter id="scribble-filter">

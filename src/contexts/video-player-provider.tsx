@@ -485,7 +485,7 @@ export const VideoPlayerProvider = ({
           h.items?.some((i: any) => i.targetSceneId)
         ) ||
         (scene as any).targetSceneId;
-
+      
       if ((scene as any)?.endingScene) {
         setIsEndingScene(true);
         pause();
@@ -499,6 +499,8 @@ export const VideoPlayerProvider = ({
         //   setIsPlayerLoading(false);
         //   setType("intro");
         // }, 3000);
+      } else {
+        onSetCurrentSceneId(scene.targetSceneId);
       }
     },
     [
@@ -508,6 +510,7 @@ export const VideoPlayerProvider = ({
       triggerDisplayReward,
       pause,
       setIsEndingScene,
+      onSetCurrentSceneId,
     ]
   );
 

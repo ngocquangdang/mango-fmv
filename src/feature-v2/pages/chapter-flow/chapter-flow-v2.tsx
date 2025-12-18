@@ -310,27 +310,13 @@ const ChapterFlowV2 = () => {
     position: "absolute" as const,
     top: 0,
     left: "100%", // Push to right edge to rotate back in?
-    // User said: "giao diện web được xoay ngang bằng CSS transform: rotate(90deg)"
-    // Typically: rotate(90deg) needs absolute positioning adjustments.
-    // If I use the same approach as App.css likely handles it globally?
-    // Or I should apply it here.
-    // App.css had: top: 100%; left: 0; transform: rotate(-90deg) (Mobile)
-    // User request: "rotate(90deg)".
-    // Let's use specific style for this container or assume parent handles it?
-    // User request: "Môi trường: ... giao diện web được xoay ngang" -> Implies environment is set up.
-    // But then: "x_logicflow = clientY - top_container" matches a specific rotation.
 
-    // I will assume I need to implement the container style as requested
-    // or fit into the `container-rotate` check if applicable.
-    // I'll apply standard full dimensions for now.
-    // Wait, if I replace `ChapterFlow` (V1), it was inside a `div.container-rotate`.
-    // I should probably conform to that.
   };
 
   return (
     // Added touch-action: none to prevent browser panning
     <div
-      className="w-full h-full relative flow-v2"
+      className="w-full h-[calc(100%-100px)] relative flow-v2"
       ref={containerRef}
       id="logic-flow-container"
       style={{ touchAction: "none" }}

@@ -109,6 +109,7 @@ export const FlowChartContextProvider = ({
     const nodeList: any[] = [];
     const edgeList: any[] = [];
     const processedNodes = new Set<string>();
+    const visitedScenes = new Set<string>();
 
     const startNode = scenes[data?.startSceneId];
 
@@ -178,47 +179,74 @@ export const FlowChartContextProvider = ({
       return branchOptions;
     };
 
-    const nodes = (parentId: string, options: BranchOption[] = []) => {
-      const allOptions = options.filter((option) => {
-        const targetScene = scenes[option.targetSceneId];
-        return targetScene && !processedNodes.has(option.targetSceneId);
+    const traverseScene = (sceneId: string) => {
+      if (!sceneId) return;
+      if (visitedScenes.has(sceneId)) return;
+      visitedScenes.add(sceneId);
+
+      const scene = scenes[sceneId];
+      if (!scene) return;
+
+      // Thêm node cho scene hiện tại (nếu chưa có)
+      addNode(sceneId, {
+        ...scene,
       });
 
-      allOptions.forEach((option, index) => {
-        const targetScene = scenes[option.targetSceneId];
-        if (!targetScene || processedNodes.has(option.targetSceneId)) return;
+      // Lấy branch options và hotspot investigate options
+      const branchOptions: BranchOption[] = scene.branch?.options || [];
+      const investigateOptions = convertHotspotItemsToBranchOptions(scene);
+      const allOptions = [...branchOptions, ...investigateOptions];
 
-        addNode(option.targetSceneId, {
-          ...targetScene,
-          ...option,
+      // Nếu có branch / hotspot thì tạo edge cho từng option và đệ quy tiếp
+      if (allOptions.length > 0) {
+        allOptions.forEach((option, index) => {
+          const targetScene = scenes[option.targetSceneId];
+          if (!targetScene) return;
+
+          addNode(option.targetSceneId, {
+            ...targetScene,
+            ...option,
+          });
+
+          addEdge(sceneId, option.targetSceneId, index, {
+            ...option,
+            status: targetScene.status,
+          });
+
+          traverseScene(option.targetSceneId);
         });
-        addEdge(parentId, option.targetSceneId, index, {
-          ...option,
-          status: targetScene.status,
-        });
+        return;
+      }
 
-        // Get branch options and investigate hotspots for next node
-        const nextBranchOptions = targetScene.branch?.options || [];
-        const nextInvestigateOptions =
-          convertHotspotItemsToBranchOptions(targetScene);
-        const nextAllOptions = [
-          ...nextBranchOptions,
-          ...nextInvestigateOptions,
-        ];
-
-        if (nextAllOptions.length > 0) {
-          nodes(option.targetSceneId, nextAllOptions);
+      // Nếu không có branch / hotspot:
+      // - Nếu có targetSceneId thì nối tới đó và tiếp tục đệ quy
+      // - Nếu không nhưng là endingScene thì dừng tại đây (leaf)
+      const fallbackTargetId = scene.targetSceneId;
+      if (!fallbackTargetId) {
+        if (scene.endingScene) {
+          return;
         }
+        return;
+      }
+
+      const fallbackTargetScene = scenes[fallbackTargetId];
+      if (!fallbackTargetScene) return;
+
+      if (!processedNodes.has(fallbackTargetId)) {
+        addNode(fallbackTargetId, {
+          ...fallbackTargetScene,
+        });
+      }
+
+      addEdge(sceneId, fallbackTargetId, undefined, {
+        status: fallbackTargetScene.status,
       });
+
+      traverseScene(fallbackTargetId);
     };
 
-    // DONOT CHECK THIS
     if (startNode) {
-      const branchOptions: BranchOption[] = startNode.branch?.options || [];
-      const investigateOptions = convertHotspotItemsToBranchOptions(startNode);
-      const allOptions = [...branchOptions, ...investigateOptions];
-      addNode(startNode.id, { ...startNode });
-      nodes(startNode.id, allOptions);
+      traverseScene(startNode.id);
     }
     return { nodes: nodeList, edges: edgeList };
   }, [scenes, data?.startSceneId]);

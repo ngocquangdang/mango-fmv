@@ -40,7 +40,9 @@ export interface Scene {
   duration: number;
   order: number;
   status?: string;
+  targetSceneId: string;
   hotspots?: Hotspot[];
+  endingScene?: boolean;
   branch?: {
     countdown: number;
     defaultChoice: string;
