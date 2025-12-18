@@ -10,7 +10,7 @@ import ChapterFlow from './chapter-flow';
 
 export default function ChapterPage() {
   const { onPlayPlayer, setType } = useVideoPlayerContext();
-  const { chapter,  } = useUserContext();
+  const { chapter, } = useUserContext();
   const { progress } = chapter;
 
   const handlePlay = () => {
@@ -21,7 +21,7 @@ export default function ChapterPage() {
 
   return (
     <div className="w-full h-full">
-      <div className="w-full h-[100px] ">
+      <div className="w-full h-[74px] ">
         <div
           className="absolute top-0 left-0 p-4 z-10 cursor-pointer"
           onClick={() => setType("intro")}
@@ -94,7 +94,7 @@ export default function ChapterPage() {
           <RewardProgress
             currentPoints={progress?.milestone || 0}
             maxPoints={100}
-            onClaimReward={() => {}}
+            onClaimReward={() => { }}
             className="pb-4"
           />
         </div>

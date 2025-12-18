@@ -67,7 +67,8 @@ class SafariChapterNode extends RectNode {
         width: imageWidth,
         height: imageHeight,
         preserveAspectRatio: "xMidYMid slice",
-        style: isLocked ? "opacity:0.5;" : "opacity:1;",
+        style: isLocked ? "opacity:0.5; filter: grayscale(100%);" : "opacity:1;",
+
       })
     );
 

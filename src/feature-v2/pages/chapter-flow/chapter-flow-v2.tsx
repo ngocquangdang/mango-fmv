@@ -338,7 +338,14 @@ const ChapterFlowV2 = () => {
       {/* SVG defs for scribble edge filter, shared by LogicFlow edges */}
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
-          <filter id="scribble-filter">
+          <filter
+            id="scribble-filter"
+            x="-20%"
+            y="-20%"
+            width="140%"
+            height="140%"
+            filterUnits="objectBoundingBox"
+          >
             <feTurbulence
               type="fractalNoise"
               baseFrequency="0.5"

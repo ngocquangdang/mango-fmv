@@ -126,9 +126,8 @@ export default function Home() {
       <div className="flex flex-col h-full justify-center items-center gap-4 w-fit pl-2">
         <div
           style={{
-            transform: `translateY(${
-              activeShakeIndex === 0 ? shakeOffset : 0
-            }px)`,
+            transform: `translateY(${activeShakeIndex === 0 ? shakeOffset : 0
+              }px)`,
             transition: "transform 80ms linear",
           }}
         >
@@ -140,9 +139,8 @@ export default function Home() {
         </div>
         <div
           style={{
-            transform: `translateY(${
-              activeShakeIndex === 1 ? shakeOffset : 0
-            }px)`,
+            transform: `translateY(${activeShakeIndex === 1 ? shakeOffset : 0
+              }px)`,
             transition: "transform 80ms linear",
           }}
         >
@@ -154,9 +152,8 @@ export default function Home() {
         </div>
         <div
           style={{
-            transform: `translateY(${
-              activeShakeIndex === 2 ? shakeOffset : 0
-            }px)`,
+            transform: `translateY(${activeShakeIndex === 2 ? shakeOffset : 0
+              }px)`,
             transition: "transform 80ms linear",
           }}
         >
@@ -169,9 +166,8 @@ export default function Home() {
         {+(isPlaying || 0) > 0 && (
           <div
             style={{
-              transform: `translateY(${
-                activeShakeIndex === 3 ? shakeOffset : 0
-              }px)`,
+              transform: `translateY(${activeShakeIndex === 3 ? shakeOffset : 0
+                }px)`,
               transition: "transform 80ms linear",
             }}
           >
@@ -242,7 +238,7 @@ export default function Home() {
           <img
             src={`/images/home/paper-PN.png?v=${IMAGE_VERSION}`}
             alt="bottom-bg-home"
-            className="w-[147px] h-[206px] absolute bottom-0 left-83 z-20"
+            className="w-[147px] h-[206px] absolute bottom-0 left-80 z-20"
           />
         </div>
       </div>
