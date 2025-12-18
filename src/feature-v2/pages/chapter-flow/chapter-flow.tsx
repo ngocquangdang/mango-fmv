@@ -71,7 +71,7 @@ const ChapterFlow = () => {
   }, [nodesWithOriginalY, layoutedEdges, setNodes, setEdges]);
 
   return (
-    <div className="w-full h-[calc(100%-100px)]">
+    <div className="w-full h-[calc(100vh-100px)]">
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
           <filter id="scribble-filter">
@@ -92,7 +92,7 @@ const ChapterFlow = () => {
         edgeTypes={edgeTypes}
         minZoom={0.5}
         maxZoom={0.5}
-      
+        // style={{ transform: 'rotate(0deg)'}} // Rotate the whole canvas!
         defaultViewport={{
           x: 100,
           y: 0,

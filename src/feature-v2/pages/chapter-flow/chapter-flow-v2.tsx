@@ -1,0 +1,357 @@
+import { useEffect, useRef, useMemo } from "react";
+import LogicFlow from "@logicflow/core";
+import CustomChapterNode from "./components/logic-flow/custom-node";
+import CustomChapterEdge from "./components/logic-flow/custom-edge";
+import { useFlowChart } from "./context";
+import { getLayoutedElements } from "../../../features/pixel-flow/layout";
+import { useVideoPlayerContext } from "../../../contexts";
+import { useToast } from "../../../components/ui/toast-v2/use-toast";
+
+const ChapterFlowV2 = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lfRef = useRef<LogicFlow | null>(null);
+  const { nodes: contextNodes, edges: contextEdges, data } = useFlowChart();
+  const videoPlayerContext = useVideoPlayerContext();
+  const { showToast } = useToast();
+
+  // Ref để handler click node luôn đọc được context mới nhất
+  const clickContextRef = useRef({
+    data,
+    currentStatus: videoPlayerContext.currentStatus,
+    setCurrentStatus: videoPlayerContext.setCurrentStatus,
+    setPauseType: videoPlayerContext.setPauseType,
+    onPlayPlayer: videoPlayerContext.onPlayPlayer,
+    setReviewScene: videoPlayerContext.setReviewScene,
+    showToast,
+  });
+
+  useEffect(() => {
+    clickContextRef.current = {
+      data,
+      currentStatus: videoPlayerContext.currentStatus,
+      setCurrentStatus: videoPlayerContext.setCurrentStatus,
+      setPauseType: videoPlayerContext.setPauseType,
+      onPlayPlayer: videoPlayerContext.onPlayPlayer,
+      setReviewScene: videoPlayerContext.setReviewScene,
+      showToast,
+    };
+  }, [
+    data,
+    videoPlayerContext.currentStatus,
+    videoPlayerContext.setCurrentStatus,
+    videoPlayerContext.setPauseType,
+    videoPlayerContext.onPlayPlayer,
+    videoPlayerContext.setReviewScene,
+    showToast,
+  ]);
+
+  // Prepare Data (Reuse layout logic from V1)
+  const { nodes: layoutedNodes, edges: layoutedEdges } = useMemo(() => {
+    // Map to format expected by layout.ts (ReactFlow format)
+    const mappedNodes = contextNodes.map((node) => ({
+      ...node,
+      type: "chapter", // V1 type name, doesn't matter for layout calc
+      data: {
+        ...node.data,
+        title: node.data.name || node.data.text || node.data.title,
+      },
+    }));
+    const mappedEdges = contextEdges.map((edge) => ({
+      ...edge,
+      type: "chapter",
+    }));
+
+    return getLayoutedElements(mappedNodes, mappedEdges);
+  }, [contextNodes, contextEdges]);
+
+  // Init Logic Flow
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const lf = new LogicFlow({
+      container: containerRef.current,
+      grid: false,
+      isSilentMode: true, // Only view
+      stopScrollGraph: true, // Disable native pan, use custom handler
+      stopZoomGraph: false, // Allow zoom
+      // stopMoveGraph: false, // deprecated? check docs. Default pan is allowed if not invalid.
+      // key mappings? default matches constraints.
+      width: window.innerHeight, // Rotating, so swap? No, container dimensions.
+      // Wait, if we use CSS rotation on container, the logicflow internal canvas is normal size relative to container div.
+      // But user says: "x_logicflow = clientY - top_container"
+
+      nodeTextDraggable: false,
+      edgeTextDraggable: false,
+    });
+
+    // Register Custom Elements
+    lf.register(CustomChapterNode);
+    lf.register(CustomChapterEdge);
+
+    // CRITICAL: Override getPointByClient for 90deg Rotated UI
+    // The touch/mouse events come in screen coordinates (Portrait).
+    // The container is rotated 90deg.
+    // LogicFlow needs coordinates relative to its top-left (which is visually top-right of screen?).
+    // User formula:
+    // x_metric = clientY - top_container
+    // y_metric = width_container - (clientX - left_container)
+
+    // LogicFlow internals use getPointByClient to map event => canvas graph point.
+    lf.graphModel.getPointByClient = (point: { x: number; y: number }) => {
+      const { x: clientX, y: clientY } = point;
+      const { top, left, height } =
+        containerRef.current!.getBoundingClientRect();
+
+      // Calculate 'DOM' position relative to rotated container
+      // Based on user formula:
+      const x = height - (clientY - top);
+      const y = clientX - left;
+
+      // Map this DOM point to Graph Space (taking zoom/pan into account)
+      // transformModel.HtmlPointToCanvasPoint takes [x, y] and returns [x, y]
+      const [canvasX, canvasY] =
+        lf.graphModel.transformModel.HtmlPointToCanvasPoint([x, y]);
+
+      // Return ClientPosition structure
+      return {
+        domOverlayPosition: { x, y },
+        canvasOverlayPosition: { x: canvasX, y: canvasY },
+      };
+    };
+
+    lf.on("node:click", ({ data: nodeData }: any) => {
+      const nodeId = nodeData?.id;
+      if (!nodeId) return;
+
+      const {
+        data: chapterData,
+        currentStatus,
+        setCurrentStatus,
+        setPauseType,
+        onPlayPlayer,
+        setReviewScene,
+        showToast: showToastFn,
+      } = clickContextRef.current;
+
+      const scene = chapterData?.scenes?.[nodeId];
+      setReviewScene(false);
+
+      if (!scene?.videoUrl) {
+        showToastFn({ description: "Player chưa sẵn sàng" });
+        return;
+      }
+
+      if (!scene.status) return;
+
+      if (nodeId !== currentStatus?.currentSceneId) {
+        setCurrentStatus(null);
+        setPauseType(null);
+      }
+
+      if (scene.status === "COMPLETED") {
+        setReviewScene(true);
+        onPlayPlayer(nodeId, true);
+        return;
+      }
+
+      onPlayPlayer(nodeId);
+    });
+
+    lfRef.current = lf;
+
+    return () => {
+      // Cleanup
+      // lf.destroy(); // LogicFlow doesn't strictly require destroy, but good practice if supported
+    };
+  }, []);
+
+  // Render Data
+  useEffect(() => {
+    if (!lfRef.current || layoutedNodes.length === 0) return;
+    const lf = lfRef.current;
+
+    // Transform ReactFlow Layout Data -> LogicFlow Data
+    const lfData = {
+      nodes: layoutedNodes.map((node) => {
+        // ReactFlow layout (layout.ts) produced Top-Left coordinates?
+        // Let's verify layout.ts output. It iterates and sets position.x/y.
+        // It uses dagre which centers, but then subtracts nodeWidth/2. So yes, Top-Left.
+        // LogicFlow nodes are centered by default.
+        // We need to shift back to center.
+
+        // Custom Node size defined in model: 200x120
+        const w = 200;
+        const h = 120;
+
+        return {
+          id: node.id,
+          type: "chapter-node",
+          x: node.position.x + w / 2,
+          y: node.position.y + h / 2,
+          properties: {
+            ...node.data,
+            // Pass original properties
+          },
+        };
+      }),
+      edges: layoutedEdges.map((edge: any) => ({
+        id: edge.id,
+        type: "chapter-edge",
+        sourceNodeId: edge.source,
+        targetNodeId: edge.target,
+        properties: {
+          // Mirror ReactFlow ChapterEdge: use status to determine locked/completed style
+          status: edge.data?.status,
+        },
+      })),
+    };
+
+    lf.render(lfData);
+    // Thiết lập mức zoom mặc định nhỏ hơn 1 để toàn bộ flow nhỏ lại một chút
+    lf.setZoomMiniSize(0.7);
+    lf.setZoomMaxSize(0.7);
+    lf.zoom(0.7);
+    lf.translate(0, 0);
+  }, [layoutedNodes, layoutedEdges]);
+
+  // Handle Custom Pan (Drag) for Rotated Container
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !lfRef.current) return;
+
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+
+    const onPointerDown = (e: PointerEvent) => {
+      // Prevent default/propagation
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Strict Single Touch: Ignore 2nd finger
+      if (!e.isPrimary) return;
+
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      container.setPointerCapture(e.pointerId);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isDragging || !lfRef.current || !e.isPrimary) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+
+      // Update start positions for next delta
+      startX = e.clientX;
+      startY = e.clientY;
+
+      // Map Screen Delta to Graph Delta (90deg Rotated)
+      // Visual Down (Screen +Y) -> Graph +X (Visual Down)
+      // Visual Right (Screen +X) -> Graph -Y (Visual Right, since Graph Y is Visual
+      const { SCALE_X } = lfRef.current.graphModel.transformModel;
+
+      // Match User's New Coordinate Formula:
+      // x = height - (clientY - top)  => dx = -deltaY
+      // y = clientX - left            => dy = deltaX
+
+      const dx_graph = -deltaY / SCALE_X;
+      const dy_graph = deltaX / SCALE_X;
+
+      // Update Debug Info
+      const debugEl = document.getElementById("lf-debug-overlay");
+      if (debugEl) {
+        debugEl.innerText = `
+        Dragging: ${isDragging}
+        Screen: ${Math.round(e.clientX)}, ${Math.round(e.clientY)}
+        Delta: ${Math.round(deltaX)}, ${Math.round(deltaY)}
+        GraphDelta: ${Math.round(dx_graph)}, ${Math.round(dy_graph)}
+        Scale: ${SCALE_X.toFixed(2)}
+        `;
+      }
+
+      // Apply translation
+      const lf = lfRef.current;
+      lf.translate(dx_graph, dy_graph);
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (!e.isPrimary) return;
+      isDragging = false;
+      container.releasePointerCapture(e.pointerId);
+
+      // Clear debug
+      const debugEl = document.getElementById("lf-debug-overlay");
+      if (debugEl) debugEl.innerText = "Idle";
+    };
+
+    container.addEventListener("pointerdown", onPointerDown);
+    container.addEventListener("pointermove", onPointerMove);
+    container.addEventListener("pointerup", onPointerUp);
+    container.addEventListener("pointercancel", onPointerUp);
+
+    return () => {
+      container.removeEventListener("pointerdown", onPointerDown);
+      container.removeEventListener("pointermove", onPointerMove);
+      container.removeEventListener("pointerup", onPointerUp);
+      container.removeEventListener("pointercancel", onPointerUp);
+    };
+  }, []);
+
+  // CSS for container 90deg rotation
+  const containerStyle = {
+    width: "100vh", // Swapped for rotation
+    height: "100vw",
+    transform: "rotate(90deg)",
+    transformOrigin: "top left",
+    position: "absolute" as const,
+    top: 0,
+    left: "100%", // Push to right edge to rotate back in?
+    // User said: "giao diện web được xoay ngang bằng CSS transform: rotate(90deg)"
+    // Typically: rotate(90deg) needs absolute positioning adjustments.
+    // If I use the same approach as App.css likely handles it globally?
+    // Or I should apply it here.
+    // App.css had: top: 100%; left: 0; transform: rotate(-90deg) (Mobile)
+    // User request: "rotate(90deg)".
+    // Let's use specific style for this container or assume parent handles it?
+    // User request: "Môi trường: ... giao diện web được xoay ngang" -> Implies environment is set up.
+    // But then: "x_logicflow = clientY - top_container" matches a specific rotation.
+
+    // I will assume I need to implement the container style as requested
+    // or fit into the `container-rotate` check if applicable.
+    // I'll apply standard full dimensions for now.
+    // Wait, if I replace `ChapterFlow` (V1), it was inside a `div.container-rotate`.
+    // I should probably conform to that.
+  };
+
+  return (
+    // Added touch-action: none to prevent browser panning
+    <div
+      className="w-full h-full relative flow-v2"
+      ref={containerRef}
+      id="logic-flow-container"
+      style={{ touchAction: "none" }}
+    >
+      {/* SVG defs for scribble edge filter, shared by LogicFlow edges */}
+      <svg style={{ position: "absolute", width: 0, height: 0 }}>
+        <defs>
+          <filter id="scribble-filter">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.5"
+              numOctaves="1"
+              result="noise"
+            />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+          </filter>
+        </defs>
+      </svg>
+
+    </div>
+  );
+};
+
+export default ChapterFlowV2;
