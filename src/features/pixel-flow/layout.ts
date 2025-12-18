@@ -43,12 +43,43 @@ export const getLayoutedElements = (
     return newNode;
   });
 
-  // Center child nodes vertically around their parent
   const nodeMap = new Map(layoutedNodes.map((n) => [n.id, n]));
   const processedChildren = new Set<string>();
 
+  // B1: Với node có N parent -> 1 child, căn child theo trung bình các parent trước
+  const childToParentIds = new Map<string, string[]>();
+
+  edges.forEach((edge) => {
+    const parents = childToParentIds.get(edge.target) || [];
+    parents.push(edge.source);
+    childToParentIds.set(edge.target, parents);
+  });
+
+  childToParentIds.forEach((parentIds, childId) => {
+    if (parentIds.length < 2) return;
+
+    const childNode = nodeMap.get(childId);
+    if (!childNode || !childNode.position) return;
+
+    const parentNodes = parentIds
+      .map((pid) => nodeMap.get(pid))
+      .filter((n): n is (typeof layoutedNodes)[0] => n !== undefined);
+
+    if (parentNodes.length < 2) return;
+
+    const parentCentersY = parentNodes.map(
+      (parent) => parent.position.y + nodeHeight / 2
+    );
+    const avgParentCenterY =
+      parentCentersY.reduce((sum, y) => sum + y, 0) / parentCentersY.length;
+
+    childNode.position.y = avgParentCenterY - nodeHeight / 2;
+    // Đánh dấu để bước B2 không ghi đè lại vị trí đã cân giữa N parent
+    processedChildren.add(childId);
+  });
+
+  // B2: Sau khi đã cố định node N->1, căn lại children quanh parent (1 parent -> N children)
   layoutedNodes.forEach((parentNode) => {
-    // Find all children of this node
     const childEdges = edges.filter((e) => e.source === parentNode.id);
     const children = childEdges
       .map((e) => nodeMap.get(e.target))
@@ -59,27 +90,19 @@ export const getLayoutedElements = (
 
     if (children.length === 0) return;
 
-    // Sort children by their original Y position to maintain order
     children.sort((a, b) => (a?.position?.y || 0) - (b?.position?.y || 0));
 
-    // Calculate parent's vertical center (middle of the node)
     const parentCenterY = parentNode.position.y + nodeHeight / 2;
 
     if (children.length === 1) {
-      // Single child: center it with parent
       const child = children[0];
       if (child?.position) {
         child.position.y = parentCenterY - nodeHeight / 2;
         processedChildren.add(child.id);
       }
     } else {
-      // Multiple children: distribute evenly around parent center
-      const verticalSpacing = 250; // Space between children centers
-
-      // Calculate total vertical span of all children
+      const verticalSpacing = 250;
       const totalSpan = verticalSpacing * (children.length - 1);
-
-      // Start position: parent center minus half the total span
       const firstChildCenterY = parentCenterY - totalSpan / 2;
 
       children.forEach((child, index) => {
