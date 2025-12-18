@@ -302,16 +302,16 @@ const ChapterFlowV2 = () => {
   }, []);
 
   // CSS for container 90deg rotation
-  const containerStyle = {
-    width: "100vh", // Swapped for rotation
-    height: "100vw",
-    transform: "rotate(90deg)",
-    transformOrigin: "top left",
-    position: "absolute" as const,
-    top: 0,
-    left: "100%", // Push to right edge to rotate back in?
+  // const containerStyle = {
+  //   width: "100vh", // Swapped for rotation
+  //   height: "100vw",
+  //   transform: "rotate(90deg)",
+  //   transformOrigin: "top left",
+  //   position: "absolute" as const,
+  //   top: 0,
+  //   left: "100%", // Push to right edge to rotate back in?
 
-  };
+  // };
 
   return (
     // Added touch-action: none to prevent browser panning

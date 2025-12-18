@@ -30,20 +30,20 @@ export default function Button({
     <div
       className={`${width} ${height} bg-center bg-no-repeat bg-cover cursor-pointer inline-flex items-center justify-center `}
       style={{ backgroundImage: `url(${ButtonBg})` }}
+      onClick={onClick}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          if (!disabled) onClick?.();
+        }
+      }}
     >
       <button
         type="button"
-        onClick={onClick}
         disabled={disabled}
         aria-label={label}
         tabIndex={0}
         className={`relative text-sm px-3 font-semibold text-white drop-shadow-md transition-opacity duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-orange-400 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            if (!disabled) onClick?.();
-          }
-        }}
       >
         <span className=" leading-none">{label}</span>
       </button>

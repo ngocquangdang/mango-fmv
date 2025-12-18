@@ -11,6 +11,9 @@ export default function Home() {
   const { chapter, refetch, refetchCollectedRewards } = useUserContext();
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
+  const [activeShakeIndex, setActiveShakeIndex] = React.useState<number>(0);
+  const [shakeOffset, setShakeOffset] = React.useState(0);
+  const [paperOffset, setPaperOffset] = React.useState(0);
 
   const isPlaying = useMemo(() => {
     return (
@@ -36,7 +39,7 @@ export default function Home() {
     //   chapter.progress?.currentScene?.sceneId || chapter.startSceneId;
     // onPlayPlayer(sceneId);
     setType("story");
-    setCollectionItems({})
+    setCollectionItems({});
   };
 
   const onConfirm = async () => {
@@ -49,6 +52,68 @@ export default function Home() {
     setDialogName(null);
   };
 
+  React.useEffect(() => {
+    const buttonCount = 3 + (+(isPlaying || 0) > 0 ? 1 : 0);
+    if (!buttonCount) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setActiveShakeIndex((previousIndex) => {
+        const nextIndex = (previousIndex + 1) % buttonCount;
+        return nextIndex;
+      });
+    }, 2000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [isPlaying]);
+
+  React.useEffect(() => {
+    let animationFrameId: number;
+    const startTime = performance.now();
+
+    const animateShake = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const duration = 600;
+      const progress = (elapsed % duration) / duration;
+      const wave = Math.sin(progress * 2 * Math.PI);
+      const amplitude = 2;
+
+      setShakeOffset(wave * amplitude);
+      animationFrameId = requestAnimationFrame(animateShake);
+    };
+
+    animationFrameId = requestAnimationFrame(animateShake);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    let animationFrameId: number;
+    const startTime = performance.now();
+
+    const animatePaper = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const duration = 2600;
+      const progress = (elapsed % duration) / duration;
+      const wave = Math.sin(progress * 2 * Math.PI);
+      const amplitude = 3;
+
+      setPaperOffset(wave * amplitude);
+      animationFrameId = requestAnimationFrame(animatePaper);
+    };
+
+    animationFrameId = requestAnimationFrame(animatePaper);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
   return (
     <div className="relative w-full h-full overflow-hidden">
       <img
@@ -57,30 +122,140 @@ export default function Home() {
         className="absolute top-8 left-[50%] translate-x-[-50%] w-[263px] h-[120px] object-cover"
       />
       <div className="flex flex-col h-full justify-center items-center gap-4 w-fit pl-2">
-        <HomeButton
-          icon="/images/window-icon.png"
-          label="Cốt truyện"
-          onClick={() => handleClick("story")}
-        />
-        <HomeButton
-          icon="/images/book-icon.png"
-          label="Nhật ký"
-          onClick={() => handleClick("journal")}
-        />
-        <HomeButton
-          icon="/images/rank-icon.png"
-          label="Xếp hạng"
-          onClick={() => handleClick("ranking")}
-        />
-        {+(isPlaying || 0) > 0 && (
+        <div
+          style={{
+            transform: `translateY(${
+              activeShakeIndex === 0 ? shakeOffset : 0
+            }px)`,
+            transition: "transform 80ms linear",
+          }}
+        >
           <HomeButton
-            icon="/images/reload-icon.png"
-            label="Chơi lại"
-            onClick={() => handleClick("playAgain")}
+            icon="/images/window-icon.png"
+            label="Cốt truyện"
+            onClick={() => handleClick("story")}
           />
+        </div>
+        <div
+          style={{
+            transform: `translateY(${
+              activeShakeIndex === 1 ? shakeOffset : 0
+            }px)`,
+            transition: "transform 80ms linear",
+          }}
+        >
+          <HomeButton
+            icon="/images/book-icon.png"
+            label="Nhật ký"
+            onClick={() => handleClick("journal")}
+          />
+        </div>
+        <div
+          style={{
+            transform: `translateY(${
+              activeShakeIndex === 2 ? shakeOffset : 0
+            }px)`,
+            transition: "transform 80ms linear",
+          }}
+        >
+          <HomeButton
+            icon="/images/rank-icon.png"
+            label="Xếp hạng"
+            onClick={() => handleClick("ranking")}
+          />
+        </div>
+        {+(isPlaying || 0) > 0 && (
+          <div
+            style={{
+              transform: `translateY(${
+                activeShakeIndex === 3 ? shakeOffset : 0
+              }px)`,
+              transition: "transform 80ms linear",
+            }}
+          >
+            <HomeButton
+              icon="/images/reload-icon.png"
+              label="Chơi lại"
+              onClick={() => handleClick("playAgain")}
+            />
+          </div>
         )}
       </div>
-      <div className="absolute bottom-0 right-10 w-[134px] h-[116px]">
+      <div className="absolute bottom-0 top-[103%] left-40 right-40 w-full h-full">
+        <div
+          style={{
+            transform: `translateY(${paperOffset * 0.9}px)`,
+            transition: "transform 120ms linear",
+          }}
+        >
+          <img
+            src="/images/home/paper-HDQ.png"
+            alt="paper-HDQ"
+            className="w-[168px] h-[216px] absolute bottom-0 left-0 z-10"
+          />
+        </div>
+        <div
+          style={{
+            transform: `translateY(${paperOffset * 1.1}px)`,
+            transition: "transform 120ms linear",
+          }}
+        >
+          <img
+            src="/images/home/paper-LA.png"
+            alt="bottom-bg-home"
+            className="w-[174px] h-[206px] absolute bottom-0 left-25 z-20"
+          />
+        </div>
+        <div
+          style={{
+            transform: `translateY(${paperOffset * 1.2}px)`,
+            transition: "transform 120ms linear",
+          }}
+        >
+          <img
+            src="/images/home/paper-CB.png"
+            alt="bottom-bg-home"
+            className="w-[177px] h-[230px] absolute bottom-0 left-48 z-30"
+          />
+        </div>
+
+        <div
+          style={{
+            transform: `translateY(${paperOffset * 0.8}px)`,
+            transition: "transform 120ms linear",
+          }}
+        >
+          <img
+            src="/images/home/paper-TLMH.png"
+            alt="bottom-bg-home"
+            className="w-[224px] h-[179px] absolute bottom-0 left-83 z-10"
+          />
+        </div>
+        <div
+          style={{
+            transform: `translateY(${paperOffset * 1.05}px)`,
+            transition: "transform 120ms linear",
+          }}
+        >
+          <img
+            src="/images/home/paper-PN.png"
+            alt="bottom-bg-home"
+            className="w-[147px] h-[206px] absolute bottom-0 left-83 z-20"
+          />
+        </div>
+      </div>
+      <div
+        className="absolute bottom-0 left-0 z-40"
+        style={{
+          width: "100%",
+          height: "116px",
+          backgroundImage: "url('/images/home/bottom-bg-home.png')",
+          backgroundSize: "100% 100%",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+        }}
+      ></div>
+      <div className="absolute bottom-0 right-10 w-[134px] h-[116px] z-50">
         <HookButton
           label={isPlaying ? "Tiếp tục" : "Bắt đầu"}
           onClick={handleStart}

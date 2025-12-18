@@ -44,6 +44,10 @@ body {
   .flow-v2 {
     display: block;
   }
+
+  .interactive-video-wrapper {
+    height: 100vw;
+  }
 }
 
 .game-modal-overlay {
