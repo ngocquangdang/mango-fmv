@@ -72,6 +72,11 @@ const ChapterFlowV2 = () => {
     const isSafari =
       typeof navigator !== "undefined" &&
       /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isIOS =
+      typeof navigator !== "undefined" &&
+      /iP(ad|hone|od)/i.test(navigator.userAgent);
+    const isSafariLike = isSafari || isIOS;
+    console.log("🚀 ~ ChapterFlowV2 ~ isSafariLike:", isSafariLike, isSafari, isIOS, navigator.userAgent)
 
     const lf = new LogicFlow({
       container: containerRef.current,
@@ -91,7 +96,7 @@ const ChapterFlowV2 = () => {
 
     // Register Custom Elements
     // Safari có vấn đề với HtmlNode/foreignObject, nên dùng SVG node fallback
-    if (isSafari) {
+    if (isSafariLike) {
       lf.register(SafariChapterNode);
     } else {
       lf.register(CustomChapterNode);
@@ -308,6 +313,93 @@ const ChapterFlowV2 = () => {
       container.removeEventListener("pointermove", onPointerMove);
       container.removeEventListener("pointerup", onPointerUp);
       container.removeEventListener("pointercancel", onPointerUp);
+    };
+  }, []);
+
+  // Handle Custom Pan for iOS WebView (Touch fallback)
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !lfRef.current) return;
+
+    const isIOS =
+      typeof navigator !== "undefined" &&
+      /iP(ad|hone|od)/i.test(navigator.userAgent);
+
+    if (!isIOS) return;
+
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+
+    const handlePan = (clientX: number, clientY: number) => {
+      if (!isDragging || !lfRef.current) return;
+
+      const deltaX = clientX - startX;
+      const deltaY = clientY - startY;
+
+      startX = clientX;
+      startY = clientY;
+
+      const { SCALE_X } = lfRef.current.graphModel.transformModel;
+
+      const dx_graph = -deltaY / SCALE_X;
+      const dy_graph = deltaX / SCALE_X;
+
+      const debugEl = document.getElementById("lf-debug-overlay");
+      if (debugEl) {
+        debugEl.innerText = `
+        Dragging (iOS): ${isDragging}
+        Screen: ${Math.round(clientX)}, ${Math.round(clientY)}
+        Delta: ${Math.round(deltaX)}, ${Math.round(deltaY)}
+        GraphDelta: ${Math.round(dx_graph)}, ${Math.round(dy_graph)}
+        Scale: ${SCALE_X.toFixed(2)}
+        `;
+      }
+
+      lfRef.current.translate(dx_graph, dy_graph);
+    };
+
+    const passiveFalse: AddEventListenerOptions = { passive: false };
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const t = e.touches[0];
+      isDragging = true;
+      startX = t.clientX;
+      startY = t.clientY;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isDragging || e.touches.length !== 1) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const t = e.touches[0];
+      handlePan(t.clientX, t.clientY);
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      isDragging = false;
+
+      const debugEl = document.getElementById("lf-debug-overlay");
+      if (debugEl) debugEl.innerText = "Idle";
+    };
+
+    container.addEventListener("touchstart", onTouchStart, passiveFalse);
+    container.addEventListener("touchmove", onTouchMove, passiveFalse);
+    container.addEventListener("touchend", onTouchEnd, passiveFalse);
+    container.addEventListener("touchcancel", onTouchEnd, passiveFalse);
+
+    return () => {
+      container.removeEventListener("touchstart", onTouchStart, passiveFalse);
+      container.removeEventListener("touchmove", onTouchMove, passiveFalse);
+      container.removeEventListener("touchend", onTouchEnd, passiveFalse);
+      container.removeEventListener("touchcancel", onTouchEnd, passiveFalse);
     };
   }, []);
 
