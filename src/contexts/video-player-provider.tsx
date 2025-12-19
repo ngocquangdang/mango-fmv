@@ -485,7 +485,7 @@ export const VideoPlayerProvider = ({
           h.items?.some((i: any) => i.targetSceneId)
         ) ||
         (scene as any).targetSceneId;
-      
+
       if ((scene as any)?.endingScene) {
         setIsEndingScene(true);
         pause();
@@ -606,6 +606,19 @@ export const VideoPlayerProvider = ({
   }, [api, data?.id]);
 
   React.useEffect(() => {
+    const handleTouchMove = (e: any) => {
+      // Nếu app của bạn không cần scroll trang web theo kiểu truyền thống
+      if (e.scale !== 1) {
+        e.preventDefault();
+      } // Ngăn zoom nhầm
+    };
+    document.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
+    return () => document.removeEventListener('touchmove', handleTouchMove);
+  }, []);
+
+  React.useEffect(() => {
     if (Object.values(collectionItems).some((item) => item.isCompleted)) {
       const completedItems = Object.values(collectionItems).filter(
         (item) => item.isCompleted
@@ -642,11 +655,11 @@ export const VideoPlayerProvider = ({
     );
 
     unsubRef.current.push(
-      offStart ?? (() => {}),
-      offStop ?? (() => {}),
-      offEnded ?? (() => {}),
-      offChoice ?? (() => {}),
-      offCollectionSelected ?? (() => {})
+      offStart ?? (() => { }),
+      offStop ?? (() => { }),
+      offEnded ?? (() => { }),
+      offChoice ?? (() => { }),
+      offCollectionSelected ?? (() => { })
     );
 
     return () => {

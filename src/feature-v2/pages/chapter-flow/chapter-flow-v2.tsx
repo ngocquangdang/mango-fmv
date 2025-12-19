@@ -302,16 +302,30 @@ const ChapterFlowV2 = () => {
       if (debugEl) debugEl.innerText = "Idle";
     };
 
+    // Force chặn các gesture mặc định của trình duyệt (back/forward)
+    const handleTouchExplicit = (e: TouchEvent) => {
+      // Chặn mọi hành vi mặc định khi thao tác trong vùng này
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+    };
+
     container.addEventListener("pointerdown", onPointerDown);
     container.addEventListener("pointermove", onPointerMove);
     container.addEventListener("pointerup", onPointerUp);
     container.addEventListener("pointercancel", onPointerUp);
+
+    // Safari đôi khi bỏ qua touch-action: none, nên cần chặn manual với passive: false
+    container.addEventListener("touchstart", handleTouchExplicit, { passive: false });
+    container.addEventListener("touchmove", handleTouchExplicit, { passive: false });
 
     return () => {
       container.removeEventListener("pointerdown", onPointerDown);
       container.removeEventListener("pointermove", onPointerMove);
       container.removeEventListener("pointerup", onPointerUp);
       container.removeEventListener("pointercancel", onPointerUp);
+      container.removeEventListener("touchstart", handleTouchExplicit);
+      container.removeEventListener("touchmove", handleTouchExplicit);
     };
   }, []);
 
@@ -330,7 +344,7 @@ const ChapterFlowV2 = () => {
   return (
     // Added touch-action: none to prevent browser panning
     <div
-      className="w-full h-[calc(100%-100px)] relative flow-v2"
+      className="w-full h-[calc(100%-100px)] relative flow-v2 select-none"
       ref={containerRef}
       id="logic-flow-container"
       style={{ touchAction: "none" }}

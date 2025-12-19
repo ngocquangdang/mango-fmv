@@ -20,8 +20,8 @@ export default function ChapterPage() {
   };
 
   return (
-    <div className="w-full h-full">
-      <div className="w-full h-[74px] ">
+    <div className="relative w-full h-full overflow-hidden">
+      < div className="w-full h-[74px] " >
         <div
           className="absolute top-0 left-0 p-4 z-10 cursor-pointer"
           onClick={() => setType("intro")}
@@ -52,7 +52,7 @@ export default function ChapterPage() {
             className="w-9 h-9 cursor-pointer"
           />
         </div>
-      </div>
+      </div >
       <FlowChartContextProvider>
         <ChapterFlowV2 />
         <ChapterFlow />
@@ -103,6 +103,6 @@ export default function ChapterPage() {
           <HookButton label="Tiếp tục" onClick={handlePlay} />
         </div>
       </div>
-    </div>
+    </div >
   );
 }

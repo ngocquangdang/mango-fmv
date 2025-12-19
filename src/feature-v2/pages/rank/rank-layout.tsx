@@ -83,11 +83,10 @@ export default function RankLayout() {
                   <div className="w-8 flex justify-center">
                     {/* Crown icon or simple number styled */}
                     <span
-                      className={`relative z-10 text-2xl font-bold ${
-                        index === 0
+                      className={`relative z-10 text-2xl font-bold ${index === 0
                           ? "text-yellow-500 scale-125"
                           : "text-slate-500"
-                      }`}
+                        }`}
                     >
                       {index + 1}
                     </span>
@@ -126,7 +125,7 @@ export default function RankLayout() {
                         alt="heart"
                         className="w-4 h-4"
                       />{" "}
-                      {user.totalVotes}
+                      {user.totalVotes || 0}
                     </span>
                   </div>
                 </div>
