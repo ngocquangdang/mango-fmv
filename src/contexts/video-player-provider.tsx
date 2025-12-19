@@ -426,7 +426,7 @@ export const VideoPlayerProvider = ({
 
       submitHotspot(
         {
-          sceneId: currentSceneId || "",
+          sceneId: currentStatus?.currentSceneId || "",
           hotspotItemId: hotspotItemId,
         },
         {
@@ -434,8 +434,8 @@ export const VideoPlayerProvider = ({
             const result = response.data;
             openDialogInfo({
               hotspotId: hotspotId,
-              title: result.moment?.title || "Thông báo",
-              description: result.moment?.description || "Bạn đã chọn câu hỏi này",
+              title: result.moment?.title || "",
+              description: result.moment?.description || "",
               mainImage: result.character?.imageUrl,
               itemImage: result.moment?.rewards?.[0]?.imageUrl,
               characterName: result.character?.id, // Or name if available
@@ -561,7 +561,6 @@ export const VideoPlayerProvider = ({
 
   const onPlayPlayer = React.useCallback(
     (sceneId: string, isReviewScene?: boolean) => {
-      console.log(data);
       if (!data?.id || !data.scenes[sceneId]?.videoUrl) {
         showToast({ description: "Scene không tồn tại" });
         return;
