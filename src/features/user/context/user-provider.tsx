@@ -112,7 +112,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const chapterValues = React.useMemo(
     () => ({
       chapterId: chapter?.chapterId,
-      id: chapter?.id,
+      id: chapter?.projectId,
       startSceneId: chapter?.startSceneId,
       exists: !!chapter,
       sences: chapter?.scenes,

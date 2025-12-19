@@ -120,8 +120,8 @@ export const useChapters = () => {
 };
 
 export const useChapter = (
-  projectId = "546d7eec-d52b-49f9-957e-cf3c7e67e6b5",
-  chapterId = "39982da1-4af7-40c2-8e28-241a7041f7a9"
+  projectId = "",
+  chapterId = ""
 ) => {
   const { data, ...rest } = useQuery({
     queryKey: ["chapter", projectId, chapterId],
