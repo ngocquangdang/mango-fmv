@@ -424,6 +424,10 @@ export const VideoPlayerProvider = ({
         isLoading: true,
       });
 
+      const scene = data.scenes[currentStatus?.currentSceneId || ""];
+      const hotpot = scene.hotspots?.find((hotspot: any) => hotspot.id === hotspotId)
+      const minCollectionItems = hotpot?.minCollectionItems || hotpot?.items?.length || 0;
+
       submitHotspot(
         {
           sceneId: currentStatus?.currentSceneId || "",
@@ -438,7 +442,6 @@ export const VideoPlayerProvider = ({
               description: result.moment?.description || "",
               mainImage: result.character?.imageUrl,
               itemImage: result.moment?.rewards?.[0]?.imageUrl,
-              characterName: result.character?.id, // Or name if available
             });
             setDialogInfoState((prev) => ({ ...prev, isLoading: false }));
 
@@ -451,10 +454,15 @@ export const VideoPlayerProvider = ({
                 ],
                 isCompleted:
                   (collectionItems[hotspotId]?.collectionIds?.length || 0) + 1 >=
-                  (collectionItems[hotspotId]?.minCollectionItems || 0),
+                  minCollectionItems,
+                minCollectionItems,
               },
             };
             setCollectionItems(items);
+            showToast({
+              description: `Bạn đã thu thập được vật phẩm ${items[hotspotId].collectionIds.length}/${minCollectionItems}`,
+              position: "bottom-left",
+            });
             api?.setCollectionItems?.(items);
           },
           onError: () => {
@@ -658,18 +666,18 @@ export const VideoPlayerProvider = ({
     return () => document.removeEventListener('touchmove', handleTouchMove);
   }, []);
 
-  React.useEffect(() => {
-    if (Object.values(collectionItems).some((item) => item.isCompleted)) {
-      const completedItems = Object.values(collectionItems).filter(
-        (item) => item.isCompleted
-      ).length;
-      const totalItems = Object.values(collectionItems).length;
-      showToast({
-        description: `Bạn đã thu thập được vật phẩm ${completedItems}/${totalItems}`,
-        position: "bottom-left",
-      });
-    }
-  }, [showToast, collectionItems]);
+  // React.useEffect(() => {
+  //   if (Object.values(collectionItems).some((item) => item.isCompleted)) {
+  //     const completedItems = Object.values(collectionItems).filter(
+  //       (item) => item.isCompleted
+  //     ).length;
+  //     const totalItems = Object.values(collectionItems).length;
+  //     showToast({
+  //       description: `Bạn đã thu thập được vật phẩm ${completedItems}/${totalItems}`,
+  //       position: "bottom-left",
+  //     });
+  //   }
+  // }, [showToast, collectionItems]);
 
   // One-time initialization when api is ready (only re-run when api/data change)
   React.useEffect(() => {
