@@ -16,6 +16,7 @@ export default function ChapterPage() {
   const handlePlay = () => {
     const sceneId =
       progress?.currentScene?.sceneId || chapter.startSceneId;
+
     onPlayPlayer(sceneId);
   };
 
@@ -78,25 +79,27 @@ export default function ChapterPage() {
               />
             ))}
           </div>
-
-          <div className="flex items-center gap-2">
-            <div
-              className="relative w-[116px] h-[22px] bg-cover bg-center bg-no-repeat flex items-center justify-center"
-              style={{ backgroundImage: `url(/images/bg-title.png)` }}
-            >
-              <span className=" uppercase text-[10px] font-bold text-center">
-                tiến độ hiện tại
-              </span>
+          <div className='flex items-center gap-2'>
+            <div className="flex items-center gap-2">
+              <div
+                className="relative w-[116px] h-[22px] bg-cover bg-center bg-no-repeat flex items-center justify-center"
+                style={{ backgroundImage: `url(/images/bg-title.png)` }}
+              >
+                <span className=" uppercase text-[10px] font-bold text-center">
+                  tiến độ hiện tại
+                </span>
+              </div>
+              <span className="text-3xl font-bold text-[#F76933]">{progress?.milestone || 0}%</span>
             </div>
-            <span className="text-3xl font-bold text-[#F76933]">{progress?.milestone || 0}%</span>
+
+            <RewardProgress
+              currentPoints={progress?.milestone || 0}
+              maxPoints={100}
+              onClaimReward={() => { }}
+              className="pb-4"
+            />
           </div>
 
-          <RewardProgress
-            currentPoints={progress?.milestone || 0}
-            maxPoints={100}
-            onClaimReward={() => { }}
-            className="pb-4"
-          />
         </div>
 
         <div className="absolute bottom-0 right-8 w-[134px] h-[116px]">

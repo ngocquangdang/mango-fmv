@@ -4,6 +4,7 @@ import { VideoPlayerContext } from ".";
 
 import { PausedActionName, type Scene } from "../types/chapter";
 import { useUserContext } from "../features/user/context";
+import { useSubmitHotspot } from "../features/user/hooks";
 import {
   getLocalParam,
   removeLocalParam,
@@ -54,6 +55,7 @@ export interface VideoPlayerContextType {
   dialogInfoState: {
     isOpen: boolean;
     data: any;
+    isLoading?: boolean;
   };
   openDialogInfo: (data: any) => void;
   closeDialogInfo: () => void;
@@ -78,6 +80,7 @@ export const VideoPlayerProvider = ({
 }) => {
   const { api, ready } = useVideoPlayer();
   const { chapter: data, updateSceneStatus } = useUserContext();
+  const { mutate: submitHotspot } = useSubmitHotspot();
   const { showToast } = useToast();
 
   const [type, setType] = React.useState<
@@ -109,9 +112,11 @@ export const VideoPlayerProvider = ({
   const [dialogInfoState, setDialogInfoState] = React.useState<{
     isOpen: boolean;
     data: any;
+    isLoading?: boolean;
   }>({
     isOpen: false,
     data: null,
+    isLoading: false,
   });
 
   const [isEndingScene, setIsEndingScene] = React.useState(false);
@@ -395,36 +400,6 @@ export const VideoPlayerProvider = ({
     ]
   );
 
-  const handleCollectionSelected = React.useCallback(
-    (collectionItemId: string) => {
-      console.log("🚀 ~ [HOTSPOT COLLECTION ITEM]", collectionItemId);
-      const [hotspotId] = collectionItemId.split("_item_");
-      openDialogInfo({
-        hotspotId: hotspotId,
-        title: "Thông báo",
-        description: "Bạn đã chọn câu hỏi này",
-      });
-      const items = {
-        ...collectionItems,
-        [hotspotId]: {
-          collectionIds: [
-            ...(collectionItems[hotspotId]?.collectionIds || []),
-            collectionItemId,
-          ],
-          isCompleted:
-            (collectionItems[hotspotId]?.collectionIds?.length || 0) + 1 >=
-            (collectionItems[hotspotId]?.minCollectionItems || 0),
-        },
-      };
-      setCollectionItems(items);
-      api?.setCollectionItems?.(items);
-      // if (items[hotspotId].isCompleted) {
-      //   play();
-      // }
-    },
-    [api, collectionItems]
-  );
-
   const openDialogInfo = React.useCallback((data: any) => {
     setDialogInfoState({ isOpen: true, data });
   }, []);
@@ -436,6 +411,71 @@ export const VideoPlayerProvider = ({
       play();
     }
   }, [collectionItems, play, dialogInfoState?.data?.hotspotId]);
+
+  const handleCollectionSelected = React.useCallback(
+    (collectionItemId: string) => {
+      console.log("🚀 ~ [HOTSPOT COLLECTION ITEM]", collectionItemId);
+      const [hotspotId, hotspotItemId] = collectionItemId.split("_item_");
+
+      pause();
+      setDialogInfoState({
+        isOpen: true,
+        data: null,
+        isLoading: true,
+      });
+
+      submitHotspot(
+        {
+          sceneId: currentSceneId || "",
+          hotspotItemId: hotspotItemId,
+        },
+        {
+          onSuccess: (response) => {
+            const result = response.data;
+            openDialogInfo({
+              hotspotId: hotspotId,
+              title: result.moment?.title || "Thông báo",
+              description: result.moment?.description || "Bạn đã chọn câu hỏi này",
+              mainImage: result.character?.imageUrl,
+              itemImage: result.moment?.rewards?.[0]?.imageUrl,
+              characterName: result.character?.id, // Or name if available
+            });
+            setDialogInfoState((prev) => ({ ...prev, isLoading: false }));
+
+            const items = {
+              ...collectionItems,
+              [hotspotId]: {
+                collectionIds: [
+                  ...(collectionItems[hotspotId]?.collectionIds || []),
+                  collectionItemId,
+                ],
+                isCompleted:
+                  (collectionItems[hotspotId]?.collectionIds?.length || 0) + 1 >=
+                  (collectionItems[hotspotId]?.minCollectionItems || 0),
+              },
+            };
+            setCollectionItems(items);
+            api?.setCollectionItems?.(items);
+          },
+          onError: () => {
+            showToast({ description: "Có lỗi xảy ra khi gửi dữ liệu" });
+            setDialogInfoState({ isOpen: false, data: null, isLoading: false });
+            // play();
+          },
+        }
+      );
+    },
+    [
+      api,
+      collectionItems,
+      currentSceneId,
+      pause,
+      openDialogInfo,
+      submitHotspot,
+      showToast,
+      play,
+    ]
+  );
 
   const handleChoiceSelected = React.useCallback(
     (sceneId: string, nextSceneId: string) => {
@@ -521,8 +561,9 @@ export const VideoPlayerProvider = ({
 
   const onPlayPlayer = React.useCallback(
     (sceneId: string, isReviewScene?: boolean) => {
+      console.log(data);
       if (!data?.id || !data.scenes[sceneId]?.videoUrl) {
-        showToast({ description: "Player chưa sẵn sàng" });
+        showToast({ description: "Scene không tồn tại" });
         return;
       }
       setType("interactive");

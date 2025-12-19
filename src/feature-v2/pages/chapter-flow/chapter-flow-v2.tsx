@@ -14,6 +14,8 @@ const ChapterFlowV2 = () => {
   const { nodes: contextNodes, edges: contextEdges, data } = useFlowChart();
   const videoPlayerContext = useVideoPlayerContext();
   const { showToast } = useToast();
+  const interactionRef = useRef({ hasMoved: false, startX: 0, startY: 0 });
+
 
   // Ref để handler click node luôn đọc được context mới nhất
   const clickContextRef = useRef({
@@ -134,7 +136,10 @@ const ChapterFlowV2 = () => {
     };
 
     lf.on("node:click", ({ data: nodeData }: any) => {
+      if (interactionRef.current.hasMoved) return;
+
       const nodeId = nodeData?.id;
+
       if (!nodeId) return;
 
       const {
@@ -151,7 +156,7 @@ const ChapterFlowV2 = () => {
       setReviewScene(false);
 
       if (!scene?.videoUrl) {
-        showToastFn({ description: "Player chưa sẵn sàng" });
+        showToastFn({ description: "Scene chưa sẵn sàng" });
         return;
       }
 
@@ -193,9 +198,9 @@ const ChapterFlowV2 = () => {
         // LogicFlow nodes are centered by default.
         // We need to shift back to center.
 
-        // Custom Node size defined in model: 200x120
-        const w = 200;
-        const h = 120;
+        // Custom Node size defined in model: 240x150
+        const w = 240;
+        const h = 150;
 
         return {
           id: node.id,
@@ -213,6 +218,8 @@ const ChapterFlowV2 = () => {
         type: "chapter-edge",
         sourceNodeId: edge.source,
         targetNodeId: edge.target,
+        sourceAnchorId: `${edge.source}_right`,
+        targetAnchorId: `${edge.target}_left`,
         properties: {
           // Mirror ReactFlow ChapterEdge: use status to determine locked/completed style
           status: edge.data?.status,
@@ -248,7 +255,11 @@ const ChapterFlowV2 = () => {
       isDragging = true;
       startX = e.clientX;
       startY = e.clientY;
+      interactionRef.current.hasMoved = false;
+      interactionRef.current.startX = e.clientX;
+      interactionRef.current.startY = e.clientY;
       container.setPointerCapture(e.pointerId);
+
     };
 
     const onPointerMove = (e: PointerEvent) => {
@@ -259,7 +270,19 @@ const ChapterFlowV2 = () => {
       const deltaX = e.clientX - startX;
       const deltaY = e.clientY - startY;
 
+      // Update movement status
+      if (!interactionRef.current.hasMoved) {
+        const dist = Math.sqrt(
+          Math.pow(e.clientX - interactionRef.current.startX, 2) +
+          Math.pow(e.clientY - interactionRef.current.startY, 2)
+        );
+        if (dist > 10) {
+          interactionRef.current.hasMoved = true;
+        }
+      }
+
       // Update start positions for next delta
+
       startX = e.clientX;
       startY = e.clientY;
 

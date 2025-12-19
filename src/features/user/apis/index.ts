@@ -4,6 +4,7 @@ import {
   apiClientInteractiveLicense,
   apiClientVideoProgress,
 } from "../../../lib/api/api-client";
+import type { ApiResponse } from "../../../lib/api/api-client";
 import { getLocalParam } from "../../../lib/api/storage";
 
 // const mockProject = {
@@ -201,6 +202,34 @@ export interface UpdateStatusPayload {
   status: string;
 }
 
+export interface SubmitHotspotPayload {
+  sceneId: string;
+  hotspotItemId: string;
+}
+
+export interface HotspotReward {
+  rewardId: string;
+  imageUrl: string;
+}
+
+export interface HotspotMoment {
+  momentId: string;
+  title: string;
+  momentCategoryType: string;
+  description: string;
+  rewards: HotspotReward[];
+}
+
+export interface HotspotCharacter {
+  id: string;
+  imageUrl: string;
+}
+
+export interface SubmitHotspotResponse {
+  character: HotspotCharacter;
+  moment: HotspotMoment;
+}
+
 export interface MomentReward {
   collectedAt: string;
   createdAt: string;
@@ -304,6 +333,28 @@ export const restartChapter = async (chapterId: string) => {
     }
   );
   return response;
+};
+
+export const resetProgress = async () => {
+  const response = await apiClientVideoProgress.post(
+    `/demo/reset`,
+    {},
+    {
+      "X-Ticket": getLocalParam("ticket") || "",
+    }
+  );
+  return response;
+};
+
+export const submitHotspot = async (payload: SubmitHotspotPayload) => {
+  const response = await apiClientVideoProgress.post(
+    `/interactive-scene/hotspot`,
+    payload,
+    {
+      "X-Ticket": getLocalParam("ticket") || "",
+    }
+  );
+  return response as ApiResponse<SubmitHotspotResponse>;
 };
 
 export const getCharacters = async (

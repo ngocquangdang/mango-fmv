@@ -6,22 +6,23 @@ import {
   getUserProgress,
   getVideos,
   updateStatus,
-  restartChapter,
   getCharacters,
   getCollectedRewards,
+  resetProgress,
+  submitHotspot,
 } from "../apis";
-import type { UpdateStatusPayload } from "../apis";
+import type { UpdateStatusPayload, SubmitHotspotPayload } from "../apis";
 import type { ChapterMapped, Character, Scene } from "../../../types/chapter";
 
 const mapHotspots = (hotspots: any): any[] => {
   return hotspots.map((hotspot: any) => ({
     ...hotspot,
-    items: hotspot.items.map((item: any, index: number) => ({
+    items: hotspot.items.map((item: any) => ({
       ...item,
-      id: hotspot.id + "_item_" + index,
+      id: hotspot.id + "_item_" + item.hotspotItemId,
       type: hotspot.type,
-      x: item.x / 100,
-      y: item.y / 100,
+      // x: item.x / 100,
+      // y: item.y / 100,
     })),
   }));
 };
@@ -105,6 +106,12 @@ export const useUpdateStatus = () => {
   });
 };
 
+export const useSubmitHotspot = () => {
+  return useMutation({
+    mutationFn: (payload: SubmitHotspotPayload) => submitHotspot(payload),
+  });
+};
+
 export const useChapters = () => {
   return useQuery({
     queryKey: ["chapters"],
@@ -166,7 +173,7 @@ export const useVideos = (ids: string[]) => {
 
 export const useRestartChapter = () => {
   return useMutation({
-    mutationFn: (chapterId: string) => restartChapter(chapterId),
+    mutationFn: () => resetProgress(),
   });
 };
 

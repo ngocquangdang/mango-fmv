@@ -46,7 +46,8 @@ export default function Home() {
 
   const onConfirm = async () => {
     try {
-      await restartChapter(chapter.id);
+      // await restartChapter(chapter.id);
+      await restartChapter();
       refetch();
     } catch (error) {
       console.error("Failed to restart chapter", error);
@@ -179,7 +180,7 @@ export default function Home() {
           </div>
         )}
       </div>
-      <div className="absolute bottom-0 top-[103%] left-30 w-full h-full">
+      <div className="absolute bottom-0 top-[103%] left-40 w-full h-full">
         <div
           style={{
             transform: `translateY(${paperOffset * 0.9}px)`,
@@ -189,7 +190,7 @@ export default function Home() {
           <img
             src={`/images/home/charactor.png?v=${IMAGE_VERSION}`}
             alt="paper-HDQ"
-            className="w-[70%] h-[224px] absolute bottom-0 left-0 z-10"
+            className="w-[70%] h-[224px] lg:h-[354px] absolute bottom-0 lg:-bottom-10 left-0 z-10"
           />
         </div>
       </div>

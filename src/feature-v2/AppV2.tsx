@@ -103,9 +103,9 @@ function AppV2Content() {
       sceneId: currentStatus?.currentSceneId || "",
       totalDuration: Math.floor(
         scene?.duration ||
-          currentStatus?.totalDuration ||
-          currentStatus?.time ||
-          0
+        currentStatus?.totalDuration ||
+        currentStatus?.time ||
+        0
       ),
       watchingSecond: Math.floor(
         currentStatus?.watchingSecond || currentStatus?.time || 0
@@ -212,6 +212,7 @@ function AppV2Content() {
       <DialogInfo
         isOpen={dialogInfoState.isOpen}
         onClose={closeDialogInfo}
+        isLoading={dialogInfoState.isLoading}
         data={dialogInfoState.data}
       />
     </div>

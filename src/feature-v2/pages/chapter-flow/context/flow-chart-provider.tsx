@@ -181,16 +181,19 @@ export const FlowChartContextProvider = ({
 
     const traverseScene = (sceneId: string) => {
       if (!sceneId) return;
-      if (visitedScenes.has(sceneId)) return;
-      visitedScenes.add(sceneId);
 
       const scene = scenes[sceneId];
       if (!scene) return;
 
       // Thêm node cho scene hiện tại (nếu chưa có)
+      // addNode có kiểm tra processedNodes nên an toàn
       addNode(sceneId, {
         ...scene,
       });
+      if ((scene as any).isVip) return;
+
+      if (visitedScenes.has(sceneId)) return;
+      visitedScenes.add(sceneId);
 
       // Lấy branch options và hotspot investigate options
       const branchOptions: BranchOption[] = scene.branch?.options || [];
@@ -200,43 +203,30 @@ export const FlowChartContextProvider = ({
       // Nếu có branch / hotspot thì tạo edge cho từng option và đệ quy tiếp
       if (allOptions.length > 0) {
         allOptions.forEach((option, index) => {
-          const targetScene = scenes[option.targetSceneId];
+          const targetSceneId = option.targetSceneId;
+          const targetScene = scenes[targetSceneId];
           if (!targetScene) return;
 
-          addNode(option.targetSceneId, {
-            ...targetScene,
-            ...option,
-          });
-
-          addEdge(sceneId, option.targetSceneId, index, {
+          // Tạo edge luôn, bất kể node đích đã visit hay chưa
+          addEdge(sceneId, targetSceneId, index, {
             ...option,
             status: targetScene.status,
           });
 
-          traverseScene(option.targetSceneId);
+          // Đệ quy để đảm bảo node đích được addNode (nếu chưa có) và khám phá tiếp
+          traverseScene(targetSceneId);
         });
         return;
       }
 
       // Nếu không có branch / hotspot:
-      // - Nếu có targetSceneId thì nối tới đó và tiếp tục đệ quy
-      // - Nếu không nhưng là endingScene thì dừng tại đây (leaf)
       const fallbackTargetId = scene.targetSceneId;
       if (!fallbackTargetId) {
-        if (scene.endingScene) {
-          return;
-        }
         return;
       }
 
       const fallbackTargetScene = scenes[fallbackTargetId];
       if (!fallbackTargetScene) return;
-
-      if (!processedNodes.has(fallbackTargetId)) {
-        addNode(fallbackTargetId, {
-          ...fallbackTargetScene,
-        });
-      }
 
       addEdge(sceneId, fallbackTargetId, undefined, {
         status: fallbackTargetScene.status,

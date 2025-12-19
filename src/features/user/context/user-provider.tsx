@@ -78,8 +78,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const progressParams = React.useMemo(
     () => ({
       chapterId: chapterId,
+      projectId: projectIdFromUrl,
     }),
-    [chapterId]
+    [chapterId, projectIdFromUrl]
   );
 
   const {
@@ -102,9 +103,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   } = useCollectedRewards(projectIdFromUrl);
 
   const chapterMapped = React.useMemo(() => {
-    if (!chapter) return null;
+    if (!chapter || !progress || !videos || loading) return null;
+
     return mapChapter(chapter, progress?.scenes || {}, videos || {});
-  }, [chapter, progress?.scenes, videos]);
+  }, [chapter, progress?.scenes, videos, loading]);
 
   // Memoize chapter values to prevent unnecessary effect triggers
   const chapterValues = React.useMemo(
@@ -142,10 +144,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   React.useEffect(() => {
     setLoading(
-      isChapterLoading ||
-        isProgressLoading ||
-        isVideosLoading ||
-        isCollectedRewardsLoading
+      isChapterLoading &&
+      isProgressLoading &&
+      isVideosLoading &&
+      isCollectedRewardsLoading
     );
   }, [
     isChapterLoading,

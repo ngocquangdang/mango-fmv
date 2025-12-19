@@ -9,7 +9,7 @@ import Loading from "../../components/loading";
 
 export default function EndChapter() {
   const { setType } = useVideoPlayerContext();
-  const { chapter, refetch } = useUserContext();
+  const { refetch } = useUserContext();
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -21,7 +21,7 @@ export default function EndChapter() {
 
     return () => clearTimeout(timer);
   }, []);
-  
+
   const handleClick = async (
     actionName: "story" | "journal" | "ranking" | "playAgain"
   ) => {
@@ -32,7 +32,8 @@ export default function EndChapter() {
   };
   const onConfirm = async () => {
     try {
-      await restartChapter(chapter.id);
+      await restartChapter();
+      // await restartChapter(chapter.id);
       refetch();
     } catch (error) {
       console.error("Failed to restart chapter", error);

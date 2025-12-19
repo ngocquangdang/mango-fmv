@@ -42,7 +42,8 @@ export default function Home() {
 
   const onConfirm = async () => {
     try {
-      await restartChapter(chapter.id);
+      await restartChapter();
+      // await restartChapter(chapter.id);
       refetch();
     } catch (error) {
       console.error("Failed to restart chapter", error);

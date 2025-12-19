@@ -103,12 +103,12 @@ const ChapterFlow = () => {
           setReviewScene(false);
 
           if (!scene?.videoUrl) {
-            showToast({ description: "Player chưa sẵn sàng" });
+            showToast({ description: "Scene chưa sẵn sàng" });
             return;
           }
           // Assuming we want to allow playing any node for now, or check status
-          if (!scene.status) return; 
-          
+          if (!scene.status) return;
+
           if (node.id !== currentStatus?.currentSceneId) {
             setCurrentStatus(null);
             setPauseType(null);
