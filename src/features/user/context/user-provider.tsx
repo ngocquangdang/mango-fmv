@@ -203,7 +203,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const { sceneId, totalDuration, watchingSecond, status } = data;
       updateStatus(
         {
-          projectId: chapter?.id || "",
+          projectId: chapter?.projectId || "",
           chapterId: chapter?.chapterId || "",
           watchingSecond,
           totalDuration,

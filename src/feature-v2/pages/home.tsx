@@ -190,7 +190,7 @@ export default function Home() {
           <img
             src={`/images/home/charactor.png?v=${IMAGE_VERSION}`}
             alt="paper-HDQ"
-            className="w-[70%] h-[224px] lg:h-[354px] absolute bottom-0 lg:-bottom-10 left-0 z-10"
+            className="w-[60%] h-[200px] lg:h-[354px] absolute bottom-0 lg:-bottom-10 left-0 z-10"
           />
         </div>
       </div>

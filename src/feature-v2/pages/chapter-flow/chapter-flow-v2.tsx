@@ -77,7 +77,10 @@ const ChapterFlowV2 = () => {
     const isIOS =
       typeof navigator !== "undefined" &&
       /iP(ad|hone|od)/i.test(navigator.userAgent);
-    const isSafariLike = isSafari || isIOS;
+    const isAndroid =
+      typeof navigator !== "undefined" &&
+      /android/i.test(navigator.userAgent);
+    const isMobileLike = isSafari || isIOS || isAndroid;
 
     const lf = new LogicFlow({
       container: containerRef.current,
@@ -96,8 +99,8 @@ const ChapterFlowV2 = () => {
     });
 
     // Register Custom Elements
-    // Safari có vấn đề với HtmlNode/foreignObject, nên dùng SVG node fallback
-    if (isSafariLike) {
+    // Safari/Mobile có vấn đề với HtmlNode/foreignObject, nên dùng SVG node fallback
+    if (isMobileLike) {
       lf.register(SafariChapterNode);
     } else {
       lf.register(CustomChapterNode);
@@ -245,10 +248,6 @@ const ChapterFlowV2 = () => {
     let startY = 0;
 
     const onPointerDown = (e: PointerEvent) => {
-      // Prevent default/propagation
-      e.preventDefault();
-      e.stopPropagation();
-
       // Strict Single Touch: Ignore 2nd finger
       if (!e.isPrimary) return;
 
@@ -338,8 +337,9 @@ const ChapterFlowV2 = () => {
     container.addEventListener("pointerup", onPointerUp);
     container.addEventListener("pointercancel", onPointerUp);
 
-    // Safari đôi khi bỏ qua touch-action: none, nên cần chặn manual với passive: false
-    container.addEventListener("touchstart", handleTouchExplicit, { passive: false });
+    // Safari/Mobile đôi khi bỏ qua touch-action: none, nên cần chặn manual với passive: false
+    // Chỉ chặn nếu chúng ta thực sự đang thao tác logic flow
+    // container.addEventListener("touchstart", handleTouchExplicit, { passive: false });
     container.addEventListener("touchmove", handleTouchExplicit, { passive: false });
 
     return () => {
