@@ -122,7 +122,7 @@ export default function Home() {
       <img
         src={`/images/LOGO_GCNMN.png?v=${IMAGE_VERSION}`}
         alt="home-bg"
-        className="absolute top-8 left-[50%] translate-x-[-50%] w-[263px] h-[120px] object-cover"
+        className="absolute top-8 left-[50%] translate-x-[-50%] w-[263px] h-[120px] lg:w-[340px] lg:h-[144px] object-cover"
       />
       <div className="flex flex-col h-full justify-center items-center gap-4 w-fit pl-2">
         <div
@@ -180,7 +180,7 @@ export default function Home() {
           </div>
         )}
       </div>
-      <div className="absolute bottom-0 top-[103%] left-40 w-full h-full">
+      <div className="absolute -bottom-6 lg:-bottom-16 left-1/2 -translate-x-1/2 z-10">
         <div
           style={{
             transform: `translateY(${paperOffset * 0.9}px)`,
@@ -190,22 +190,21 @@ export default function Home() {
           <img
             src={`/images/home/charactor.png?v=${IMAGE_VERSION}`}
             alt="paper-HDQ"
-            className="w-[60%] h-[200px] lg:h-[354px] absolute bottom-0 lg:-bottom-10 left-0 z-10"
+            className="w-auto h-[200px] lg:h-[425px] object-contain block mx-auto"
           />
         </div>
       </div>
+
       <div
-        className="absolute bottom-0 left-0 z-40"
+        className="absolute bottom-0 left-0 z-40 w-full h-[116px] lg:h-[260px]"
         style={{
-          width: "100%",
-          height: "116px",
           backgroundImage: `url('/images/home/bottom-bg-home.png?v=${IMAGE_VERSION}')`,
           backgroundSize: "100% 100%",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
         }}
       ></div>
-      <div className="absolute bottom-0 right-10 w-[134px] h-[116px] z-50">
+      <div className="absolute bottom-0 right-10 w-[134px] h-[116px] lg:w-[161px] lg:h-[139px] z-50">
         <HookButton
           label={isPlaying ? "Tiếp tục" : "Bắt đầu"}
           onClick={handleStart}

@@ -24,6 +24,7 @@ body {
 .flow-v2 {
   display: none;
 }
+
 /* Chỉ áp dụng khi mobile và đang portrait */
 @media screen and (max-width: 767px) and (orientation: portrait) {
   .app-container {
@@ -31,8 +32,8 @@ body {
     transform-origin: left top;
     /* width: 100vh;
     height: 100vw; */
-    width: 100dvh; 
-  height: 100dvw;
+    width: 100dvh;
+    height: 100dvw;
     overflow-x: hidden;
     position: absolute;
     top: 100%;
@@ -90,6 +91,15 @@ body {
   filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
 }
 
+@media (min-width: 1024px) {
+  .game-modal-box {
+    width: 576px;
+    max-width: 811px;
+    height: 324px;
+    max-height: 348px;
+  }
+}
+
 .game-close-btn {
   position: absolute;
   top: -10px;
@@ -127,6 +137,17 @@ body {
 
   /* Thêm padding để text không dính sát mép ảnh nền khi text dài */
   padding: 0 25px;
+}
+
+@media (min-width: 1024px) {
+  .game-title-area {
+    min-width: 216px;
+    height: 60px;
+  }
+
+  .game-title-text {
+    font-size: 24px;
+  }
 }
 
 /* Chỉnh lại background title để nó co giãn theo khung cha */
@@ -197,6 +218,14 @@ body {
   white-space: nowrap;
 }
 
+@media (min-width: 1024px) {
+  .game-confirm-btn {
+    min-width: 168px;
+    height: 60px;
+    font-size: 24px;
+  }
+}
+
 /* Custom Shadow Box */
 .custom-shadow-box {
   position: relative;
@@ -243,6 +272,12 @@ body {
   overflow: visible;
   /* Để quà tặng hiển thị đè lên trên */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 1024px) {
+  .progress-track {
+    height: 11px;
+  }
 }
 
 /* --- THANH FILL (Phần đã chạy) --- */
@@ -300,6 +335,17 @@ body {
   /* Điều chỉnh kích thước quà */
   height: 22px;
   filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.2));
+}
+
+@media (min-width: 1024px) {
+  .gift-icon {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    min-height: 46px;
+    flex-shrink: 0;
+    object-fit: contain;
+  }
 }
 
 

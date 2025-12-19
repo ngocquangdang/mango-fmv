@@ -45,24 +45,23 @@ export default function RightSide({
     <div className="relative w-full h-full">
       <div className="flex flex-row items-center justify-center h-full">
         <div
-          className={`cursor-pointer ${
-            currentPage === 0 ? "opacity-0 pointer-events-none" : ""
-          }`}
+          className={`cursor-pointer ${currentPage === 0 ? "opacity-0 pointer-events-none" : ""
+            }`}
           onClick={handlePrevPage}
           style={{ zIndex: 50 }}
         >
           <img
             src="/images/chevon-left.png"
             alt="prev-page"
-            className="w-6 h-6"
+            className="w-6 h-6 lg:w-[28.8px] lg:h-[28.8px]"
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-2 min-w-[200px] min-h-[220px]">
+        <div className="grid grid-cols-3 gap-2 min-w-[200px] lg:min-w-[240px] min-h-[220px] lg:min-h-[264px]">
           {currentItems.map((reward) => (
             <div
               key={reward.rewardId}
-              className="w-[54px] h-[64px] cursor-pointer"
+              className="w-[54px] h-[64px] lg:w-[64.8px] lg:h-[76.8px] cursor-pointer"
               role="button"
               tabIndex={0}
               aria-label="Xem chi tiết phần thưởng"
@@ -75,7 +74,7 @@ export default function RightSide({
               }}
             >
               <FramedStoryline
-                className="w-[54px] h-[64px] -rotate-12"
+                className="w-[54px] h-[64px] lg:w-[64.8px] lg:h-[76.8px] -rotate-12"
                 bgImg="/images/note-gift-card.png"
                 info={{
                   avatar: reward.rewardImageUrl,
@@ -86,27 +85,26 @@ export default function RightSide({
           ))}
           {Array.from({ length: ITEMS_PER_PAGE - currentItems.length }).map(
             (_, index) => (
-              <div key={`empty-${index}`} className="w-[54px] h-[64px]" />
+              <div key={`empty-${index}`} className="w-[54px] h-[64px] lg:w-[64.8px] lg:h-[76.8px]" />
             )
           )}
         </div>
 
         <div
-          className={`cursor-pointer ${
-            currentPage >= totalPages - 1 ? "opacity-0 pointer-events-none" : ""
-          }`}
+          className={`cursor-pointer ${currentPage >= totalPages - 1 ? "opacity-0 pointer-events-none" : ""
+            }`}
           onClick={handleNextPage}
           style={{ zIndex: 50 }}
         >
           <img
             src="/images/chevon-right.png"
             alt="next-page"
-            className="w-6 h-6"
+            className="w-6 h-6 lg:w-[28.8px] lg:h-[28.8px]"
           />
         </div>
       </div>
-      <div className="absolute bottom-2 left-4">
-        <span className="text-[10px]">
+      <div className="absolute bottom-2 left-4 lg:bottom-4 lg:left-6">
+        <span className="text-[10px] lg:text-[12px]">
           Bạn đã sưu tầm được {collectedRewards.length}/
           {collectedRewards.length} vật phẩm
         </span>

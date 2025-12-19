@@ -23,7 +23,7 @@ const ChapterNode = ({ data }: NodeProps) => {
       ) : (
         <div
           className={`
-          w-[200px] h-[120px] 
+          w-[200px] h-[120px] lg:w-[240px] lg:h-[144px]
           flex items-center justify-center
           relative
           shadow-lg
@@ -51,7 +51,7 @@ const ChapterNode = ({ data }: NodeProps) => {
 
           {((data.label || data.title) as string) && (
             <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 shadow-md border border-gray-200 rounded-sm whitespace-nowrap z-10">
-              <span className="text-xs font-bold text-blue-900 font-handwriting">
+              <span className="text-xs lg:text-sm font-bold text-blue-900 font-handwriting">
                 {(data.label || data.title) as string}
               </span>
             </div>

@@ -97,7 +97,7 @@ export default function HookButton({
 
   return (
     <div
-      className={`relative min-w-[134px] min-h-[116px] ${className}`}
+      className={`relative min-w-[134px] min-h-[116px] lg:min-w-[161px] lg:min-h-[139px] ${className}`}
       aria-label={label}
       role="button"
       tabIndex={0}
@@ -109,12 +109,12 @@ export default function HookButton({
         }
       }}
     >
-      <img src="/images/hook-button.png" alt="hook-button" className="w-full h-[116px]" />
+      <img src="/images/hook-button.png" alt="hook-button" className="w-full h-[116px] lg:h-[139px]" />
       <button
         type="button"
         onClick={() => !disabled && onClick?.()}
         disabled={disabled}
-        className="text-[22px] w-[100px] font-regular text-white absolute z-10 h-fit top-[38%] left-[41%] -translate-x-1/2 -translate-y-1/2 -rotate-5 overflow-hidden flex items-center justify-center"
+        className="text-[22px] lg:text-[26.4px] w-[100px] lg:w-[120px] font-regular text-white absolute z-10 h-fit top-[38%] left-[41%] -translate-x-1/2 -translate-y-1/2 -rotate-5 overflow-hidden flex items-center justify-center"
       >
         <span
           ref={textRef}

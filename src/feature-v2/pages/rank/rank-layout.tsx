@@ -18,13 +18,13 @@ export default function RankLayout() {
 
   return (
     <div
-      className="relative w-[620px] h-[344px] bg-cover bg-center flex items-center justify-center py-8"
+      className="relative w-[620px] h-[344px] lg:w-[744px] lg:h-[413px] bg-cover bg-center flex items-center justify-center py-8"
       style={{ backgroundImage: "url('/images/rank-bg.png')" }}
     >
       {/* LEFT SIDE: Featured */}
       <div className="w-[40%] relative le -rotate-6">
         <FramedStoryline
-          className="w-[234px] h-[184px] text-[#26396C] relative z-20"
+          className="w-[234px] h-[184px] lg:w-[281px] lg:h-[221px] text-[#26396C] relative z-20"
           info={{
             avatar: users[0]?.characterAvatar || "",
             name: "Nhân Vật Được Yêu Thích Nhất",
@@ -33,22 +33,22 @@ export default function RankLayout() {
         <img
           src="/images/elements/crown-1-element.png"
           alt="cloud"
-          className="w-12 h-10 absolute top-0 left-0 z-20"
+          className="w-12 h-10 lg:w-[58px] lg:h-[48px] absolute top-0 left-0 z-20"
         />
         <img
           src="/images/elements/cloud-element.png"
           alt="cloud"
-          className="w-12 h-10 absolute bottom-10 left-0 z-20"
+          className="w-12 h-10 lg:w-[58px] lg:h-[48px] absolute bottom-10 left-0 z-20"
         />
         <img
           src="/images/elements/cloud-element.png"
           alt="start-bold"
-          className="w-16 h-16 absolute top-15 right-0 z-20"
+          className="w-16 h-16 lg:w-[77px] lg:h-[77px] absolute top-15 right-0 z-20"
         />
         <img
           src="/images/elements/tag-element.png"
           alt="tag"
-          className="w-[54px] h-[40px] absolute top-15 z-50 -left-4 rotate-60"
+          className="w-[54px] h-[40px] lg:w-[65px] lg:h-[48px] absolute top-15 z-50 -left-4 rotate-60"
         />
       </div>
 
@@ -57,7 +57,7 @@ export default function RankLayout() {
         {/* Total Votes Badge */}
         <div className="absolute top-6 right-8 z-20">
           <div
-            className="w-20 h-10 bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs"
+            className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
             style={{ backgroundImage: `url(/images/score-banner.png)` }}
           >
             {totalVotes}
@@ -84,8 +84,8 @@ export default function RankLayout() {
                     {/* Crown icon or simple number styled */}
                     <span
                       className={`relative z-10 text-2xl font-bold ${index === 0
-                          ? "text-yellow-500 scale-125"
-                          : "text-slate-500"
+                        ? "text-yellow-500 scale-125"
+                        : "text-slate-500"
                         }`}
                     >
                       {index + 1}
@@ -104,7 +104,7 @@ export default function RankLayout() {
                     }
                   />
                   <div
-                    className="w-8 h-8 bg-cover bg-center bg-no-repeat flex items-center justify-center"
+                    className="w-8 h-8 lg:w-[38.4px] lg:h-[38.4px] bg-cover bg-center bg-no-repeat flex items-center justify-center"
                     style={{
                       backgroundImage: `url('/images/avatar-border.png')`,
                     }}
@@ -112,18 +112,18 @@ export default function RankLayout() {
                     <img
                       src={user.characterAvatar}
                       alt={user.characterName}
-                      className="w-7 h-7 rounded-full object-cover"
+                      className="w-7 h-7 lg:w-[33.6px] lg:h-[33.6px] rounded-full object-cover"
                     />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[#3b82f6] text-[10px] font-bold uppercase leading-tight">
+                    <span className="text-[#3b82f6] text-[10px] lg:text-[12px] font-bold uppercase leading-tight">
                       {user.characterName}
                     </span>
-                    <span className="text-[#f97316] text-[10px] font-bold flex items-center gap-1">
+                    <span className="text-[#f97316] text-[10px] lg:text-[12px] font-bold flex items-center gap-1">
                       <img
                         src="/images/heart-icon.png"
                         alt="heart"
-                        className="w-4 h-4"
+                        className="w-4 h-4 lg:w-[19.2px] lg:h-[19.2px]"
                       />{" "}
                       {user.totalVotes || 0}
                     </span>
@@ -133,7 +133,8 @@ export default function RankLayout() {
                 <Button
                   label="BÌNH CHỌN"
                   size="tiny"
-                  className="text-[10px] p-0!"
+                  lgSize="small"
+                  className="text-[10px] lg:text-sm p-0! lg:px-4!"
                   onClick={() => setSelectedUser(user)}
                 />
               </div>

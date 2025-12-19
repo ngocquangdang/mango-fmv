@@ -54,7 +54,7 @@ export default function RelationshipPoint({
           key={index}
           imageSrc={item.imageUrl}
           score={item.points}
-          className="w-24 h-24"
+          className="w-24 h-24 lg:w-[115.2px] lg:h-[115.2px]"
         />
       ))}
     </div>

@@ -26,7 +26,7 @@ const NotebookLayout = ({
 
   return (
     <div className="relative">
-      <div className="notebook-cover w-[536px] h-[340px] z-2">
+      <div className="notebook-cover w-[536px] h-[340px] lg:w-[643.2px] lg:h-[408px] z-2">
         <div className="notebook-spread">
           <div className="notebook-page page-left">{leftContent}</div>
           <div className="notebook-page page-right">{rightContent}</div>
@@ -40,14 +40,13 @@ const NotebookLayout = ({
           </div>
         </div>
       </div>
-      <div className="absolute -right-26 top-4 flex flex-col gap-4">
+      <div className="absolute -right-26 lg:-right-32 top-4 flex flex-col gap-4">
         {categories.map((category) => {
           return (
             <div
               key={category.id}
-              className={`relative ${
-                selectedTab === category.id ? "z-2" : "z-0"
-              }`}
+              className={`relative ${selectedTab === category.id ? "z-2" : "z-0"
+                }`}
               onClick={() => setSelectedTab(category.id)}
             >
               <img
@@ -59,14 +58,13 @@ const NotebookLayout = ({
                 alt="marker"
                 className={
                   selectedTab === category.id
-                    ? "w-[130px] h-[62px]"
-                    : "w-[130px] h-[40px]"
+                    ? "w-[130px] h-[62px] lg:w-[156px] lg:h-[74.4px]"
+                    : "w-[130px] h-[40px] lg:w-[156px] lg:h-[48px]"
                 }
               />
               <button
-                className={`absolute top-0 left-0 w-full h-full ${
-                  selectedTab === category.id ? "text-[13px]" : "text-[12px]"
-                }`}
+                className={`absolute top-0 left-0 w-full h-full ${selectedTab === category.id ? "text-[13px] lg:text-[15.6px]" : "text-[12px] lg:text-[14.4px]"
+                  }`}
               >
                 {category.name}
               </button>

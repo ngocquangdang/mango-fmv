@@ -11,10 +11,10 @@ interface LeftSideProps {
   }>;
 }
 
-export default function LeftSide({ 
-  selectedUser, 
+export default function LeftSide({
+  selectedUser,
   setSelectedUser,
-  users 
+  users
 }: LeftSideProps) {
 
   return (
@@ -26,9 +26,9 @@ export default function LeftSide({
       }}
     >
       {selectedUser && selectedUser.id && (
-        <FramedStoryline info={selectedUser} className="w-[202px] h-[158px]  top-10 right-2 " />
+        <FramedStoryline info={selectedUser} className="w-[202px] h-[158px] lg:w-[242.4px] lg:h-[189.6px] top-10 right-2 " />
       )}
-      <div className="relative w-[274px] h-[154px] right-10">
+      <div className="relative w-[274px] h-[154px] lg:w-[328.8px] lg:h-[184.8px] right-10">
         <div className="w-full h-full flex items-center justify-center gap-2">
           {selectedUser && selectedUser.id && (
             <FrameUser key={selectedUser.id} selected={true} avatar={selectedUser.avatar} />

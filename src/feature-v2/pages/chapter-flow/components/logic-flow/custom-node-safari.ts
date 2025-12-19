@@ -10,8 +10,8 @@ type ChapterNodeProperties = {
 
 class SafariChapterNodeModel extends RectNodeModel {
   setAttributes() {
-    this.width = 240;
-    this.height = 150;
+    this.width = 288;
+    this.height = 180;
     this.text.editable = false;
     this.text.draggable = false;
   }
@@ -30,16 +30,16 @@ class SafariChapterNode extends RectNode {
     const cardX = x - width / 2;
     const cardY = y - height / 2;
 
-    const paddingX = 16;
-    const paddingTop = 24;
-    const imageHeight = 104;
+    const paddingX = 19.2;
+    const paddingTop = 28.8;
+    const imageHeight = 124.8;
 
     const imageX = cardX + paddingX;
     const imageY = cardY + paddingTop;
     const imageWidth = width - paddingX * 2;
 
     const chipWidth = width * 0.8;
-    const chipHeight = 24;
+    const chipHeight = 28.8;
     const chipX = x - chipWidth / 2;
     // Nằm chồng lên phần dưới của ảnh giống version HTML (top: -16px)
     const chipY = imageY + imageHeight - chipHeight / 2;
@@ -99,7 +99,7 @@ class SafariChapterNode extends RectNode {
             textAnchor: "middle",
             dominantBaseline: "middle",
             fill: "#1e3a8a",
-            fontSize: 12,
+            fontSize: 14.4,
             fontWeight: 700,
           },
           title

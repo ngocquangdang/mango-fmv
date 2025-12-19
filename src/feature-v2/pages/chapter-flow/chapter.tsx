@@ -30,13 +30,13 @@ export default function ChapterPage() {
           <img
             src="/images/back-icon.png"
             alt="back-icon"
-            className="w-9 h-9"
+            className="w-9 h-9 lg:w-[43.2px] lg:h-[43.2px]"
           />
         </div>
         <Banner text='Cốt truyện' />
         <div className="absolute top-0 right-0 flex items-center gap-2 p-4">
           <div
-            className="w-20 h-10 bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs"
+            className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
             style={{ backgroundImage: `url(/images/score-banner.png)` }}
           >
             {(progress as any)?.points || 0}
@@ -44,13 +44,13 @@ export default function ChapterPage() {
           <img
             src="/images/book-with-bg-icon.png"
             alt="book-icon"
-            className="w-9 h-9 cursor-pointer"
+            className="w-9 h-9 lg:w-[43.2px] lg:h-[43.2px] cursor-pointer"
             onClick={() => setType("journal")}
           />
           <img
             src="/images/ask-icon.png"
             alt="ask-icon"
-            className="w-9 h-9 cursor-pointer"
+            className="w-9 h-9 lg:w-[43.2px] lg:h-[43.2px] cursor-pointer"
           />
         </div>
       </div >
@@ -60,7 +60,7 @@ export default function ChapterPage() {
       </FlowChartContextProvider>
 
       <div
-        className=" absolute bottom-0 h-[150px] w-full pb-4"
+        className=" absolute bottom-0 h-[150px] lg:h-[300px] w-full pb-4"
         style={{
           backgroundImage: `url(/images/bottom-bg.png)`,
           backgroundSize: "cover",
@@ -68,41 +68,41 @@ export default function ChapterPage() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <div className="absolute bottom-4 flex items-end justify-between w-[74%] mt-auto">
-          <div className="flex items-center">
+        <div className="absolute bottom-4 flex items-end justify-between w-[74%] lg:w-[86%] mt-auto">
+          <div className="flex items-center pl-0 lg:pl-6">
             {progress?.characters?.map((item: any) => (
               <PhotoFrame
                 key={item.id}
                 imageSrc={item.imageUrl}
                 score={item.relationshipPoints}
-                className={`w-10 h-10`}
+                className={`w-10 h-10 lg:w-[68px] lg:h-[68px]`}
               />
             ))}
           </div>
           <div className='flex items-center gap-2'>
             <div className="flex items-center gap-2">
               <div
-                className="relative w-[116px] h-[22px] bg-cover bg-center bg-no-repeat flex items-center justify-center"
+                className="relative w-[116px] h-[22px] lg:w-[282px] lg:h-[53.6px] bg-cover bg-center bg-no-repeat flex items-center justify-center"
                 style={{ backgroundImage: `url(/images/bg-title.png)` }}
               >
-                <span className=" uppercase text-[10px] font-bold text-center">
+                <span className=" uppercase text-[10px] lg:text-[24.4px] font-bold text-center">
                   tiến độ hiện tại
                 </span>
               </div>
-              <span className="text-3xl font-bold text-[#F76933]">{progress?.milestone || 0}%</span>
+              <span className="text-3xl lg:text-[60.8px] font-bold text-[#F76933]">{progress?.milestone || 0}%</span>
             </div>
 
             <RewardProgress
               currentPoints={progress?.milestone || 0}
               maxPoints={100}
               onClaimReward={() => { }}
-              className="pb-4"
+              className="pb-4 flex-shrink-0"
             />
           </div>
 
         </div>
 
-        <div className="absolute bottom-0 right-8 w-[134px] h-[116px]">
+        <div className="absolute bottom-0 right-8 w-[134px] h-[116px] lg:w-[160.8px] lg:h-[139.2px]">
           <HookButton label="Tiếp tục" onClick={handlePlay} />
         </div>
       </div>

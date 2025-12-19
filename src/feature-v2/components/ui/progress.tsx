@@ -21,8 +21,8 @@ const RewardProgress = ({
   const GIFT_DISABLED = "/images/gift-disabled.png";
 
   return (
-    <div className={`relative w-[192px] ${className}`}>
-      <div className="progress-track">
+    <div className={`relative w-[192px] lg:w-[390px] lg:min-w-[390px] px-3 lg:px-6 ${className}`}>
+      <div className="progress-track overflow-visible">
         <div
           className="progress-fill"
           style={{ width: `${percentage}%` }}
@@ -38,7 +38,10 @@ const RewardProgress = ({
               <div
                 key={milestone.value}
                 className="milestone-item"
-                style={{ left: `${milestone.value}%` }} // Căn vị trí theo %
+                style={{
+                  left: `${milestone.value}%`,
+                  minWidth: 'max-content'
+                }} // Căn vị trí theo %
                 onClick={() =>
                   isReached && onClaimReward && onClaimReward(milestone.value)
                 }
@@ -51,7 +54,7 @@ const RewardProgress = ({
                 />
 
                 {/* Nhãn phần trăm */}
-                <span className="text-[10px] text-[#667085]">{milestone.label}</span>
+                <span className="text-[10px] lg:text-sm text-[#F76933] font-bold whitespace-nowrap">{milestone.label}</span>
               </div>
             );
           })}

@@ -30,17 +30,17 @@ const LoadingBar = ({ isLoading = true }: { isLoading?: boolean }) => {
   }, [isLoading]);
 
   return (
-    <div className="flex flex-col w-full max-w-[500px] gap-1">
+    <div className="flex flex-col w-full max-w-[500px] lg:max-w-[600px] gap-1">
       {/* 1. Label Text: "Tải xuống..." */}
       <div className="ml-2">
-        <span className=" text-xs text-white font-bold drop-shadow-[2px_2px_0_rgba(0,0,0,0.6)] tracking-wide">
+        <span className=" text-xs lg:text-sm text-white font-bold drop-shadow-[2px_2px_0_rgba(0,0,0,0.6)] tracking-wide">
           Tải xuống{dots}
         </span>
       </div>
 
       {/* 2. Thanh Loading */}
       <div
-        className="relative w-full h-[25px] select-none"
+        className="relative w-full h-[25px] lg:h-[30px] select-none"
         style={{
           backgroundImage: `url(${loadingTrackImg})`,
           backgroundSize: "100% 100%",

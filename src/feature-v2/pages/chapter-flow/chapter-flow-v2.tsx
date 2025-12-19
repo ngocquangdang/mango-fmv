@@ -201,9 +201,9 @@ const ChapterFlowV2 = () => {
         // LogicFlow nodes are centered by default.
         // We need to shift back to center.
 
-        // Custom Node size defined in model: 240x150
-        const w = 240;
-        const h = 150;
+        // Custom Node size defined in model: 288x180
+        const w = 288;
+        const h = 180;
 
         return {
           id: node.id,
@@ -231,11 +231,15 @@ const ChapterFlowV2 = () => {
     };
 
     lf.render(lfData);
+    const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+    const zoomLevel = isDesktop ? 0.84 : 0.7;
+
     // Thiết lập mức zoom mặc định nhỏ hơn 1 để toàn bộ flow nhỏ lại một chút
-    lf.setZoomMiniSize(0.7);
-    lf.setZoomMaxSize(0.7);
-    lf.zoom(0.7);
+    lf.setZoomMiniSize(zoomLevel);
+    lf.setZoomMaxSize(zoomLevel);
+    lf.zoom(zoomLevel);
     lf.translate(0, 0);
+
   }, [layoutedNodes, layoutedEdges]);
 
   // Handle Custom Pan (Drag) for Rotated Container

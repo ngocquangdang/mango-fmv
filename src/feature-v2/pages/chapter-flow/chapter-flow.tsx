@@ -70,6 +70,9 @@ const ChapterFlow = () => {
     setEdges(layoutedEdges);
   }, [nodesWithOriginalY, layoutedEdges, setNodes, setEdges]);
 
+  const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+  const zoomLevel = isDesktop ? 0.8 : 0.5;
+
   return (
     <div className="w-full h-[calc(100vh-100px)] flow-v1">
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
@@ -90,14 +93,14 @@ const ChapterFlow = () => {
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        minZoom={0.5}
-        maxZoom={0.5}
-        // style={{ transform: 'rotate(0deg)'}} // Rotate the whole canvas!
+        minZoom={zoomLevel}
+        maxZoom={zoomLevel}
         defaultViewport={{
-          x: 100,
-          y: 0,
-          zoom: 0.5,
+          x: isDesktop ? 250 : 170,
+          y: isDesktop ? 150 : 0,
+          zoom: zoomLevel,
         }}
+
         onNodeClick={(_, node) => {
           const scene = data?.scenes[node.id];
           setReviewScene(false);

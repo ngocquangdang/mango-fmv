@@ -13,8 +13,8 @@ type ChapterNodeProperties = {
 class ChapterNodeModel extends HtmlNodeModel {
   setAttributes() {
     // Node rộng hơn một chút để khung thoáng hơn
-    this.width = 240;
-    this.height = 150;
+    this.width = 288;
+    this.height = 180;
     this.text.editable = false;
     this.text.draggable = false;
     // Anchors (Handles)
@@ -59,9 +59,10 @@ class ChapterNode extends HtmlNode {
     const el = document.createElement("div");
     el.className = "chapter-node-container";
 
+    const { width, height } = this.props.model;
     const contentStyle = `
-        width: 240px;
-        height: 150px;
+        width: ${width}px;
+        height: ${height}px;
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -79,8 +80,8 @@ class ChapterNode extends HtmlNode {
 
     el.innerHTML = `
         <div style="${contentStyle}">
-             <div style="width: 100%; flex: 1; padding: 1rem; padding-top: 1.5rem;">
-                <img src="${thumbUrl}" alt="${title}" style="width: 100%; height: 104px; object-fit: cover; filter: ${
+             <div style="width: 100%; flex: 1; padding: 1.2rem; padding-top: 1.8rem;">
+                <img src="${thumbUrl}" alt="${title}" style="width: 100%; height: 124.8px; object-fit: cover; filter: ${
       !data.status ? "grayscale(100%)" : "none"
     };" />
              </div>

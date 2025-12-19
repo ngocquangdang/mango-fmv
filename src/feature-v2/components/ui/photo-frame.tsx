@@ -24,8 +24,8 @@ const PhotoFrame = ({ imageSrc = "", score = 0, className = "" }: PhotoFrameProp
         src={imageSrc}
         alt="User"
         loading="lazy"
-        className={`absolute inset-2.5 top-[6px] left-[7px] z-1 object-cover bg-neutral-200 rotate-[3deg] w-[66%] h-[66%]`}
-      />  
+        className={`absolute inset-2.5 top-[6px] left-[7px] lg:top-[12px] lg:left-[14px] z-1 object-cover bg-neutral-200 rotate-[8deg] w-[63%] h-[63%]`}
+      />
 
       <img
         src={AVATAR_FRAME}
