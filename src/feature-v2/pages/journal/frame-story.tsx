@@ -29,7 +29,7 @@ const FramedStoryline = ({
       <img
         src={info?.avatar || ""}
         alt={info?.name}
-        className="absolute z-1 top-[7.5%] left-1/2 -translate-x-1/2 w-auto h-[74%] object-contain"
+        className="absolute z-2 top-[7.5%] left-1/2 -translate-x-1/2 w-auto h-[74%] object-contain"
       />
       <div className="absolute z-10 bottom-1 left-0 w-full flex items-center justify-center">
         <p className="text-xs">{info?.name}</p>

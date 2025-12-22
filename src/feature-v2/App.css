@@ -55,6 +55,12 @@ body {
   .interactive-video-wrapper {
     height: 100vw;
   }
+
+  .toast-item {
+    transform: rotate(-90deg);
+    top: 50%;
+    left: 50%;
+  }
 }
 
 .game-modal-overlay {

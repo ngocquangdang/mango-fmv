@@ -60,7 +60,7 @@ export default function ChapterPage() {
       </FlowChartContextProvider>
 
       <div
-        className=" absolute bottom-0 h-[150px] lg:h-[300px] w-full pb-4"
+        className=" absolute bottom-0 h-[130px] lg:h-[300px] w-full pb-4"
         style={{
           backgroundImage: `url(/images/bottom-bg.png)`,
           backgroundSize: "cover",

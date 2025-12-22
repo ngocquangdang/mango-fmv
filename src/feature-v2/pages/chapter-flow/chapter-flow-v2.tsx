@@ -369,15 +369,9 @@ const ChapterFlowV2 = () => {
   // };
 
   return (
-    // Added touch-action: none to prevent browser panning
-    <div
-      className="w-full h-[calc(100%-100px)] relative flow-v2 select-none"
-      ref={containerRef}
-      id="logic-flow-container"
-      style={{ touchAction: "none" }}
-    >
+    <>
       {/* SVG defs for scribble edge filter, shared by LogicFlow edges */}
-      <svg style={{ position: "absolute", width: 0, height: 0 }}>
+      <svg style={{ position: "absolute", width: 0, height: 0, pointerEvents: "none" }}>
         <defs>
           <filter
             id="scribble-filter"
@@ -395,10 +389,21 @@ const ChapterFlowV2 = () => {
             />
             <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
           </filter>
+          <filter id="grayscale">
+            <feColorMatrix type="saturate" values="0" />
+          </filter>
         </defs>
       </svg>
 
-    </div>
+      {/* Added touch-action: none to prevent browser panning */}
+      <div
+        className="w-full h-[calc(100%-100px)] relative flow-v2 select-none"
+        ref={containerRef}
+        id="logic-flow-container"
+        style={{ touchAction: "none" }}
+      >
+      </div>
+    </>
   );
 };
 

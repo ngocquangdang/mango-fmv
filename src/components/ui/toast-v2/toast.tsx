@@ -52,7 +52,7 @@ const Toast = ({
   return (
     <div
       className={cn(
-        "pointer-events-none fixed z-50 transition-all duration-200 h-8 w-fit bg-cover bg-no-repeat",
+        "pointer-events-none fixed z-50 transition-all duration-200 h-8 w-fit bg-cover bg-no-repeat toast-item",
         positionClasses[position]
       )}
       style={{
