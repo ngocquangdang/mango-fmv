@@ -498,6 +498,7 @@ export const VideoPlayerProvider = ({
             totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
             watchingSecond: Math.floor(data.scenes[sceneId]?.duration || 0),
             status: "COMPLETED",
+            points: data.scenes[sceneId]?.points || 0,
           });
         }
       }
@@ -519,6 +520,7 @@ export const VideoPlayerProvider = ({
             totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
             watchingSecond: Math.floor(data.scenes[sceneId]?.duration || 0),
             status: "COMPLETED",
+            points: data.scenes[sceneId]?.points || 0,
           },
           (params: any) => triggerDisplayReward(params)
         );

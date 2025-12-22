@@ -24,6 +24,7 @@ export interface UserContextType {
       totalDuration: number;
       watchingSecond: number;
       status: string;
+      points?: number;
     },
     callback?: (params: any) => void
   ) => void;
@@ -197,10 +198,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         totalDuration: number;
         watchingSecond: number;
         status: string;
+        points?: number;
       },
       callback?: (params: any) => void
     ) => {
-      const { sceneId, totalDuration, watchingSecond, status } = data;
+      const { sceneId, totalDuration, watchingSecond, status, points } = data;
       updateStatus(
         {
           projectId: chapter?.projectId || "",
@@ -209,6 +211,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           totalDuration,
           sceneId,
           status,
+          points,
         },
         {
           onSuccess: (data: any) => {

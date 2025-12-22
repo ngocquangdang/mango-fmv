@@ -200,6 +200,7 @@ export interface UpdateStatusPayload {
   watchingSecond: number;
   totalDuration: number;
   status: string;
+  points?: number;
 }
 
 export interface SubmitHotspotPayload {
