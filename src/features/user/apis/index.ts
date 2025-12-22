@@ -273,6 +273,15 @@ export interface CollectedRewardsResponse {
   characters: CollectedRewardCharacter[];
 }
 
+export interface CollectedHotspot {
+  hotspotId: string;
+  collectedHotspotItemIds: string[];
+}
+
+export interface CollectedHotspotsResponse {
+  collectedHotspots: CollectedHotspot[];
+}
+
 export const getUserProgress = async (queryParams: Record<string, string>) => {
   const params = new URLSearchParams(queryParams);
 
@@ -385,6 +394,17 @@ export const getCollectedRewards = async (projectId?: string) => {
 
   return response;
   // return mockCollectedRewards;
+};
+
+export const getCollectedHotspots = async (sceneId: string) => {
+  const response = await apiClientVideoProgress.get(
+    `/interactive-scene/hotspot-collected?sceneId=${sceneId}`,
+    {
+      "X-Ticket": getLocalParam("ticket") || "",
+    }
+  );
+
+  return response as ApiResponse<CollectedHotspotsResponse>;
 };
 
 // const mockCollectedRewards = {

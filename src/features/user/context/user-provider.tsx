@@ -30,6 +30,8 @@ export interface UserContextType {
   ) => void;
   collectedRewards?: Record<string, CollectedRewardCharacter>;
   refetchCollectedRewards: () => void;
+  refetchChapter: () => void;
+  userInfo: Record<string, any>;
 }
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -37,6 +39,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mutate: updateStatus } = useUpdateStatus();
 
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [userInfo, setUserInfo] = React.useState<Record<string, any>>({});
 
   const {
     chapterId: chapterIdFromUrl,
@@ -58,7 +61,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  const { data: chapter, isLoading: isChapterLoading } = useChapter(
+  const { data: chapter, isLoading: isChapterLoading, refetch: refetchChapter } = useChapter(
     projectIdFromUrl,
     chapterIdFromUrl
   );
@@ -166,6 +169,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       "UserProvider"
     );
     const mgUserInfoObject = JSON.parse(mgUserInfo || "{}");
+    setUserInfo(mgUserInfoObject);
     saveLocalParams({
       ticket: mgUserInfoObject?.ticket,
     });
@@ -228,20 +232,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   React.useEffect(() => {
     if (!mgApi) {
       logInfo(
-        "UserProvider - mgApi is not available",
-        undefined,
-        "UserProvider"
+        "UserProvider - mgApi is not available"
       );
       return;
     }
-
-    logInfo(
-      "UserProvider - mgApi initialized, setting up login callback",
-      {
-        hasLoginMethod: !!mgApi.login,
-      },
-      "UserProvider"
-    );
 
     mgApi.login?.(handleGetToken);
   }, [mgApi, handleGetToken]);
@@ -257,6 +251,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       updateSceneStatus,
       collectedRewards,
       refetchCollectedRewards,
+      refetchChapter,
+      userInfo
     }),
     [
       chapterMapped,
@@ -266,6 +262,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       updateSceneStatus,
       collectedRewards,
       refetchCollectedRewards,
+      refetchChapter,
+      userInfo
     ]
   );
 

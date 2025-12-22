@@ -4,6 +4,7 @@ import type { UserProgress } from "./user";
 export interface BranchOption {
   id: string;
   text: string;
+  isVip?: boolean;
   targetSceneId: string; // ID của scene sẽ chuyển đến
 }
 
@@ -43,6 +44,7 @@ export interface Scene {
   targetSceneId: string;
   hotspots?: Hotspot[];
   endingScene?: boolean;
+  isVip?: boolean;
   points?: number;
   branch?: {
     countdown: number;

@@ -16,7 +16,7 @@ export const FlowChartContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { chapter: data } = useUserContext();
+  const { chapter: data, userInfo } = useUserContext();
   // const isPreview = React.useMemo(() => {
   //   const params = new URLSearchParams(window.location.search);
   //   const isPreview = params.get("isPreview");
@@ -190,7 +190,9 @@ export const FlowChartContextProvider = ({
       addNode(sceneId, {
         ...scene,
       });
-      if ((scene as any).isVip) return;
+      const isUserVip = userInfo?.vipinfo?.isvip === 1;
+      console.log("isUserVip", isUserVip);
+      // if ((scene as any).isVip) return;
 
       if (visitedScenes.has(sceneId)) return;
       visitedScenes.add(sceneId);

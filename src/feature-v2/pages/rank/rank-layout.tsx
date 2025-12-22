@@ -22,7 +22,7 @@ export default function RankLayout() {
       style={{ backgroundImage: "url('/images/rank-bg.png')" }}
     >
       {/* LEFT SIDE: Featured */}
-      <div className="w-[40%] relative le -rotate-6">
+      <div className="w-[40%] relative -rotate-6">
         <FramedStoryline
           className="w-[234px] h-[184px] lg:w-[281px] lg:h-[221px] text-[#26396C] relative z-20"
           info={{
@@ -125,7 +125,7 @@ export default function RankLayout() {
                         alt="heart"
                         className="w-4 h-4 lg:w-[19.2px] lg:h-[19.2px]"
                       />{" "}
-                      {user.totalVotes || 0}
+                      {user.totalPoints || 0}
                     </span>
                   </div>
                 </div>

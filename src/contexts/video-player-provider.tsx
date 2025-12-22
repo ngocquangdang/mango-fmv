@@ -4,7 +4,7 @@ import { VideoPlayerContext } from ".";
 
 import { PausedActionName, type Scene } from "../types/chapter";
 import { useUserContext } from "../features/user/context";
-import { useSubmitHotspot } from "../features/user/hooks";
+import { useSubmitHotspot, useCollectedHotspots } from "../features/user/hooks";
 import {
   getLocalParam,
   removeLocalParam,
@@ -71,6 +71,8 @@ export interface VideoPlayerContextType {
   ) => void;
   isEndingScene: boolean;
   setIsEndingScene: React.Dispatch<React.SetStateAction<boolean>>;
+  isVipModalOpen: boolean;
+  setIsVipModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const VideoPlayerProvider = ({
@@ -79,7 +81,7 @@ export const VideoPlayerProvider = ({
   children: React.ReactNode;
 }) => {
   const { api, ready } = useVideoPlayer();
-  const { chapter: data, updateSceneStatus } = useUserContext();
+  const { chapter: data, updateSceneStatus, userInfo } = useUserContext();
   const { mutate: submitHotspot } = useSubmitHotspot();
   const { showToast } = useToast();
 
@@ -120,6 +122,39 @@ export const VideoPlayerProvider = ({
   });
 
   const [isEndingScene, setIsEndingScene] = React.useState(false);
+  const [isVipModalOpen, setIsVipModalOpen] = React.useState(false);
+  const lastSyncedSceneId = React.useRef<string | null>(null);
+  const { data: collectedHotspotsData } = useCollectedHotspots(
+    currentSceneId || ""
+  );
+
+  React.useEffect(() => {
+    const collectedHotspots = collectedHotspotsData?.data?.collectedHotspots;
+    if (!collectedHotspots || !data.scenes || !currentSceneId) return;
+
+    if (lastSyncedSceneId.current === currentSceneId) return;
+
+    const transformedItems: Record<string, any> = {};
+    const scene = data.scenes[currentSceneId];
+
+    collectedHotspots.forEach((item: any) => {
+      const hotspot = scene?.hotspots?.find((h: any) => h.id === item.hotspotId);
+      const minCollectionItems =
+        hotspot?.minCollectionItems || hotspot?.items?.length || 0;
+
+      transformedItems[item.hotspotId] = {
+        collectionIds: item.collectedHotspotItemIds.map(
+          (itemId: string) => `${item.hotspotId}_item_${itemId}`
+        ),
+        minCollectionItems,
+        isCompleted: item.collectedHotspotItemIds.length >= minCollectionItems,
+      };
+    });
+
+    setCollectionItems(transformedItems);
+    api?.setCollectionItems?.(transformedItems);
+    lastSyncedSceneId.current = currentSceneId;
+  }, [collectedHotspotsData, currentSceneId, data.scenes, api]);
 
   const [rewardCollectionState, setRewardCollectionState] = React.useState<{
     isOpen: boolean;
@@ -502,8 +537,12 @@ export const VideoPlayerProvider = ({
           });
         }
       }
-
-      setCurrentSceneId(nextSceneId);
+      const nextScene = data.scenes[nextSceneId];
+      const isUserVip = userInfo?.vipinfo?.isvip === 1;
+      if (nextScene.isVip && !isUserVip) {
+        return setIsVipModalOpen(true);
+      }
+      onSetCurrentSceneId(nextSceneId);
       setPauseType(null);
       setCurrentStatus(null);
     },
@@ -550,7 +589,15 @@ export const VideoPlayerProvider = ({
         //   setType("intro");
         // }, 3000);
       } else {
-        onSetCurrentSceneId(scene.targetSceneId);
+        const nextSceneId = (scene as any).targetSceneId;
+        if (nextSceneId) {
+          const nextScene = data.scenes[nextSceneId];
+          const isUserVip = userInfo?.vipinfo?.isvip === 1;
+          if (nextScene?.isVip && !isUserVip) {
+            return setIsVipModalOpen(true);
+          }
+        }
+        onSetCurrentSceneId(nextSceneId);
       }
     },
     [
@@ -760,6 +807,8 @@ export const VideoPlayerProvider = ({
     showRelationshipPoint,
     isEndingScene,
     setIsEndingScene,
+    isVipModalOpen,
+    setIsVipModalOpen,
   };
   return (
     <VideoPlayerContext.Provider value={value}>

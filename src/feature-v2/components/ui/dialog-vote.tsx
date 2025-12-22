@@ -28,10 +28,10 @@ const DialogVote = ({
   },
   onVote,
 }: DialogVoteProps) => {
-  const { chapter } = useUserContext();
-  const { voteCharacter, isVoting } = useRankContext();
+  const { chapter, refetchChapter } = useUserContext();
+  const { voteCharacter, isVoting, refetchLeaderboard } = useRankContext();
   const availablePoints = chapter?.progress?.points || 0;
-  
+
   // Lấy chapterId từ URL params hoặc từ chapter
   const projectId = React.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
@@ -69,6 +69,8 @@ const DialogVote = ({
     setIsSuccessOpen(false);
     onVote?.();
     onClose();
+    refetchChapter()
+    refetchLeaderboard()
   };
 
   const handleVoteClick = async () => {
@@ -164,9 +166,9 @@ const DialogVote = ({
                 onChange={handleChangeVote}
               />
 
-              <Button 
-                label={isVoting ? "Đang bình chọn..." : "Bình chọn"} 
-                onClick={handleVoteClick} 
+              <Button
+                label={isVoting ? "Đang bình chọn..." : "Bình chọn"}
+                onClick={handleVoteClick}
                 size="small"
                 disabled={isVoting}
               />

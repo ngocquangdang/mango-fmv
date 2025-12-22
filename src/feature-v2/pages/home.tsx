@@ -124,7 +124,7 @@ export default function Home() {
         alt="home-bg"
         className="absolute top-8 left-[50%] translate-x-[-50%] w-[263px] h-[120px] lg:w-[340px] lg:h-[144px] object-cover"
       />
-      <div className="flex flex-col h-full justify-center items-center gap-4 w-fit pl-2">
+      <div className="flex flex-col h-full justify-center items-center gap-4 w-fit pl-2 relative z-100">
         <div
           style={{
             transform: `translateY(${activeShakeIndex === 0 ? shakeOffset : 0

@@ -67,6 +67,8 @@ function AppV2Content() {
     clips,
     isEndingScene,
     setIsEndingScene,
+    isVipModalOpen,
+    setIsVipModalOpen,
   } = useVideoPlayerContext();
 
   const [dialogName, setDialogName] = React.useState<string | null>(null);
@@ -207,6 +209,22 @@ function AppV2Content() {
       />
 
       {isGiftSelectionOpen && <GiftSelection />}
+
+      {/* SVIP Dialog */}
+      <GameModal
+        isOpen={isVipModalOpen}
+        onClose={() => {
+          setIsVipModalOpen(false);
+          onPlay();
+        }}
+        onConfirm={() => {
+          setIsVipModalOpen(false);
+          window.open("https://club.glb.mangoplus.vn/intelmgtv/pay_vn/index.html?product_level=6", "_blank");
+          onPlay();
+        }}
+        title="Đăng ký thành viên SVIP"
+        message="Để trải nghiệm toàn bộ nội dung và cơ hội nhận quà độc quyền từ chương trình SVIP"
+      />
 
       {/* Dialog Info */}
       <DialogInfo

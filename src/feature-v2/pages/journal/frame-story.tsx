@@ -18,12 +18,18 @@ const FramedStoryline = ({
         src={bgImg}
         alt="Frame"
         className="relative block z-2 pointer-events-none w-full h-full"
+        style={{
+          backgroundImage: `url(${bgImg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
       />
 
       <img
-        src={info?.avatar || "https://picsum.photos/200/120"}
+        src={info?.avatar || ""}
         alt={info?.name}
-        className="absolute z-1 top-[7.5%] left-[4%] w-[91%] h-[85%]"
+        className="absolute z-1 top-[7.5%] left-1/2 -translate-x-1/2 w-auto h-[74%] object-contain"
       />
       <div className="absolute z-10 bottom-1 left-0 w-full flex items-center justify-center">
         <p className="text-xs">{info?.name}</p>
