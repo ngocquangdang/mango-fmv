@@ -26,7 +26,6 @@ const ChapterNode = ({ data }: NodeProps) => {
           w-[200px] h-[120px] lg:w-[240px] lg:h-[144px]
           flex items-center justify-center
           relative
-          shadow-lg
           transition-transform hover:scale-105
           cursor-pointer
           rounded-sm

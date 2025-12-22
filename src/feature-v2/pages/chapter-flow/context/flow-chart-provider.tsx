@@ -16,7 +16,7 @@ export const FlowChartContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { chapter: data, userInfo } = useUserContext();
+  const { chapter: data } = useUserContext();
   // const isPreview = React.useMemo(() => {
   //   const params = new URLSearchParams(window.location.search);
   //   const isPreview = params.get("isPreview");
@@ -109,9 +109,6 @@ export const FlowChartContextProvider = ({
     const nodeList: any[] = [];
     const edgeList: any[] = [];
     const processedNodes = new Set<string>();
-    const visitedScenes = new Set<string>();
-
-    const startNode = scenes[data?.startSceneId];
 
     const addNode = (id: string, data: any) => {
       if (processedNodes.has(id)) return;
@@ -179,67 +176,109 @@ export const FlowChartContextProvider = ({
       return branchOptions;
     };
 
-    const traverseScene = (sceneId: string) => {
-      if (!sceneId) return;
+    const getSceneChildren = (scene: Scene) => {
+      const branchOptions = scene.branch?.options || [];
+      const investigateOptions = convertHotspotItemsToBranchOptions(scene);
+      const allOptions = [...branchOptions, ...investigateOptions];
+
+      const children: {
+        targetSceneId: string;
+        option?: BranchOption;
+        index?: number;
+      }[] = [];
+
+      if (allOptions.length > 0) {
+        allOptions.forEach((option, index) => {
+          if (option.targetSceneId) {
+            children.push({
+              targetSceneId: option.targetSceneId,
+              option,
+              index,
+            });
+          }
+        });
+      } else if (scene.targetSceneId) {
+        children.push({ targetSceneId: scene.targetSceneId });
+      }
+
+      return children;
+    };
+
+    /**
+     * Cách 1: Duyệt đệ quy đơn giản.
+     * Nếu node hiện tại chưa xem (no status), chỉ hiển thị chính nó rồi dừng (không hiện con).
+     */
+    const traverseSceneClassic = (sceneId: string, visited = new Set<string>()) => {
+      if (!sceneId || visited.has(sceneId)) return;
+      visited.add(sceneId);
 
       const scene = scenes[sceneId];
       if (!scene) return;
 
-      // Thêm node cho scene hiện tại (nếu chưa có)
-      // addNode có kiểm tra processedNodes nên an toàn
-      addNode(sceneId, {
-        ...scene,
-      });
-      const isUserVip = userInfo?.vipinfo?.isvip === 1;
-      console.log("isUserVip", isUserVip);
-      // if ((scene as any).isVip) return;
+      addNode(sceneId, { ...scene });
 
-      if (visitedScenes.has(sceneId)) return;
-      visitedScenes.add(sceneId);
+      // Nếu chưa xem thì không hiện tiếp các con
+      if (!scene.status) return;
 
-      // Lấy branch options và hotspot investigate options
-      const branchOptions: BranchOption[] = scene.branch?.options || [];
-      const investigateOptions = convertHotspotItemsToBranchOptions(scene);
-      const allOptions = [...branchOptions, ...investigateOptions];
-
-      // Nếu có branch / hotspot thì tạo edge cho từng option và đệ quy tiếp
-      if (allOptions.length > 0) {
-        allOptions.forEach((option, index) => {
-          const targetSceneId = option.targetSceneId;
-          const targetScene = scenes[targetSceneId];
-          if (!targetScene) return;
-
-          // Tạo edge luôn, bất kể node đích đã visit hay chưa
-          addEdge(sceneId, targetSceneId, index, {
-            ...option,
-            status: targetScene.status,
-          });
-
-          // Đệ quy để đảm bảo node đích được addNode (nếu chưa có) và khám phá tiếp
-          traverseScene(targetSceneId);
+      const children = getSceneChildren(scene);
+      children.forEach((child) => {
+        const targetScene = scenes[child.targetSceneId];
+        addEdge(sceneId, child.targetSceneId, child.index, {
+          ...child.option,
+          status: targetScene?.status,
         });
-        return;
-      }
-
-      // Nếu không có branch / hotspot:
-      const fallbackTargetId = scene.targetSceneId;
-      if (!fallbackTargetId) {
-        return;
-      }
-
-      const fallbackTargetScene = scenes[fallbackTargetId];
-      if (!fallbackTargetScene) return;
-
-      addEdge(sceneId, fallbackTargetId, undefined, {
-        status: fallbackTargetScene.status,
+        traverseSceneClassic(child.targetSceneId, visited);
       });
-
-      traverseScene(fallbackTargetId);
     };
 
-    if (startNode) {
-      traverseScene(startNode.id);
+    /**
+     * Cách 2: Duyệt 2 bước (Discovery).
+     * Tìm tất cả các node 'lộ diện' rồi vẽ mọi edge nối giữa chúng.
+     * Xử lý tốt trường hợp nhiều parent cùng dẫn tới 1 node con.
+     */
+    // const traverseSceneDiscovery = (startId: string) => {
+    //   const revealedNodes = new Set<string>();
+
+    //   const discover = (id: string) => {
+    //     if (!id || revealedNodes.has(id)) return;
+    //     revealedNodes.add(id);
+
+    //     const scene = scenes[id];
+    //     if (!scene || !scene.status) return;
+
+    //     getSceneChildren(scene).forEach((child) => discover(child.targetSceneId));
+    //   };
+
+    //   discover(startId);
+
+    //   // Bước 1: Thêm Nodes
+    //   revealedNodes.forEach((id) => {
+    //     const scene = scenes[id];
+    //     if (scene) addNode(id, { ...scene });
+    //   });
+
+    //   // Bước 2: Thêm Edges
+    //   revealedNodes.forEach((id) => {
+    //     const scene = scenes[id];
+    //     if (!scene) return;
+
+    //     getSceneChildren(scene).forEach((child) => {
+    //       if (revealedNodes.has(child.targetSceneId)) {
+    //         const targetScene = scenes[child.targetSceneId];
+    //         addEdge(id, child.targetSceneId, child.index, {
+    //           ...child.option,
+    //           status: targetScene?.status,
+    //         });
+    //       }
+    //     });
+    //   });
+    // };
+
+    if (data?.startSceneId) {
+      // Bạn có thể đổi sang traverseSceneClassic(data.startSceneId) nếu muốn dùng cách 1
+      traverseSceneClassic(data.startSceneId);
     }
+
     return { nodes: nodeList, edges: edgeList };
   }, [scenes, data?.startSceneId]);
 
