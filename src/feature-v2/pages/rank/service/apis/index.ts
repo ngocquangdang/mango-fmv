@@ -3,7 +3,7 @@ import { getLocalParam } from "../../../../../lib/api/storage";
 
 export interface VotePayload {
   characterId: string;
-  projectId: string;
+  chapterId: string;
   points: number;
 }
 

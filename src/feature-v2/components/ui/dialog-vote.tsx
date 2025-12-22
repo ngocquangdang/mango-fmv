@@ -32,12 +32,6 @@ const DialogVote = ({
   const { voteCharacter, isVoting, refetchLeaderboard } = useRankContext();
   const availablePoints = chapter?.progress?.points || 0;
 
-  // Lấy chapterId từ URL params hoặc từ chapter
-  const projectId = React.useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("projectId") || "";
-  }, []);
-
   const [voteValue, setVoteValue] = React.useState<string>("100");
   const [isNotEnoughOpen, setIsNotEnoughOpen] = React.useState<boolean>(false);
   const [isSuccessOpen, setIsSuccessOpen] = React.useState<boolean>(false);
@@ -89,7 +83,7 @@ const DialogVote = ({
     }
 
     // Gọi API vote
-    if (!data.id || !projectId) {
+    if (!data.id || !chapter?.id) {
       setIsNotEnoughOpen(true);
       return;
     }
@@ -97,7 +91,7 @@ const DialogVote = ({
     try {
       await voteCharacter({
         characterId: data.id,
-        projectId: projectId,
+        chapterId: chapter?.id,
         points: amount,
       });
       setIsSuccessOpen(true);
