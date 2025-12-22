@@ -48,14 +48,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     ticket: ticketFromUrl,
   } = React.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    const chapterIdFromUrl = params.get("chapterId");
-    const projectIdFromUrl = params.get("projectId");
     const isPreviewParam = params.get("isPreview");
     const ticketParam = params.get("ticket");
 
     return {
-      chapterId: chapterIdFromUrl || "",
-      projectId: projectIdFromUrl || "",
+      chapterId: import.meta.env.VITE_CHAPTER_ID || "",
+      projectId: import.meta.env.VITE_PROJECT_ID || "",
       isPreview: isPreviewParam === "true",
       ticket: ticketParam || "",
     };

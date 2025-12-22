@@ -7,7 +7,7 @@ import { ToastProvider } from "./components/ui/toast-v2/toast-context.tsx";
 import VConsole from "vconsole";
 
 // Khởi tạo vConsole (có thể điều kiện hóa theo môi trường)
-if (import.meta.env.DEV || new URLSearchParams(window.location.search).get("vconsole") === "true") {
+if (import.meta.env.DEV) {
   new VConsole({
     theme: "light",
   });
