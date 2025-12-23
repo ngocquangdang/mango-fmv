@@ -182,9 +182,21 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     confirmQrLogin({
       ticket: mgUserInfoObject?.ticket,
       sessionId: qrSessionId,
+    }, {
+      onSuccess: () => {
+        refetchProgress();
+        setIsQrLoginVisible(false);
+      },
+      onError: () => {
+        logInfo(
+          "UserProvider - confirmQrLogin failed",
+          {},
+          "UserProvider"
+        );
+      },
     });
     setLoading(true);
-  }, []);
+  }, [qrSessionId]);
 
   React.useEffect(() => {
     if (!isPreview || !ticketFromUrl) {
@@ -207,11 +219,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // QR Login Flow for Web Browsers
   React.useEffect(() => {
-    const isWebBrowser = !ticketFromUrl && !isPreview && !mgApi && !isLoadingMgApi;
+    const isIOS =
+      typeof navigator !== "undefined" &&
+      /iP(ad|hone|od)/i.test(navigator.userAgent);
+    const isAndroid =
+      typeof navigator !== "undefined" &&
+      /android/i.test(navigator.userAgent);
+    const isMobileLike = isIOS || isAndroid;
 
-    if (isWebBrowser) {
+    if (isMobileLike) {
       logInfo(
-        "UserProvider - Web browser detected without ticket, initializing QR session",
+        "UserProvider - Mobile detected without ticket, initializing QR session",
         {},
         "UserProvider"
       );
