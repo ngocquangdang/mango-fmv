@@ -21,7 +21,18 @@ export const QrLoginOverlay: React.FC<QrLoginOverlayProps> = ({
   const { data: qrStatus, error } = useQrStatus(sessionId, true);
 
   React.useEffect(() => {
+    if (qrStatus?.data) {
+      console.log('[QR Overlay] Status Update:', {
+        status: qrStatus.data.status,
+        hasTicket: !!qrStatus.data.ticket,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }, [qrStatus]);
+
+  React.useEffect(() => {
     if (error) {
+      console.error('[QR Overlay] Polling Error:', error);
       onError(error as Error);
     }
   }, [error, onError]);

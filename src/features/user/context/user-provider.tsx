@@ -199,7 +199,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // QR Login Flow for Web Browsers
   React.useEffect(() => {
-
+    console.log("UserProvider - ticketFromUrl", mgApi);
     const isWebBrowser = !ticketFromUrl && !isPreview && !mgApi;
     console.log("UserProvider - isWebBrowser", isWebBrowser, !isPreview);
 
@@ -214,7 +214,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         onSuccess: (response: any) => {
           const sessionId = response.data.sessionId;
           // Generate QR URL from sessionId
-          const generatedQrUrl = `https://gocuanhamynam.mangoplus.vn?sessionId=${sessionId}`;
+          const generatedQrUrl = `https://gocuanhamynam.mangoplus.vn?sessionId=${sessionId}&vconsole=true`;
 
           logInfo(
             "UserProvider - QR session initialized",

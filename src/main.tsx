@@ -6,8 +6,11 @@ import App from "./feature-v2/AppV2";
 import { ToastProvider } from "./components/ui/toast-v2/toast-context.tsx";
 import VConsole from "vconsole";
 
-// Khởi tạo vConsole (có thể điều kiện hóa theo môi trường)
-if (import.meta.env.DEV) {
+// Khởi tạo vConsole (có thể điều kiện hóa theo môi trường hoặc query param)
+const params = new URLSearchParams(window.location.search);
+const enableVConsole = import.meta.env.DEV || params.get('vconsole') === 'true';
+
+if (enableVConsole) {
   new VConsole({
     theme: "light",
   });
