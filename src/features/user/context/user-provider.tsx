@@ -226,6 +226,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       typeof navigator !== "undefined" &&
       /android/i.test(navigator.userAgent);
     const isMobileLike = isIOS || isAndroid;
+    console.log("isMobileLike", isMobileLike);
 
     if (!isMobileLike) {
       logInfo(
