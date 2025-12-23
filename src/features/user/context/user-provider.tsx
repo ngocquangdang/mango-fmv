@@ -53,19 +53,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     chapterId: chapterIdFromUrl,
     projectId: projectIdFromUrl,
     isPreview,
-    ticket: ticketFromUrl,
     sessionId: sessionIdFromUrl,
   } = React.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     const isPreviewParam = params.get("isPreview");
-    const ticketParam = params.get("ticket");
     const sessionIdParam = params.get("sessionId");
 
     return {
       chapterId: import.meta.env.VITE_CHAPTER_ID || "",
       projectId: import.meta.env.VITE_PROJECT_ID || "",
       isPreview: isPreviewParam === "true",
-      ticket: ticketParam || "",
       sessionId: sessionIdParam || "",
     };
   }, []);
@@ -213,7 +210,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     console.log("isMobileLike", isMobileLike);
 
     const hasLocalTicket = !!getLocalParam("ticket");
-
+    console.log("hasLocalTicket", hasLocalTicket, getLocalParam("ticket"));
     if (!isMobileLike && !hasLocalTicket) {
       logInfo(
         "UserProvider - Mobile detected without ticket, initializing QR session",
