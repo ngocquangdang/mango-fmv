@@ -8,6 +8,7 @@ import {
   useVideos,
   useCollectedRewards,
   useInitQrSession,
+  useConfirmQrSession,
 } from "../hooks";
 import { useMgSdk } from "../../../hooks/useMgSdk";
 import type { ChapterMapped } from "../../../types/chapter";
@@ -38,10 +39,10 @@ export interface UserContextType {
 }
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const { mgApi } = useMgSdk();
+  const { mgApi, loading: isLoadingMgApi } = useMgSdk();
   const { mutate: updateStatus } = useUpdateStatus();
   const { mutate: initQrSession } = useInitQrSession();
-
+  const { mutate: confirmQrLogin } = useConfirmQrSession();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [userInfo, setUserInfo] = React.useState<Record<string, any>>({});
   const [qrSessionId, setQrSessionId] = React.useState<string | null>(null);
@@ -175,6 +176,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     saveLocalParams({
       ticket: mgUserInfoObject?.ticket,
     });
+    if (!qrSessionId) {
+      return;
+    }
+    confirmQrLogin({
+      ticket: mgUserInfoObject?.ticket,
+      sessionId: qrSessionId,
+    });
     setLoading(true);
   }, []);
 
@@ -199,9 +207,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // QR Login Flow for Web Browsers
   React.useEffect(() => {
-    console.log("UserProvider - ticketFromUrl", mgApi);
-    const isWebBrowser = !ticketFromUrl && !isPreview && !mgApi;
-    console.log("UserProvider - isWebBrowser", isWebBrowser, !isPreview);
+    const isWebBrowser = !ticketFromUrl && !isPreview && !mgApi && !isLoadingMgApi;
 
     if (isWebBrowser) {
       logInfo(
