@@ -21,18 +21,7 @@ export const QrLoginOverlay: React.FC<QrLoginOverlayProps> = ({
   const { data: qrStatus, error } = useQrStatus(sessionId, true);
 
   React.useEffect(() => {
-    if (qrStatus?.data) {
-      console.log('[QR Overlay] Status Update:', {
-        status: qrStatus.data.status,
-        hasTicket: !!qrStatus.data.ticket,
-        timestamp: new Date().toISOString(),
-      });
-    }
-  }, [qrStatus]);
-
-  React.useEffect(() => {
     if (error) {
-      console.error('[QR Overlay] Polling Error:', error);
       onError(error as Error);
     }
   }, [error, onError]);
@@ -46,12 +35,12 @@ export const QrLoginOverlay: React.FC<QrLoginOverlayProps> = ({
   }, [qrStatus, onSuccess, onExpired]);
 
   return (
-    <div className="qr-login-overlay">
+    <div className="qr-login-overlay mx-6">
       <div className="qr-login-container">
         <div className="qr-login-content">
-          <h2 className="qr-login-title">Scan to Login</h2>
+          <h2 className="qr-login-title">Quét mã để đăng nhập</h2>
           <p className="qr-login-subtitle">
-            Open the Mango+ app and scan this QR code to continue
+            Mở ứng dụng Mango+ và quét mã QR này để tiếp tục
           </p>
 
           <div className="qr-code-wrapper">
@@ -67,22 +56,22 @@ export const QrLoginOverlay: React.FC<QrLoginOverlayProps> = ({
           <div className="qr-login-instructions">
             <div className="instruction-step">
               <span className="step-number">1</span>
-              <span className="step-text">Open Mango+ app on your phone</span>
+              <span className="step-text">Mở ứng dụng Mango+ trên điện thoại</span>
             </div>
             <div className="instruction-step">
               <span className="step-number">2</span>
-              <span className="step-text">Tap the QR scan icon</span>
+              <span className="step-text">Nhấn vào biểu tượng quét QR</span>
             </div>
             <div className="instruction-step">
               <span className="step-number">3</span>
-              <span className="step-text">Point your camera at this code</span>
+              <span className="step-text">Hướng camera vào mã này</span>
             </div>
           </div>
 
           {qrStatus?.data?.status === "PENDING" && (
             <div className="qr-status-pending">
               <div className="loading-spinner"></div>
-              <p>Waiting for scan...</p>
+              <p>Đang chờ quét...</p>
             </div>
           )}
         </div>

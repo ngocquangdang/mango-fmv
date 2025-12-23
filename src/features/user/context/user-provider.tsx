@@ -12,7 +12,7 @@ import {
 } from "../hooks";
 import { useMgSdk } from "../../../hooks/useMgSdk";
 import type { ChapterMapped } from "../../../types/chapter";
-import { saveLocalParams } from "../../../lib/api/storage";
+import { saveLocalParams, getLocalParam } from "../../../lib/api/storage";
 import type { CollectedRewardCharacter } from "../apis";
 import { logInfo } from "../../../lib/utils/logger";
 import { QrLoginOverlay } from "../../../feature-v2/components/QrLoginOverlay";
@@ -199,26 +199,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       },
     });
     setLoading(true);
-  }, [qrSessionId]);
-
-  React.useEffect(() => {
-    if (!isPreview || !ticketFromUrl) {
-      return;
-    }
-
-    logInfo(
-      "UserProvider - isPreview is true, setting ticket from URL",
-      {
-        ticketFromUrl,
-      },
-      "UserProvider"
-    );
-
-    saveLocalParams({
-      ticket: ticketFromUrl,
-    });
-    setLoading(true);
-  }, [isPreview, ticketFromUrl]);
+  }, [sessionIdFromUrl]);
 
   // QR Login Flow for Web Browsers
   React.useEffect(() => {
@@ -231,7 +212,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const isMobileLike = isIOS || isAndroid;
     console.log("isMobileLike", isMobileLike);
 
-    if (!isMobileLike) {
+    const hasLocalTicket = !!getLocalParam("ticket");
+
+    if (!isMobileLike && !hasLocalTicket) {
       logInfo(
         "UserProvider - Mobile detected without ticket, initializing QR session",
         {},
