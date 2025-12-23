@@ -13,8 +13,9 @@ import {
   submitHotspot,
   initQrSession,
   checkQrStatus,
+  confirmQrSession,
 } from "../apis";
-import type { UpdateStatusPayload, SubmitHotspotPayload } from "../apis";
+import type { UpdateStatusPayload, SubmitHotspotPayload, QrConfirmRequest } from "../apis";
 import type { ChapterMapped, Character, Scene } from "../../../types/chapter";
 
 const mapHotspots = (hotspots: any): any[] => {
@@ -253,3 +254,10 @@ export const useQrStatus = (sessionId: string | null, enabled: boolean) => {
     refetchIntervalInBackground: false,
   });
 };
+
+export const useConfirmQrSession = () => {
+  return useMutation({
+    mutationFn: (payload: QrConfirmRequest) => confirmQrSession(payload),
+  });
+};
+

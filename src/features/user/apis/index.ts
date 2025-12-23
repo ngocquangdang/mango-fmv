@@ -293,6 +293,15 @@ export interface QrStatusResponse {
   ticket?: string;
 }
 
+export interface QrConfirmRequest {
+  sessionId: string;
+  ticket: string;
+}
+
+export interface QrConfirmResponse {
+  confirmed: boolean;
+}
+
 export const getUserProgress = async (queryParams: Record<string, string>) => {
   const params = new URLSearchParams(queryParams);
 
@@ -418,70 +427,6 @@ export const getCollectedHotspots = async (sceneId: string) => {
   return response as ApiResponse<CollectedHotspotsResponse>;
 };
 
-// const mockCollectedRewards = {
-//   data: {
-//     characters: [
-//       {
-//         createdAt: "2023-11-01T08:05:00.000Z",
-//         dateOfBirth: "2002-03-16",
-//         description:
-//           "Visual sang san khau voi phong cach cuon hut.",
-//         height: "175cm",
-//         id: "22222222-2222-2222-2222-222222222222",
-//         imagePath: "characters/cuong-bach.jpg",
-//         imageUrl: "https://example.com/images/cuong-bach-signed.jpg",
-//         momentCategories: [
-//           {
-//             id: "e57bbbbb-5082-657e-ca16-0d8b4e761654",
-//             imagePath: "categories/khoanh-khac.png",
-//             imageUrl: "https://example.com/categories/khoanh-khac-signed.png",
-//             momentRewards: [
-//               {
-//                 collectedAt: "2025-12-14T15:56:06.236Z",
-//                 createdAt: "2023-12-12T08:00:00.000Z",
-//                 description:
-//                   "Chi\u1ebfc micro may m\u1eafn m\u00e0 \u0110\u00f4ng Quang \u0111\u00e3 \u0111\u00e1nh r\u01a1i.",
-//                 imagePath: "moments/golden-mic.jpg",
-//                 imageUrl: "https://example.com/moments/golden-mic-signed.jpg",
-//                 momentId: "1a5b3c4d-4e6f-7a8b-9c2d-1e2f3a4b3c6d",
-//                 name: "Micro V\u00e0ng C\u1ee7a \u0110\u00f4ng Quang",
-//                 relationshipPoint: 0,
-//                 rewardId: "1a5b3c4d-5e6f-8a8b-9c0d-1e1f3a4b3c5d",
-//                 rewardImagePath: "rewards/golden-mic-item.png",
-//                 rewardImageUrl:
-//                   "https://example.com/rewards/golden-mic-item.png",
-//               },
-//               {
-//                 collectedAt: "2025-12-14T15:56:06.236Z",
-//                 createdAt: "2023-12-12T08:00:00.000Z",
-//                 description:
-//                   "Chi\u1ebfc micro may m\u1eafn m\u00e0 \u0110\u00f4ng Quang \u0111\u00e3 \u0111\u00e1nh r\u01a1i.",
-//                 imagePath: "moments/golden-mic.jpg",
-//                 imageUrl: "https://example.com/moments/golden-mic-signed.jpg",
-//                 momentId: "1a5b3c4d-4e6f-7a8b-9c2d-1e2f3a4b3c6d",
-//                 name: "Micro V\u00e0ng C\u1ee7a \u0110\u00f4ng Quang",
-//                 relationshipPoint: 0,
-//                 rewardId: "1a5b3c4d-5e6f-8a8b-9c0d-1e2f3a4b3c5d",
-//                 rewardImagePath: "rewards/golden-mic-item.png",
-//                 rewardImageUrl:
-//                   "https://example.com/rewards/golden-mic-item.png",
-//               },
-//             ],
-//             name: "Kho\u1ea3nh kh\u1eafc",
-//             type: "MAX_RELATIONSHIP_POINT_REWARD",
-//           },
-//         ],
-//         name: "C\u01b0\u1eddng B\u1ea1ch",
-//         projectId: "project-uuid-001",
-//         strength: "Visual",
-//         updatedAt: "2023-11-01T08:05:00.000Z",
-//       },
-//     ],
-//   },
-//   status: "success",
-//   statusCode: 200,
-// };
-
 export const initQrSession = async () => {
   const response = await apiClientVideoProgress.post(
     `/qr-sync/init`,
@@ -496,3 +441,16 @@ export const checkQrStatus = async (sessionId: string) => {
   );
   return response as ApiResponse<QrStatusResponse>;
 };
+
+export const confirmQrSession = async (payload: QrConfirmRequest) => {
+  const ticket = payload.ticket;
+  const response = await apiClientVideoProgress.post(
+    `/qr-sync/confirm`,
+    { sessionId: payload.sessionId },
+    {
+      "X-Ticket": ticket,
+    }
+  );
+  return response as ApiResponse<QrConfirmResponse>;
+};
+
