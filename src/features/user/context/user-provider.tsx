@@ -200,7 +200,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   // QR Login Flow for Web Browsers
   React.useEffect(() => {
 
-    const isWebBrowser = !ticketFromUrl && !isPreview;
+    const isWebBrowser = !ticketFromUrl && !isPreview && !mgApi;
     console.log("UserProvider - isWebBrowser", isWebBrowser, !isPreview);
 
     if (isWebBrowser) {
