@@ -28,7 +28,7 @@ const DialogVote = ({
   },
   onVote,
 }: DialogVoteProps) => {
-  const { chapter, refetchChapter } = useUserContext();
+  const { chapter, refetchProgress } = useUserContext();
   const { voteCharacter, isVoting, refetchLeaderboard } = useRankContext();
   const availablePoints = chapter?.progress?.points || 0;
 
@@ -57,14 +57,18 @@ const DialogVote = ({
 
   const handleCloseSuccess = () => {
     setIsSuccessOpen(false);
+    onVote?.();
+    onClose();
+    refetchProgress();
+    refetchLeaderboard();
   };
 
   const handleConfirmSuccess = () => {
     setIsSuccessOpen(false);
     onVote?.();
     onClose();
-    refetchChapter()
-    refetchLeaderboard()
+    refetchProgress();
+    refetchLeaderboard();
   };
 
   const handleVoteClick = async () => {

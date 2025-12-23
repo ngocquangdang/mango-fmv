@@ -10,7 +10,7 @@ const IMAGE_VERSION = "1";
 
 export default function Home() {
   const { setType, setCollectionItems } = useVideoPlayerContext();
-  const { chapter, refetch, refetchCollectedRewards } = useUserContext();
+  const { chapter, refetchProgress, refetchCollectedRewards } = useUserContext();
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const [activeShakeIndex, setActiveShakeIndex] = React.useState<number>(0);
@@ -48,7 +48,7 @@ export default function Home() {
     try {
       // await restartChapter(chapter.id);
       await restartChapter();
-      refetch();
+      refetchProgress();
     } catch (error) {
       console.error("Failed to restart chapter", error);
     }

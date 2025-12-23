@@ -102,7 +102,6 @@ export const VideoPlayerProvider = ({
   const [currentSceneId, setCurrentSceneId] = React.useState<string | null>(
     null
   );
-
   const [collectionItems, setCollectionItems] = React.useState<
     Record<string, any>
   >({});
@@ -123,16 +122,19 @@ export const VideoPlayerProvider = ({
 
   const [isEndingScene, setIsEndingScene] = React.useState(false);
   const [isVipModalOpen, setIsVipModalOpen] = React.useState(false);
-  const lastSyncedSceneId = React.useRef<string | null>(null);
+
   const { data: collectedHotspotsData } = useCollectedHotspots(
     currentSceneId || ""
   );
 
   React.useEffect(() => {
+    if (!data?.progress) return;
+    setCurrentSceneId(data.progress?.currentScene?.sceneId);
+  }, [data?.progress])
+
+  React.useEffect(() => {
     const collectedHotspots = collectedHotspotsData?.data?.collectedHotspots;
     if (!collectedHotspots || !data.scenes || !currentSceneId) return;
-
-    if (lastSyncedSceneId.current === currentSceneId) return;
 
     const transformedItems: Record<string, any> = {};
     const scene = data.scenes[currentSceneId];
@@ -153,7 +155,6 @@ export const VideoPlayerProvider = ({
 
     setCollectionItems(transformedItems);
     api?.setCollectionItems?.(transformedItems);
-    lastSyncedSceneId.current = currentSceneId;
   }, [collectedHotspotsData, currentSceneId, data.scenes, api]);
 
   const [rewardCollectionState, setRewardCollectionState] = React.useState<{
@@ -217,6 +218,7 @@ export const VideoPlayerProvider = ({
       if (!api) return;
       api.setCurrentSceneId?.(sceneId);
       setCurrentSceneId(sceneId);
+      play()
     },
     [api]
   );
@@ -535,6 +537,13 @@ export const VideoPlayerProvider = ({
             status: "COMPLETED",
             points: data.scenes[sceneId]?.points || 0,
           });
+          updateSceneStatus({
+            sceneId: nextSceneId,
+            totalDuration: Math.floor(data.scenes[nextSceneId]?.duration || 0),
+            watchingSecond: 0,
+            status: "INPROGRESS",
+            points: 0,
+          });
         }
       }
       const nextScene = data.scenes[nextSceneId];
@@ -596,8 +605,8 @@ export const VideoPlayerProvider = ({
           if (nextScene?.isVip && !isUserVip) {
             return setIsVipModalOpen(true);
           }
+          onSetCurrentSceneId(nextSceneId);
         }
-        onSetCurrentSceneId(nextSceneId);
       }
     },
     [

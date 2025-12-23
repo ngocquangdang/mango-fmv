@@ -11,6 +11,8 @@ import {
   getCollectedHotspots,
   resetProgress,
   submitHotspot,
+  initQrSession,
+  checkQrStatus,
 } from "../apis";
 import type { UpdateStatusPayload, SubmitHotspotPayload } from "../apis";
 import type { ChapterMapped, Character, Scene } from "../../../types/chapter";
@@ -129,7 +131,6 @@ export const useChapter = (
     queryFn: () => getChapter(projectId, chapterId),
     enabled: !!chapterId,
   });
-
   // Memoize the transformed data to prevent creating new objects on every render
   const transformedData = React.useMemo(() => {
     if (!data?.data) return undefined;
@@ -234,5 +235,21 @@ export const useCollectedHotspots = (sceneId: string) => {
     gcTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
+  });
+};
+
+export const useInitQrSession = () => {
+  return useMutation({
+    mutationFn: () => initQrSession(),
+  });
+};
+
+export const useQrStatus = (sessionId: string | null, enabled: boolean) => {
+  return useQuery({
+    queryKey: ["qr-status", sessionId],
+    queryFn: () => checkQrStatus(sessionId!),
+    enabled: !!sessionId && enabled,
+    refetchInterval: 2000, // Poll every 2 seconds
+    refetchIntervalInBackground: false,
   });
 };

@@ -1,4 +1,5 @@
 import { useVideoPlayerContext } from "../../../contexts";
+import Banner from '../../components/banner';
 import { RankProvider } from "./context/rank-provider";
 import RankLayout from "./rank-layout";
 
@@ -13,6 +14,7 @@ function RankContent() {
       >
         <img src="/images/back-icon.png" alt="back-icon" className="w-9 h-9" />
       </div>
+      <Banner text="Bảng xếp hạng" className="absolute! top-4 left-4" />
       <RankLayout />
     </div>
   );

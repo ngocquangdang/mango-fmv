@@ -12,7 +12,7 @@ import { useRestartChapter } from "../user/hooks";
 
 export default function Home() {
   const { setType, onPlayPlayer } = useVideoPlayerContext();
-  const { chapter, refetch } = useUserContext();
+  const { chapter, refetchProgress } = useUserContext();
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
 
@@ -44,7 +44,7 @@ export default function Home() {
     try {
       await restartChapter();
       // await restartChapter(chapter.id);
-      refetch();
+      refetchProgress();
     } catch (error) {
       console.error("Failed to restart chapter", error);
     }

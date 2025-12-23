@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, memo } from "react";
 import {
   ReactFlow,
   useNodesState,
@@ -131,4 +131,4 @@ const ChapterFlow = () => {
   );
 };
 
-export default ChapterFlow;
+export default memo(ChapterFlow);

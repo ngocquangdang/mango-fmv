@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import HookButton from "../../components/ui/hook-button";
 import PhotoFrame from "../../components/ui/photo-frame";
 import RewardProgress from "../../components/ui/progress";
@@ -13,6 +14,30 @@ export default function ChapterPage() {
   const { chapter, } = useUserContext();
   const { progress } = chapter;
 
+  // Tối ưu: Chỉ render component được hiển thị dựa trên màn hình
+  const [shouldUseV2, setShouldUseV2] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < 768 && window.matchMedia("(orientation: portrait)").matches;
+  });
+
+  useEffect(() => {
+    const checkViewport = () => {
+      const isMobilePortrait =
+        window.innerWidth < 768 &&
+        window.matchMedia("(orientation: portrait)").matches;
+      setShouldUseV2(isMobilePortrait);
+    };
+
+    // Lắng nghe thay đổi kích thước màn hình và orientation
+    window.addEventListener("resize", checkViewport);
+    window.addEventListener("orientationchange", checkViewport);
+
+    return () => {
+      window.removeEventListener("resize", checkViewport);
+      window.removeEventListener("orientationchange", checkViewport);
+    };
+  }, []);
+
   const handlePlay = () => {
     const sceneId =
       progress?.currentScene?.sceneId || chapter.startSceneId;
@@ -22,7 +47,7 @@ export default function ChapterPage() {
 
   return (
     <div className="relative w-full h-full overflow-hidden">
-      < div className="w-full h-[74px] " >
+      <div className="w-full h-[74px] " >
         <div
           className="absolute top-0 left-0 p-4 z-10 cursor-pointer"
           onClick={() => setType("intro")}
@@ -53,10 +78,9 @@ export default function ChapterPage() {
             className="w-9 h-9 lg:w-[43.2px] lg:h-[43.2px] cursor-pointer"
           />
         </div>
-      </div >
+      </div>
       <FlowChartContextProvider>
-        <ChapterFlowV2 />
-        <ChapterFlow />
+        {shouldUseV2 ? <ChapterFlowV2 /> : <ChapterFlow />}
       </FlowChartContextProvider>
 
       <div

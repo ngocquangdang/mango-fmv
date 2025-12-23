@@ -282,6 +282,17 @@ export interface CollectedHotspotsResponse {
   collectedHotspots: CollectedHotspot[];
 }
 
+export interface QrSessionResponse {
+  sessionId: string;
+  qrUrl?: string; // Optional since we generate this client-side
+  expiresAt?: string;
+}
+
+export interface QrStatusResponse {
+  status: 'PENDING' | 'SUCCESS' | 'EXPIRED';
+  ticket?: string;
+}
+
 export const getUserProgress = async (queryParams: Record<string, string>) => {
   const params = new URLSearchParams(queryParams);
 
@@ -470,3 +481,18 @@ export const getCollectedHotspots = async (sceneId: string) => {
 //   status: "success",
 //   statusCode: 200,
 // };
+
+export const initQrSession = async () => {
+  const response = await apiClientVideoProgress.post(
+    `/qr-sync/init`,
+    {}
+  );
+  return response as ApiResponse<QrSessionResponse>;
+};
+
+export const checkQrStatus = async (sessionId: string) => {
+  const response = await apiClientVideoProgress.get(
+    `/qr-sync/status?sessionId=${sessionId}`
+  );
+  return response as ApiResponse<QrStatusResponse>;
+};

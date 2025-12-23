@@ -10,12 +10,9 @@ export const useLeaderboard = (params?: LeaderboardParams) => {
   const leaderboardParams: LeaderboardParams = React.useMemo(() => {
     if (params) return params;
 
-    // Get projectId from URL params if not provided
-    const urlParams = new URLSearchParams(window.location.search);
-    const projectId = urlParams.get("projectId");
     return {
       limit: 10,
-      projectId: projectId || undefined,
+      projectId: import.meta.env.VITE_PROJECT_ID,
     };
   }, [params]);
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, memo } from "react";
 import LogicFlow from "@logicflow/core";
 import CustomChapterNode from "./components/logic-flow/custom-node";
 import SafariChapterNode from "./components/logic-flow/custom-node-safari";
@@ -407,4 +407,4 @@ const ChapterFlowV2 = () => {
   );
 };
 
-export default ChapterFlowV2;
+export default memo(ChapterFlowV2);

@@ -7,17 +7,19 @@ import {
   useUserProgress,
   useVideos,
   useCollectedRewards,
+  useInitQrSession,
 } from "../hooks";
 import { useMgSdk } from "../../../hooks/useMgSdk";
 import type { ChapterMapped } from "../../../types/chapter";
 import { saveLocalParams } from "../../../lib/api/storage";
 import type { CollectedRewardCharacter } from "../apis";
 import { logInfo } from "../../../lib/utils/logger";
+import { QrLoginOverlay } from "../../../feature-v2/components/QrLoginOverlay";
 
 export interface UserContextType {
   chapter: ChapterMapped;
   loading: boolean;
-  refetch: () => void;
+  refetchProgress: () => void;
   updateSceneStatus: (
     data: {
       sceneId: string;
@@ -32,14 +34,19 @@ export interface UserContextType {
   refetchCollectedRewards: () => void;
   refetchChapter: () => void;
   userInfo: Record<string, any>;
+  isQrLoginVisible: boolean;
 }
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mgApi } = useMgSdk();
   const { mutate: updateStatus } = useUpdateStatus();
+  const { mutate: initQrSession } = useInitQrSession();
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const [userInfo, setUserInfo] = React.useState<Record<string, any>>({});
+  const [qrSessionId, setQrSessionId] = React.useState<string | null>(null);
+  const [qrUrl, setQrUrl] = React.useState<string>("");
+  const [isQrLoginVisible, setIsQrLoginVisible] = React.useState(false);
 
   const {
     chapterId: chapterIdFromUrl,
@@ -87,8 +94,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const {
     data: progress,
-    refetch,
     isLoading: isProgressLoading,
+    refetch: refetchProgress,
   } = useUserProgress(progressParams);
 
   const sceneIds = React.useMemo(
@@ -100,7 +107,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const {
     data: collectedRewards,
-    isLoading: isCollectedRewardsLoading,
     refetch: refetchCollectedRewards,
   } = useCollectedRewards(projectIdFromUrl);
 
@@ -137,25 +143,23 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         },
         {
           onSuccess: () => {
-            refetch();
+            refetchProgress();
           },
         }
       );
     }
-  }, [chapterValues, updateStatus, refetch, progress?.currentScene]);
+  }, [chapterValues, updateStatus, refetchProgress, progress?.currentScene]);
 
   React.useEffect(() => {
     setLoading(
       isChapterLoading &&
       isProgressLoading &&
-      isVideosLoading &&
-      isCollectedRewardsLoading
+      isVideosLoading
     );
   }, [
     isChapterLoading,
     isProgressLoading,
-    isVideosLoading,
-    isCollectedRewardsLoading,
+    isVideosLoading
   ]);
 
   const handleGetToken = React.useCallback((mgUserInfo: string) => {
@@ -193,6 +197,85 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(true);
   }, [isPreview, ticketFromUrl]);
 
+  // QR Login Flow for Web Browsers
+  React.useEffect(() => {
+
+    const isWebBrowser = !ticketFromUrl && !isPreview;
+    console.log("UserProvider - isWebBrowser", isWebBrowser, !isPreview);
+
+    if (isWebBrowser) {
+      logInfo(
+        "UserProvider - Web browser detected without ticket, initializing QR session",
+        {},
+        "UserProvider"
+      );
+
+      initQrSession(undefined, {
+        onSuccess: (response: any) => {
+          const sessionId = response.data.sessionId;
+          // Generate QR URL from sessionId
+          const generatedQrUrl = `http://localhost:3000/qr-login?sessionId=${sessionId}`;
+
+          logInfo(
+            "UserProvider - QR session initialized",
+            { sessionId, qrUrl: generatedQrUrl },
+            "UserProvider"
+          );
+          setQrSessionId(sessionId);
+          setQrUrl(generatedQrUrl);
+          setIsQrLoginVisible(true);
+        },
+        onError: (error: any) => {
+          logInfo(
+            "UserProvider - Failed to initialize QR session",
+            { error },
+            "UserProvider"
+          );
+        },
+      });
+    }
+  }, [mgApi, isPreview, initQrSession]);
+
+  const handleQrSuccess = React.useCallback((ticket: string) => {
+    logInfo(
+      "UserProvider - QR login successful",
+      { ticket },
+      "UserProvider"
+    );
+    saveLocalParams({ ticket });
+    setIsQrLoginVisible(false);
+    setLoading(true);
+    refetchProgress();
+  }, [refetchProgress]);
+
+  const handleQrError = React.useCallback((error: Error) => {
+    logInfo(
+      "UserProvider - QR login error",
+      { error: error.message },
+      "UserProvider"
+    );
+  }, []);
+
+  const handleQrExpired = React.useCallback(() => {
+    logInfo(
+      "UserProvider - QR session expired",
+      {},
+      "UserProvider"
+    );
+    setIsQrLoginVisible(false);
+    // Reinitialize QR session
+    initQrSession(undefined, {
+      onSuccess: (response: any) => {
+        const sessionId = response.data.sessionId;
+        const generatedQrUrl = `https://gocuanhamynam.mangoplus.vn?sessionId=${sessionId}`;
+
+        setQrSessionId(sessionId);
+        setQrUrl(generatedQrUrl);
+        setIsQrLoginVisible(true);
+      },
+    });
+  }, [initQrSession]);
+
   const updateSceneStatus = React.useCallback(
     (
       data: {
@@ -217,14 +300,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         },
         {
           onSuccess: (data: any) => {
-            refetch();
+            refetchProgress();
             refetchCollectedRewards();
             if (callback) callback(data.data);
           },
         }
       );
     },
-    [updateStatus, refetch, refetchCollectedRewards, chapter]
+    [updateStatus, refetchProgress, refetchCollectedRewards, chapter]
   );
 
   React.useEffect(() => {
@@ -245,25 +328,40 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         ? ({ ...chapterMapped, progress } as ChapterMapped)
         : ({} as ChapterMapped),
       loading,
-      refetch,
+      refetchProgress,
       updateSceneStatus,
       collectedRewards,
       refetchCollectedRewards,
       refetchChapter,
-      userInfo
+      userInfo,
+      isQrLoginVisible,
     }),
     [
       chapterMapped,
       progress,
       loading,
-      refetch,
+      refetchProgress,
       updateSceneStatus,
       collectedRewards,
       refetchCollectedRewards,
       refetchChapter,
-      userInfo
+      userInfo,
+      isQrLoginVisible,
     ]
   );
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={value}>
+      {children}
+      {isQrLoginVisible && qrSessionId && qrUrl && (
+        <QrLoginOverlay
+          sessionId={qrSessionId}
+          qrUrl={qrUrl}
+          onSuccess={handleQrSuccess}
+          onError={handleQrError}
+          onExpired={handleQrExpired}
+        />
+      )}
+    </UserContext.Provider>
+  );
 };
