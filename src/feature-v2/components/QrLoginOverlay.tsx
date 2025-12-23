@@ -35,7 +35,7 @@ export const QrLoginOverlay: React.FC<QrLoginOverlayProps> = ({
   }, [qrStatus, onSuccess, onExpired]);
 
   return (
-    <div className="qr-login-overlay mx-6">
+    <div className="qr-login-overlay">
       <div className="qr-login-container">
         <div className="qr-login-content">
           <h2 className="qr-login-title">Quét mã để đăng nhập</h2>

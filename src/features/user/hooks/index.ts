@@ -158,7 +158,7 @@ const mapVideos = (videos: any[]): Record<string, any> => {
 };
 
 export const useVideos = (ids: string[]) => {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, ...rest } = useQuery({
     queryKey: ["videos", ids],
     queryFn: () => getVideos(ids),
     enabled: !!ids.length,
@@ -171,6 +171,7 @@ export const useVideos = (ids: string[]) => {
     data: transformedData,
     isLoading,
     error,
+    ...rest,
   };
 };
 

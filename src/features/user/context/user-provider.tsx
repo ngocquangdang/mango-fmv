@@ -104,7 +104,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     [chapter]
   );
 
-  const { data: videos, isLoading: isVideosLoading } = useVideos(sceneIds);
+  const { data: videos, isLoading: isVideosLoading, refetch: refetchVideos } = useVideos(sceneIds);
 
   const {
     data: collectedRewards,
@@ -184,6 +184,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       sessionId: sessionIdFromUrl,
     }, {
       onSuccess: () => {
+        refetchChapter();
+        refetchCollectedRewards();
+        refetchVideos()
         refetchProgress();
         setIsQrLoginVisible(false);
       },
