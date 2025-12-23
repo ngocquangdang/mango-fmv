@@ -214,7 +214,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         onSuccess: (response: any) => {
           const sessionId = response.data.sessionId;
           // Generate QR URL from sessionId
-          const generatedQrUrl = `http://localhost:3000/qr-login?sessionId=${sessionId}`;
+          const generatedQrUrl = `https://gocuanhamynam.mangoplus.vn?sessionId=${sessionId}`;
 
           logInfo(
             "UserProvider - QR session initialized",
