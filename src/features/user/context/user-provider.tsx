@@ -39,7 +39,7 @@ export interface UserContextType {
 }
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const { mgApi, loading: isLoadingMgApi } = useMgSdk();
+  const { mgApi } = useMgSdk();
   const { mutate: updateStatus } = useUpdateStatus();
   const { mutate: initQrSession } = useInitQrSession();
   const { mutate: confirmQrLogin } = useConfirmQrSession();
@@ -227,7 +227,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       /android/i.test(navigator.userAgent);
     const isMobileLike = isIOS || isAndroid;
 
-    if (isMobileLike) {
+    if (!isMobileLike) {
       logInfo(
         "UserProvider - Mobile detected without ticket, initializing QR session",
         {},
