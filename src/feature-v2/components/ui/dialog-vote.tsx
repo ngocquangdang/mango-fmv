@@ -3,6 +3,7 @@ import Button from "./button";
 import GameModal from "./dialog";
 import { useUserContext } from "../../../features/user/context";
 import { useRankContext } from "../../pages/rank/context";
+import { VirtualNumPad } from "../../../components/ui/virtual-keyboard/virtual-num-pad";
 import "./vote-input.css";
 
 type DialogVoteProps = {
@@ -35,21 +36,9 @@ const DialogVote = ({
   const [voteValue, setVoteValue] = React.useState<string>("100");
   const [isNotEnoughOpen, setIsNotEnoughOpen] = React.useState<boolean>(false);
   const [isSuccessOpen, setIsSuccessOpen] = React.useState<boolean>(false);
+  const [showNumpad, setShowNumpad] = React.useState<boolean>(false);
 
-  const handleChangeVote = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
 
-    if (value === "") {
-      setVoteValue("");
-      return;
-    }
-
-    if (!/^\d+$/.test(value)) {
-      return;
-    }
-
-    setVoteValue(value);
-  };
 
   const handleCloseNotEnough = () => {
     setIsNotEnoughOpen(false);
@@ -158,10 +147,11 @@ const DialogVote = ({
 
               {/* Custom Input */}
               <input
-                type="number"
+                type="text"
                 className="vote-input"
                 value={voteValue}
-                onChange={handleChangeVote}
+                readOnly
+                onClick={() => setShowNumpad(true)}
               />
 
               <Button
@@ -195,6 +185,31 @@ const DialogVote = ({
         message="Bạn đã bình chọn thành công."
         displayAction={false}
       />
+
+      {showNumpad && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60">
+          <div className="bg-white p-6 rounded-xl shadow-2xl min-w-[320px]">
+            <div className="text-center mb-4">
+              <h3 className="text-lg font-bold mb-2">Nhập số điểm</h3>
+              <div className="text-3xl font-bold py-2 border-b-2 border-blue-500 text-blue-600">
+                {voteValue || "0"}
+              </div>
+            </div>
+            <VirtualNumPad
+              value={voteValue}
+              onChange={setVoteValue}
+              onConfirm={() => setShowNumpad(false)}
+              maxLength={6}
+            />
+            <button
+              onClick={() => setShowNumpad(false)}
+              className="w-full mt-4 py-2 text-gray-500 hover:text-gray-700"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

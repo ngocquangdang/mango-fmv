@@ -58,8 +58,10 @@ body {
 
   .toast-item {
     transform: rotate(-90deg);
-    top: 50%;
+    top: 80%;
     left: 50%;
+    right: unset;
+    width: max-content;
   }
 }
 

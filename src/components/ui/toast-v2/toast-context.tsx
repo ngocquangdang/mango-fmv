@@ -15,21 +15,25 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toasts, setToasts] = React.useState<ToastItem[]>([]);
 
   const hideToast = React.useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 0);
   }, []);
 
   const showToast = React.useCallback((options: ToastOptions) => {
     const id = createToastId();
-    setToasts((prev) => [
-      ...prev,
-      {
-        id,
-        description: options.description,
-        duration: options.duration,
-        autoHide: options.autoHide ?? true,
-        position: options.position ?? "top-right",
-      },
-    ]);
+    setTimeout(() => {
+      setToasts((prev) => [
+        ...prev,
+        {
+          id,
+          description: options.description,
+          duration: options.duration,
+          autoHide: options.autoHide ?? true,
+          position: options.position ?? "top-right",
+        },
+      ]);
+    }, 0);
     return id;
   }, []);
 

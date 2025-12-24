@@ -16,6 +16,7 @@ import { saveLocalParams, getLocalParam } from "../../../lib/api/storage";
 import type { CollectedRewardCharacter } from "../apis";
 import { logInfo } from "../../../lib/utils/logger";
 import { QrLoginOverlay } from "../../../feature-v2/components/QrLoginOverlay";
+import { useToast } from "../../../components/ui/toast-v2/use-toast";
 
 export interface UserContextType {
   chapter: ChapterMapped;
@@ -43,6 +44,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mutate: updateStatus } = useUpdateStatus();
   const { mutate: initQrSession } = useInitQrSession();
   const { mutate: confirmQrLogin } = useConfirmQrSession();
+  const { showToast } = useToast();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [userInfo, setUserInfo] = React.useState<Record<string, any>>({});
   const [qrSessionId, setQrSessionId] = React.useState<string | null>(null);
@@ -187,8 +189,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         refetchChapter();
         refetchCollectedRewards();
         refetchVideos()
-        refetchProgress();
-        setIsQrLoginVisible(false);
+        // Defer UI updates to avoid race conditions
+        setTimeout(() => {
+          refetchProgress();
+          showToast({ description: "Xác nhận đăng nhập thành công!" });
+          setIsQrLoginVisible(false);
+        }, 100);
       },
       onError: () => {
         logInfo(
@@ -210,11 +216,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       typeof navigator !== "undefined" &&
       /android/i.test(navigator.userAgent);
     const isMobileLike = isIOS || isAndroid;
-    console.log("isMobileLike", isMobileLike);
 
     const hasLocalTicket = !!getLocalParam("ticket");
-    console.log("hasLocalTicket", hasLocalTicket, getLocalParam("ticket"));
-    if (!isMobileLike && !hasLocalTicket) {
+    if ((import.meta.env.DEV || !isMobileLike) && !hasLocalTicket) {
       logInfo(
         "UserProvider - Mobile detected without ticket, initializing QR session",
         {},
@@ -225,7 +229,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         onSuccess: (response: any) => {
           const sessionId = response.data.sessionId;
           // Generate QR URL from sessionId
-          const generatedQrUrl = `https://gocuanhamynam.mangoplus.vn?sessionId=${sessionId}&vconsole=true`;
+          const generatedQrUrl = `https://gocuanhamynam.mangoplus.vn?sessionId=${sessionId}`;
 
           logInfo(
             "UserProvider - QR session initialized",
@@ -253,10 +257,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       { ticket },
       "UserProvider"
     );
-    saveLocalParams({ ticket });
-    setIsQrLoginVisible(false);
-    setLoading(true);
-    refetchProgress();
+    // Defer UI updates to avoid race conditions
+    setTimeout(() => {
+      // logInfo inside timeout to capture the context of execution if needed, or keep outside.
+      // Keeping logging outside for immediate feedback is fine, but state updates must be deferred.
+      saveLocalParams({ ticket });
+      setIsQrLoginVisible(false);
+      showToast({ description: "Đăng nhập QR thành công!" });
+      setLoading(true);
+      refetchProgress();
+    }, 0);
   }, [refetchProgress]);
 
   const handleQrError = React.useCallback((error: Error) => {
