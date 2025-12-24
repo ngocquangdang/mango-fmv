@@ -233,10 +233,6 @@ export const useCollectedHotspots = (sceneId: string) => {
     queryKey: ["collected-hotspots", sceneId],
     queryFn: () => getCollectedHotspots(sceneId),
     enabled: !!sceneId,
-    staleTime: Infinity,
-    gcTime: Infinity,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
   });
 };
 

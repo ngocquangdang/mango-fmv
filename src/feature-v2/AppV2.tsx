@@ -16,6 +16,7 @@ import LoadingBar from "./components/loading";
 import Rank from "./pages/rank";
 import GiftSelection from "./components/gift-selection";
 import DialogInfo from "./components/ui/dialog-info";
+import CardCollection from "./pages/card-collection";
 
 const useIsLandscapeMobile = () => {
   const [isLandscape, setIsLandscape] = React.useState(true);
@@ -146,6 +147,8 @@ function AppV2Content() {
                 return <Journal />;
               case "ranking":
                 return <Rank />;
+              case "cardCollection":
+                return <CardCollection />;
               case "playAgain":
               case "intro":
                 return <Home />;

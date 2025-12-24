@@ -22,7 +22,8 @@ export type VideoPlayerType =
   | "journal"
   | "ranking"
   | "playAgain"
-  | "endChapter";
+  | "endChapter"
+  | "cardCollection";
 export interface VideoPlayerContextType {
   type: VideoPlayerType;
   setType: (type: VideoPlayerType) => void;
@@ -93,6 +94,7 @@ export const VideoPlayerProvider = ({
     | "ranking"
     | "playAgain"
     | "endChapter"
+    | "cardCollection"
   >("intro");
   const [pauseType, setPauseType] = React.useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = React.useState<Record<
@@ -102,6 +104,7 @@ export const VideoPlayerProvider = ({
   const [currentSceneId, setCurrentSceneId] = React.useState<string | null>(
     null
   );
+  console.log({ currentSceneId });
   const [collectionItems, setCollectionItems] = React.useState<
     Record<string, any>
   >({});
@@ -454,7 +457,6 @@ export const VideoPlayerProvider = ({
       console.log("🚀 ~ [HOTSPOT COLLECTION ITEM]", collectionItemId);
       const [hotspotId, hotspotItemId] = collectionItemId.split("_item_");
 
-      pause();
       setDialogInfoState({
         isOpen: true,
         data: null,
@@ -495,6 +497,7 @@ export const VideoPlayerProvider = ({
                 minCollectionItems,
               },
             };
+            console.log(items);
             setCollectionItems(items);
             showToast({
               description: `Bạn đã thu thập được vật phẩm ${items[hotspotId].collectionIds.length}/${minCollectionItems}`,

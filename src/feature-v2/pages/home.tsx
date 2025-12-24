@@ -26,7 +26,7 @@ export default function Home() {
   }, [chapter.scenes, chapter.progress?.currentScene?.watchingSecond]);
 
   const handleClick = async (
-    actionName: "story" | "journal" | "ranking" | "playAgain"
+    actionName: "story" | "journal" | "ranking" | "playAgain" | "cardCollection"
   ) => {
     if (actionName === "playAgain") {
       setDialogName("quitPlayer");
@@ -117,6 +117,36 @@ export default function Home() {
     };
   }, []);
 
+  const HOME_BUTTON = React.useMemo(() => [
+    {
+      icon: `/images/window-icon.png?v=${IMAGE_VERSION}`,
+      label: "Cốt truyện",
+      onClick: () => handleClick("story"),
+    },
+    {
+      icon: `/images/book-icon.png?v=${IMAGE_VERSION}`,
+      label: "Nhật ký",
+      onClick: () => handleClick("journal"),
+    },
+    {
+      icon: `/images/rank-icon.png?v=${IMAGE_VERSION}`,
+      label: "Xếp hạng",
+      onClick: () => handleClick("ranking"),
+    },
+    {
+      icon: `/images/book-icon.png?v=${IMAGE_VERSION}`,
+      label: "Bộ sưu tập",
+      onClick: () => handleClick("cardCollection"),
+    },
+    ...(+(isPlaying || 0) > 0 ? [
+      {
+        icon: `/images/reload-icon.png?v=${IMAGE_VERSION}`,
+        label: "Chơi lại",
+        onClick: () => handleClick("playAgain"),
+      },
+    ] : []),
+  ], [IMAGE_VERSION, handleClick, activeShakeIndex, shakeOffset]);
+
   return (
     <div className="relative w-full h-full overflow-hidden">
       <img
@@ -125,60 +155,22 @@ export default function Home() {
         className="absolute top-8 left-[50%] translate-x-[-50%] w-[263px] h-[120px] lg:w-[340px] lg:h-[144px] object-cover"
       />
       <div className="flex flex-col h-full justify-center items-center gap-4 w-fit pl-2 relative z-100">
-        <div
-          style={{
-            transform: `translateY(${activeShakeIndex === 0 ? shakeOffset : 0
-              }px)`,
-            transition: "transform 80ms linear",
-          }}
-        >
-          <HomeButton
-            icon={`/images/window-icon.png?v=${IMAGE_VERSION}`}
-            label="Cốt truyện"
-            onClick={() => handleClick("story")}
-          />
-        </div>
-        <div
-          style={{
-            transform: `translateY(${activeShakeIndex === 1 ? shakeOffset : 0
-              }px)`,
-            transition: "transform 80ms linear",
-          }}
-        >
-          <HomeButton
-            icon={`/images/book-icon.png?v=${IMAGE_VERSION}`}
-            label="Nhật ký"
-            onClick={() => handleClick("journal")}
-          />
-        </div>
-        <div
-          style={{
-            transform: `translateY(${activeShakeIndex === 2 ? shakeOffset : 0
-              }px)`,
-            transition: "transform 80ms linear",
-          }}
-        >
-          <HomeButton
-            icon={`/images/rank-icon.png?v=${IMAGE_VERSION}`}
-            label="Xếp hạng"
-            onClick={() => handleClick("ranking")}
-          />
-        </div>
-        {+(isPlaying || 0) > 0 && (
+        {HOME_BUTTON.map((button, index) => (
           <div
+            key={index}
             style={{
-              transform: `translateY(${activeShakeIndex === 3 ? shakeOffset : 0
+              transform: `translateY(${activeShakeIndex === index ? shakeOffset : 0
                 }px)`,
               transition: "transform 80ms linear",
             }}
           >
             <HomeButton
-              icon={`/images/reload-icon.png?v=${IMAGE_VERSION}`}
-              label="Chơi lại"
-              onClick={() => handleClick("playAgain")}
+              icon={button.icon}
+              label={button.label}
+              onClick={button.onClick}
             />
           </div>
-        )}
+        ))}
       </div>
       <div className="absolute -bottom-6 lg:-bottom-16 left-1/2 -translate-x-1/2 z-10">
         <div
