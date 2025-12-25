@@ -26,7 +26,7 @@ export default function Home() {
   }, [chapter.scenes, chapter.progress?.currentScene?.watchingSecond]);
 
   const handleClick = async (
-    actionName: "story" | "journal" | "ranking" | "playAgain" | "collection"
+    actionName: "story" | "journal" | "ranking" | "playAgain" | "collection" | "cardCollection"
   ) => {
     if (actionName === "playAgain") {
       setDialogName("quitPlayer");

@@ -24,7 +24,8 @@ export type VideoPlayerType =
   | "ranking"
   | "playAgain"
   | "endChapter"
-  | "cardCollection";
+  | "cardCollection"
+  | "collection";
 export interface VideoPlayerContextType {
   type: VideoPlayerType;
   setType: (type: VideoPlayerType) => void;
@@ -87,17 +88,7 @@ export const VideoPlayerProvider = ({
   const { mutate: submitHotspot } = useSubmitHotspot();
   const { showToast } = useToast();
 
-  const [type, setType] = React.useState<
-    | "intro"
-    | "interactive"
-    | "story"
-    | "journal"
-    | "ranking"
-    | "playAgain"
-    | "endChapter"
-    | "endChapter"
-    | "collection"
-  >("intro");
+  const [type, setType] = React.useState<VideoPlayerType>("intro");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -109,16 +100,18 @@ export const VideoPlayerProvider = ({
     "journal": "/journal",
     "ranking": "/rank",
     "collection": "/collection",
+    "cardCollection": "/card-collection",
     "interactive": "/watch",
     "playAgain": "/", // Maps to home
   };
 
-  const reverseRouteMap: Record<string, "intro" | "story" | "journal" | "ranking" | "collection" | "interactive"> = {
+  const reverseRouteMap: Record<string, VideoPlayerType> = {
     "/": "intro",
     "/chapter": "story",
     "/journal": "journal",
     "/rank": "ranking",
     "/collection": "collection",
+    "/card-collection": "cardCollection",
     "/watch": "interactive",
   }
 

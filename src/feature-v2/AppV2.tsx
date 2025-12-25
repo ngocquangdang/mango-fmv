@@ -7,7 +7,7 @@ import { VideoPlayerProvider } from "../contexts/video-player-provider";
 import { useVideoPlayerContext } from "../contexts";
 import { useUserContext } from "../features/user/context";
 
-import { BrowserRouter, Routes, Route, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet, useNavigate } from "react-router-dom";
 import VideoPlayer from "../features/video-player";
 import GameModal from "./components/ui/dialog";
 import Home from "./pages/home";
@@ -58,7 +58,7 @@ function LayoutWrapper() {
   const {
     type, // Still used for internal player states like 'interactive' vs others? Or we map routes to types?
     quitPlayer,
-    setType, // We need to sync this or replace usage
+    // setType removed - using routing instead
     setReviewScene,
     pause,
     onPlay,
@@ -76,7 +76,7 @@ function LayoutWrapper() {
   } = useVideoPlayerContext();
 
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation(); - not used
   const [dialogName, setDialogName] = React.useState<string | null>(null);
 
   const loading = userLoading || isPlayerLoading;
