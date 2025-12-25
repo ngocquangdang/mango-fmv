@@ -19,7 +19,7 @@ export default function MergeCardPage() {
   const { "*": subPageParam } = useParams();
 
   const [selectedTab, setSelectedTab] = useState<string>("");
-  const [slots, setSlots] = useState<(CollectionItem | null)[]>([null, null]);
+  const [slots, setSlots] = useState<(CollectionItem | null)[]>([null, null, null]);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [resultCard, setResultCard] = useState<Card | null>(null);
 
