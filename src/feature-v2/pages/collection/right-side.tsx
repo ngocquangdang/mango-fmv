@@ -1,21 +1,23 @@
 import React from "react";
 
-interface CollectionItem {
+export interface CollectionItem {
   id: string;
   name: string;
   image: string;
   isLocked: boolean;
   rank?: string;
+  count?: number; // Add count to support quantity
 }
 
 interface RightSideProps {
   items?: CollectionItem[];
   title?: string;
+  renderItem?: (item: CollectionItem) => React.ReactNode;
 }
 
-const ItemCard = ({ item, borderColorClass, isLocked }: { item: CollectionItem; borderColorClass: string; isLocked: boolean }) => {
+export const ItemCard = ({ item, borderColorClass, isLocked, className = "" }: { item: CollectionItem; borderColorClass: string; isLocked: boolean, className?: string }) => {
   return (
-    <div className={`relative rounded w-[44px] h-[60px] overflow-hidden aspect-[3/4.5] ${isLocked ? 'border-opacity-30' : 'border-opacity-60'} ${borderColorClass}`}>
+    <div className={`relative rounded w-[44px] h-[60px] overflow-hidden aspect-[3/4.5] ${isLocked ? 'border-opacity-30' : 'border-opacity-60'} ${borderColorClass} ${className}`}>
       {/* Background/Image */}
       <div className="w-full h-full bg-gray-300 relative">
         <img
@@ -33,7 +35,7 @@ const ItemCard = ({ item, borderColorClass, isLocked }: { item: CollectionItem; 
   );
 };
 
-interface FolderTheme {
+export interface FolderTheme {
   headerBg: string;
   bodyBg: string; // Tailwind class like bg-[#FFF579]
   titleColor: string; // Tailwind text color class
@@ -42,14 +44,16 @@ interface FolderTheme {
   itemsClass?: string;
 }
 
-const CollectionFolder = ({
+export const CollectionFolder = ({
   title,
   items,
-  theme
+  theme,
+  renderItem
 }: {
   title: string;
   items: CollectionItem[];
   theme: FolderTheme;
+  renderItem?: (item: CollectionItem, theme: FolderTheme) => React.ReactNode;
 }) => {
   return (
     <div className="w-full flex flex-col">
@@ -67,12 +71,13 @@ const CollectionFolder = ({
       <div className={`w-full relative overflow-hidden ${theme.bodyBg}`}>
         <div className={`flex items-center justify-between relative p-1 z-10 ${theme.itemsClass}`}>
           {items.map((item, index) => (
-            <ItemCard
-              key={index}
-              item={item}
-              borderColorClass={theme.borderColor}
-              isLocked={item.isLocked}
-            />
+            renderItem ? renderItem(item, theme) :
+              <ItemCard
+                key={index}
+                item={item}
+                borderColorClass={theme.borderColor}
+                isLocked={item.isLocked}
+              />
           ))}
         </div>
       </div>
@@ -80,7 +85,7 @@ const CollectionFolder = ({
   );
 };
 
-const URCollectionFolder = ({ items }: { items: CollectionItem[] }) => {
+export const URCollectionFolder = ({ items, renderItem }: { items: CollectionItem[], renderItem?: (item: CollectionItem, theme: FolderTheme) => React.ReactNode }) => {
   return (
     <div className="w-full h-[68px] relative mt-6 mb-4">
       {/* Container with orange border and grid bg */}
@@ -141,11 +146,18 @@ const URCollectionFolder = ({ items }: { items: CollectionItem[] }) => {
           ) : (
             items.map((item, idx) => (
               <div key={idx} className="relative rounded shadow-[0_0_12px_2px_rgba(255,107,53,0.5)]">
-                <ItemCard
-                  item={item}
-                  borderColorClass="border-[#FF9F1C]" // Orange border for card
-                  isLocked={item.isLocked}
-                />
+                {renderItem ? renderItem(item, {
+                  headerBg: "",
+                  bodyBg: "",
+                  titleColor: "",
+                  borderColor: "border-[#FF9F1C]",
+                  gridColor: "",
+                }) :
+                  <ItemCard
+                    item={item}
+                    borderColorClass="border-[#FF9F1C]" // Orange border for card
+                    isLocked={item.isLocked}
+                  />}
               </div>
             ))
           )}
@@ -157,7 +169,7 @@ const URCollectionFolder = ({ items }: { items: CollectionItem[] }) => {
 
 import { useCollection } from "./hooks/use-collection";
 
-const RightSide: React.FC<RightSideProps> = () => {
+const RightSide: React.FC<RightSideProps> = ({ renderItem }) => {
   const { data, isLoading } = useCollection();
 
   // If items are passed via props, use them (legacy/mock support)
@@ -218,7 +230,7 @@ const RightSide: React.FC<RightSideProps> = () => {
         // Use UR folder for specific tier if needed, or just standard CollectionFolder
         // Assuming UR uses the special folder component
         if (group.tierCode === 'UR') {
-          return <URCollectionFolder key={group.tierCode} items={folderItems} />;
+          return <URCollectionFolder key={group.tierCode} items={folderItems} renderItem={renderItem} />;
         }
 
         return (
@@ -227,6 +239,7 @@ const RightSide: React.FC<RightSideProps> = () => {
               title={group.tierName}
               items={folderItems}
               theme={themeProps}
+              renderItem={renderItem}
             />
           </div>
         );

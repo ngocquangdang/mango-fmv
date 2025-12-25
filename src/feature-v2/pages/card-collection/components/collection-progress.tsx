@@ -1,6 +1,4 @@
 
-// import React from "react";
-
 
 const CollectionProgress = ({
   current = 0,

@@ -1,5 +1,6 @@
-
 import React from "react";
+import type { UseMutateAsyncFunction } from "@tanstack/react-query";
+import type { ApiResponse } from "../../../../lib/api/api-client";
 import type { CollectionStats, Card, Banner, UserState, TicketPackage } from "../services/card-collection-service";
 
 export interface CardCollectionContextType {
@@ -12,8 +13,8 @@ export interface CardCollectionContextType {
   error: Error | null;
 
   // Actions
-  openBlindBag: (bannerId: string, quantity: number) => Promise<Card[]>;
-  buyTickets: (packageId: number) => Promise<void>;
+  openBlindBag: UseMutateAsyncFunction<ApiResponse<{ results: Card[], bonusRewards: Card[], state: UserState }>, Error, { bannerId: string, quantity: number }, unknown>;
+  buyTickets: UseMutateAsyncFunction<number, Error, number, unknown>;
 
   // Action States
   isOpening: boolean;

@@ -37,12 +37,20 @@ const TicketPurchaseOverlay = ({
 
         {/* Currency Display */}
         <div className="relative z-50">
-          <div className="relative">
-            <img src="/images/elements/tag-element.png" alt="bg" className="h-10 w-auto absolute -top-1 -left-4 z-[-1]" />
-            <div className="bg-white/90 border-2 border-blue-600 rounded-full h-10 px-4 pl-8 flex items-center gap-2 min-w-[100px] shadow-lg transform -rotate-2">
-              <img src="/images/elements/tag-element.png" alt="ticket" className="w-8 h-6 absolute -left-2 top-1" />
-              <span className="text-blue-800 font-bold ml-2">{currentTickets}</span>
+          <div className="absolute top-0 right-0 flex items-center gap-2 p-4">
+            <div
+              className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
+              style={{ backgroundImage: `url(/images/score-banner.png)` }}
+            >
+              {currentTickets}
+
             </div>
+            <div className='absolute top-3 left-3 w-8 h-8' style={{
+              backgroundImage: "url('/images/collection/ticket.png')",
+              backgroundSize: "contain",
+              backgroundPosition: "center center",
+              backgroundRepeat: "no-repeat",
+            }}></div>
           </div>
         </div>
       </div>

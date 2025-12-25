@@ -2,7 +2,6 @@
 import React from "react";
 import { CardCollectionContext } from "./card-collection-context";
 import { useCollectionData, useOpenBlindBag, usePurchaseTickets, useBanners, useTicketPackages } from "../hooks/use-card-collection-query";
-import type { Card } from "../services/card-collection-service";
 
 export const CardCollectionProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: stats, isLoading, error } = useCollectionData();
@@ -16,15 +15,6 @@ export const CardCollectionProvider = ({ children }: { children: React.ReactNode
   const { mutateAsync: openBlindBagMutation, isPending: isOpening } = useOpenBlindBag();
   const { mutateAsync: purchaseTicketsMutation, isPending: isBuying } = usePurchaseTickets();
 
-  const handleOpenBlindBag = React.useCallback(async (bannerId: string, quantity: number): Promise<Card[]> => {
-    const result = await openBlindBagMutation({ bannerId, amount: quantity });
-    return result.data?.cards || [];
-  }, [openBlindBagMutation]);
-
-  const handleBuyTickets = React.useCallback(async (packageId: number): Promise<void> => {
-    await purchaseTicketsMutation(packageId);
-  }, [purchaseTicketsMutation]);
-
   const value = React.useMemo(() => ({
     stats,
     banners,
@@ -32,11 +22,11 @@ export const CardCollectionProvider = ({ children }: { children: React.ReactNode
     ticketPackages,
     isLoading,
     error: error as Error | null,
-    openBlindBag: handleOpenBlindBag,
-    buyTickets: handleBuyTickets,
+    openBlindBag: openBlindBagMutation,
+    buyTickets: purchaseTicketsMutation,
     isOpening,
     isBuying,
-  }), [stats, banners, userState, ticketPackages, isLoading, error, handleOpenBlindBag, handleBuyTickets, isOpening, isBuying]);
+  }), [stats, banners, userState, ticketPackages, isLoading, error, openBlindBagMutation, purchaseTicketsMutation, isOpening, isBuying]);
 
   return (
     <CardCollectionContext.Provider value={value}>

@@ -5,11 +5,15 @@ import type { ApiResponse } from "../../../../lib/api/api-client";
 import { getLocalParam } from '../../../../lib/api/storage';
 
 export interface Card {
-  id: string;
+  id?: string;
+  cardId?: string; // API response
   name: string;
-  image: string;
-  rarity: "R" | "R+" | "SR" | "SSR";
-  isOwned: boolean;
+  image?: string;
+  imageUrl?: string; // API response
+  rarity?: "R" | "R+" | "SR" | "SSR";
+  tier?: "R" | "R+" | "SR" | "SSR"; // API response
+  isOwned?: boolean;
+  isNew?: boolean; // API response
 }
 
 export interface CollectionStats {
@@ -38,6 +42,8 @@ export interface Banner {
 export interface UserState {
   ticketCount: number;
   pityCount: number;
+  collectedCount?: number;
+  totalCount?: number;
 }
 
 export interface BannersResponse {
@@ -122,7 +128,8 @@ export const CardCollectionService = {
      return mockTickets;
   },
 
-  drawCards: async (bannerId: string, amount: number): Promise<ApiResponse<{ cards: Card[], userState: UserState }>> => {
+  drawCards: async (bannerId: string, amount: number): Promise<ApiResponse<{ results: Card[], bonusRewards: Card[], state: UserState }>> => {
+    console.log("Drawing cards for banner", bannerId, "amount", amount);
     return apiClientVideoProgress.post("/gacha/draw", {
         bannerId,
         amount

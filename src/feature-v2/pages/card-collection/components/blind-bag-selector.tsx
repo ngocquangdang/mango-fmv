@@ -8,13 +8,14 @@ interface BlindBagSelectorProps {
   onSelect?: (index: number) => void;
 }
 
-const BlindBagItem = ({ item, isActive = false }: { item: any; isActive?: boolean }) => {
+const BlindBagItem = ({ item, isActive: _isActive = false }: { item: any; isActive?: boolean }) => {
   return (
-    <div className={`relative transition-all duration-300 flex flex-col items-center ${isActive ? "z-10 scale-100 -translate-y-2" : "opacity-70 scale-90 translate-y-2 grayscale-[0.3]"}`}>
-      {isActive && <div className="absolute inset-0 bg-white/40 blur-2xl rounded-full scale-110"></div>}
+    <div className="relative transition-all duration-300 flex flex-col items-center z-10">
+      {/* Light effect can be kept or removed, keeping it simple for now */}
+      {/* {isActive && <div className="absolute inset-0 bg-white/50 blur-xl rounded-full"></div>} */}
 
       <div
-        className={`flex items-center justify-center relative transition-all duration-300 ${isActive ? "w-[180px] h-[140px]" : "w-[90px] h-[70px]"}`}
+        className="flex items-center justify-center relative w-[100px] h-[90px] lg:w-[120px] lg:h-[110px]"
         style={{
           backgroundImage: "url('/images/collection/blind-bag.png')",
           backgroundSize: "contain",
@@ -23,16 +24,19 @@ const BlindBagItem = ({ item, isActive = false }: { item: any; isActive?: boolea
         }}
       >
         <img
-          src="/images/home/paper-CB.png"
+          src={item?.image}
           alt="bag"
-          className={`object-contain transition-all duration-300 ${isActive ? "w-[100px] h-[60px] drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]" : "w-[40px] h-[30px]"}`}
+          className="object-contain w-[60px] h-[40px] lg:w-[70px] lg:h-[50px] drop-shadow-md"
         />
       </div>
 
-      <div className={`transition-all duration-300 flex items-center justify-center bg-center bg-no-repeat bg-contain ${isActive ? "w-[120px] h-[48px] mt-2" : "w-[80px] h-[36px] mt-1"}`} style={{
+      <div className="absolute top-[85%] left-1/2 -translate-x-1/2 flex items-center justify-center w-[90px] h-[36px] lg:w-[100px] lg:h-[40px]" style={{
         backgroundImage: "url('/images/tab-selected.png')",
+        backgroundSize: "contain",
+        backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
       }}>
-        <div className={`${isActive ? "text-sm font-bold text-[#3B4C7A] -rotate-1" : "text-[10px] text-gray-600 scale-90"}`}>
+        <div className="text-[10px] lg:text-xs font-bold text-[#3B4C7A] text-center w-[80px] line-clamp-1 pb-1">
           {item?.name}
         </div>
       </div>
@@ -66,21 +70,21 @@ const BlindBagSelector = ({ banners = [], selectedIndex = 0, onSelect }: BlindBa
   const rightIndex = (selectedIndex + 1) % items.length;
 
   return (
-    <div className="flex items-center justify-center w-full px-2">
+    <div className="relative flex items-center justify-center w-full px-8 py-4">
       {/* Left Arrow */}
       <div
-        className={`component-clickable absolute left-0 z-50 p-2 cursor-pointer hover:scale-110 transition-transform`}
+        className="cursor-pointer absolute -left-20 z-50 hover:scale-110 transition-transform"
         onClick={handlePrev}
       >
         <img
           src="/images/chevon-left.png"
           alt="prev-page"
-          className="w-6 h-6 lg:w-8 lg:h-8 drop-shadow-md"
+          className="w-8 h-8 drop-shadow-md"
         />
       </div>
 
       {/* Carousel Items */}
-      <div className="flex items-end justify-center gap-2 h-[240px] w-full">
+      <div className="flex items-center justify-center gap-1 w-full">
         <BlindBagItem item={items[leftIndex]} isActive={false} />
         <BlindBagItem item={items[selectedIndex]} isActive={true} />
         <BlindBagItem item={items[rightIndex]} isActive={false} />
@@ -88,13 +92,13 @@ const BlindBagSelector = ({ banners = [], selectedIndex = 0, onSelect }: BlindBa
 
       {/* Right Arrow */}
       <div
-        className={`component-clickable absolute right-0 z-50 p-2 cursor-pointer hover:scale-110 transition-transform`}
+        className="cursor-pointer absolute -right-20 z-50 hover:scale-110 transition-transform"
         onClick={handleNext}
       >
         <img
           src="/images/chevon-right.png"
           alt="next-page"
-          className="w-6 h-6 lg:w-8 lg:h-8 drop-shadow-md"
+          className="w-8 h-8 drop-shadow-md"
         />
       </div>
     </div>

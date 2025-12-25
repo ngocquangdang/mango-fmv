@@ -4,9 +4,11 @@ import NotebookLayout from "../../components/notebook";
 import Banner from "../../components/banner";
 import { useVideoPlayerContext } from "../../../contexts";
 import CardCollection from "../card-collection";
+import MergeCardPage from "./merge-card";
 import LeftSide from "./left-side";
 import RightSide from "./right-side";
-import { CollectionProvider, useCollectionContext } from "./context/collection-context";
+import { CollectionProvider, useCollectionContext } from './context/collection-context';
+
 
 export function CollectionPageContent() {
   const { setType } = useVideoPlayerContext();
@@ -28,7 +30,7 @@ export function CollectionPageContent() {
     fetchCollection(id);
   };
 
-  const categories = characters.map(char => ({
+  const categories = characters.map((char) => ({
     id: char.id,
     name: char.name
   }));
@@ -51,6 +53,10 @@ export function CollectionPageContent() {
 
   if (subPageParam === "card-collection") {
     return <CardCollection />;
+  }
+
+  if (subPageParam && subPageParam.startsWith("merge-card")) {
+    return <MergeCardPage />;
   }
 
   return (
