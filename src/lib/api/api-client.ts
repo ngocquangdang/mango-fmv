@@ -39,6 +39,8 @@ const createHeaders = (customHeaders?: Record<string, string>): Headers => {
   const token = getAuthToken();
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
+    // Also set X-Ticket header for ticket service compatibility
+    headers.set("X-Ticket", token);
   }
 
   return headers;
@@ -163,6 +165,11 @@ export const apiClientVideoProgress = new FetchApiClient(
 
 export const apiClienProject = new FetchApiClient(
   "https://onlala-cms-api-stg.onidservice.cloud/api/v1"
+);
+
+// Ticket service API client (local development)
+export const apiClientTicket = new FetchApiClient(
+  "http://localhost:3001/api/v1"
 );
 
 export type { ApiResponse as ApiResponseType };
