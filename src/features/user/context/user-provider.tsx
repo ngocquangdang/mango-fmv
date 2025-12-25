@@ -1,5 +1,6 @@
-import React from "react";
+import * as React from "react";
 import { UserContext } from ".";
+import { useNavigate } from "react-router-dom";
 import {
   mapChapter,
   useChapter,
@@ -45,6 +46,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mutate: initQrSession } = useInitQrSession();
   const { mutate: confirmQrLogin } = useConfirmQrSession();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [userInfo, setUserInfo] = React.useState<Record<string, any>>({});
   const [qrSessionId, setQrSessionId] = React.useState<string | null>(null);
@@ -218,38 +220,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const isMobileLike = isIOS || isAndroid;
 
     const hasLocalTicket = !!getLocalParam("ticket");
+    // If we are in dev or mobile-like env and NO ticket, redirect to login page
     if ((import.meta.env.DEV || !isMobileLike) && !hasLocalTicket) {
       logInfo(
-        "UserProvider - Mobile detected without ticket, initializing QR session",
+        "UserProvider - Mobile/Dev detected without ticket, redirecting to QR Login",
         {},
         "UserProvider"
       );
-
-      initQrSession(undefined, {
-        onSuccess: (response: any) => {
-          const sessionId = response.data.sessionId;
-          // Generate QR URL from sessionId
-          const generatedQrUrl = `https://gocuanhamynam.mangoplus.vn?sessionId=${sessionId}`;
-
-          logInfo(
-            "UserProvider - QR session initialized",
-            { sessionId, qrUrl: generatedQrUrl },
-            "UserProvider"
-          );
-          setQrSessionId(sessionId);
-          setQrUrl(generatedQrUrl);
-          setIsQrLoginVisible(true);
-        },
-        onError: (error: any) => {
-          logInfo(
-            "UserProvider - Failed to initialize QR session",
-            { error },
-            "UserProvider"
-          );
-        },
-      });
+      navigate("/login-qr");
     }
-  }, [mgApi, isPreview, initQrSession]);
+  }, [mgApi, isPreview, navigate]);
 
   const handleQrSuccess = React.useCallback((ticket: string) => {
     logInfo(

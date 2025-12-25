@@ -13,15 +13,19 @@ import { useCardCollection } from "./hooks/use-card-collection"; // Import hook
 
 function CardCollectionContent() {
   const { setType } = useVideoPlayerContext();
-  const { stats, openBlindBag, isOpening } = useCardCollection();
+  const { stats, banners, userState, openBlindBag, isOpening } = useCardCollection();
 
   const [isOpeningBulk, setIsOpeningBulk] = React.useState(false);
   const [isOpeningSingle, setIsOpeningSingle] = React.useState(false);
   const [isBuyingTickets, setIsBuyingTickets] = React.useState(false);
+  const [selectedBannerIndex, setSelectedBannerIndex] = React.useState(0);
+
+  const activeBanner = banners[selectedBannerIndex];
 
   const handleBulkOpen = async () => {
+    if (!activeBanner) return;
     try {
-      await openBlindBag(10);
+      await openBlindBag(activeBanner.id, 10);
       setIsOpeningBulk(true);
     } catch (e) {
       console.error("Failed to open bags", e);
@@ -30,8 +34,9 @@ function CardCollectionContent() {
   };
 
   const handleSingleOpen = async () => {
+    if (!activeBanner) return;
     try {
-      await openBlindBag(1);
+      await openBlindBag(activeBanner.id, 1);
       setIsOpeningSingle(true);
     } catch (e) {
       console.error("Failed to open bag", e);
@@ -48,12 +53,19 @@ function CardCollectionContent() {
   //   }
   // }
 
-  const tickets = stats?.tickets || 0;
+  // Use real ticket count from API if available, fallback to stats (mock or other source)
+  const tickets = userState?.ticketCount ?? 0;
   const collectedCount = stats?.collectedCards || 0;
-  const totalCards = stats?.totalCards || 40;
+  const totalCards = stats?.totalCards || 0;
 
   return (
     <div className="w-full h-full flex flex-col items-center relative overflow-hidden">
+      <div className='absolute inset-0 w-full h-full ' style={{
+        backgroundImage: "url('/images/collection/bg.png')",
+        backgroundSize: "contain",
+        backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
+      }}></div>
       {/* Back Button */}
       <div
         className="absolute top-4 left-4 z-50 cursor-pointer w-9 h-9"
@@ -63,20 +75,18 @@ function CardCollectionContent() {
       </div>
 
       {/* Currency Top Right */}
-      <div className="absolute top-4 right-4 z-50 flex items-center cursor-pointer hover:scale-105 transition-transform" onClick={() => setIsBuyingTickets(true)}>
-        <div className="relative">
-          <img src="/images/elements/tag-element.png" alt="bg" className="h-10 w-auto absolute -top-1 -left-4 z-[-1]" />
-          {/* Placeholder for ticket currency style */}
-          <div className="bg-white/90 border-2 border-blue-600 rounded-full h-10 px-4 pl-8 flex items-center gap-2 min-w-[120px] shadow-lg transform -rotate-2">
-            <img src="/images/elements/tag-element.png" alt="ticket" className="w-8 h-6 absolute -left-2 top-1" />
-            <span className="text-blue-800 font-bold ml-4">{tickets}</span>
-            <button className="w-5 h-5 bg-black text-white rounded-full flex items-center justify-center text-xs ml-auto">+</button>
-          </div>
+      <div className="absolute top-0 right-0 flex items-center gap-2 p-4">
+        <div
+          className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
+          style={{ backgroundImage: `url(/images/score-banner.png)` }}
+        >
+          {tickets}
         </div>
+
       </div>
 
       {/* Header Banner */}
-      <div className="mt-4">
+      <div className="flex flex-col items-center gap-2">
         <Banner text="Thu thập thẻ" />
       </div>
 
@@ -85,42 +95,54 @@ function CardCollectionContent() {
         <CollectionProgress current={collectedCount} max={totalCards} />
       </div>
 
-      {/* Blind Bag Area */}
-      <div className="flex-1 w-full flex items-center justify-center relative z-10 -mt-8">
-        <BlindBagSelector />
-      </div>
+      <div className='relative z-10 -top-[50px] w-[386px]' style={{
+        backgroundImage: "url('/images/collection/bg-inside.png')",
+        backgroundSize: "contain",
+        backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
+      }}>
 
-      {/* Action Buttons */}
-      <div className="mb-4 lg:mb-10 flex gap-8 z-20 items-end">
-        {/* Single Open */}
-        <div className="flex flex-col items-center gap-2">
-          <Button
-            label={isOpening ? "ĐANG XÉ..." : "XÉ TÚI MÙ"}
-            size="medium"
-            lgSize="large"
-            className="text-black! font-bold uppercase"
-            onClick={handleSingleOpen}
-            disabled={isOpening}
+        {/* Blind Bag Area */}
+        <div className="flex-1 w-[386px] flex items-center justify-center relative z-10 mt-10">
+          <BlindBagSelector
+            banners={banners}
+            selectedIndex={selectedBannerIndex}
+            onSelect={setSelectedBannerIndex}
           />
-          <div className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-md border border-black/10">
-            <span className="font-bold text-xs uppercase">Tốn 1</span>
-            <img src="/images/elements/tag-element.png" alt="ticket" className="w-4 h-3" />
-          </div>
         </div>
 
-        {/* Bulk Open */}
-        <div className="flex flex-col items-center gap-2">
-          <Button
-            label={isOpening ? "ĐANG XÉ..." : "XÉ TÚI MÙ X10"}
-            size="medium"
-            lgSize="large"
-            className="text-black! font-bold uppercase"
-            onClick={handleBulkOpen}
-            disabled={isOpening}
-          />
-          <div className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-md border border-black/10">
-            <span className="font-bold text-xs uppercase">Tốn 10</span>
-            <img src="/images/elements/tag-element.png" alt="ticket" className="w-4 h-3" />
+        {/* Action Buttons */}
+        <div className="mb-4 lg:mb-10 flex gap-8 z-20 items-center justify-center">
+          {/* Single Open */}
+          <div className="flex flex-col items-center gap-2">
+            <Button
+              label={isOpening ? "ĐANG XÉ..." : "XÉ TÚI MÙ"}
+              size="medium"
+              lgSize="large"
+              className="text-black! "
+              onClick={handleSingleOpen}
+              disabled={isOpening}
+            />
+            <div className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-md border border-black/10">
+              <span className="font-bold text-xs uppercase">Tốn 1</span>
+              <img src="/images/elements/tag-element.png" alt="ticket" className="w-4 h-3" />
+            </div>
+          </div>
+
+          {/* Bulk Open */}
+          <div className="flex flex-col items-center gap-2">
+            <Button
+              label={isOpening ? "ĐANG XÉ..." : "XÉ TÚI MÙ X10"}
+              size="medium"
+              lgSize="large"
+              className="text-black!"
+              onClick={handleBulkOpen}
+              disabled={isOpening}
+            />
+            <div className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-md border border-black/10">
+              <span className="font-bold text-xs uppercase">Tốn 10</span>
+              <img src="/images/elements/tag-element.png" alt="ticket" className="w-4 h-3" />
+            </div>
           </div>
         </div>
       </div>

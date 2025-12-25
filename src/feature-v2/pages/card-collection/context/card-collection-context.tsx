@@ -1,15 +1,18 @@
 
 import React from "react";
-import type { CollectionStats, Card } from "../services/card-collection-service";
+import type { CollectionStats, Card, Banner, UserState, TicketPackage } from "../services/card-collection-service";
 
 export interface CardCollectionContextType {
   // Data
   stats: CollectionStats | undefined;
+  banners: Banner[];
+  userState: UserState | undefined;
+  ticketPackages: TicketPackage[];
   isLoading: boolean;
   error: Error | null;
 
   // Actions
-  openBlindBag: (quantity: number) => Promise<Card[]>;
+  openBlindBag: (bannerId: string, quantity: number) => Promise<Card[]>;
   buyTickets: (packageId: number) => Promise<void>;
 
   // Action States

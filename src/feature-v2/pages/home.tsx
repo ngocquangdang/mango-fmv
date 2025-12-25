@@ -26,7 +26,7 @@ export default function Home() {
   }, [chapter.scenes, chapter.progress?.currentScene?.watchingSecond]);
 
   const handleClick = async (
-    actionName: "story" | "journal" | "ranking" | "playAgain" | "cardCollection"
+    actionName: "story" | "journal" | "ranking" | "playAgain" | "collection"
   ) => {
     if (actionName === "playAgain") {
       setDialogName("quitPlayer");
@@ -136,7 +136,7 @@ export default function Home() {
     {
       icon: `/images/book-icon.png?v=${IMAGE_VERSION}`,
       label: "Bộ sưu tập",
-      onClick: () => handleClick("cardCollection"),
+      onClick: () => handleClick("collection"),
     },
     ...(+(isPlaying || 0) > 0 ? [
       {

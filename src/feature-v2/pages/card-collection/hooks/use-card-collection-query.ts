@@ -14,17 +14,26 @@ export const useCollectionData = () => {
   });
 };
 
+export const useBanners = () => {
+  return useQuery({
+    queryKey: [...COLLECTION_KEYS.all, "banners"],
+    queryFn: CardCollectionService.getBanners,
+  });
+};
+
 export const useOpenBlindBag = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (quantity: number) => CardCollectionService.openBlindBag(quantity),
+    mutationFn: ({ bannerId, amount }: { bannerId: string; amount: number }) => 
+        CardCollectionService.drawCards(bannerId, amount),
     onSuccess: () => {
-        // Invalidate stats to refresh ticket count and collection progress
-        queryClient.invalidateQueries({ queryKey: COLLECTION_KEYS.stats() });
+        // Invalidate all collection data to refresh tickets (in banners) and collection stats
+        queryClient.invalidateQueries({ queryKey: COLLECTION_KEYS.all });
     },
   });
 };
+
 
 export const usePurchaseTickets = () => {
     const queryClient = useQueryClient();
@@ -36,3 +45,10 @@ export const usePurchaseTickets = () => {
       },
     });
   };
+
+export const useTicketPackages = () => {
+    return useQuery({
+        queryKey: [...COLLECTION_KEYS.all, "tickets"],
+        queryFn: CardCollectionService.getTicketPackages,
+    });
+};
