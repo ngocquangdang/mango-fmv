@@ -1,5 +1,6 @@
 // API Client with authentication
 import { getAccessToken } from "./session";
+import { getLocalParam } from "./storage";
 
 export interface ApiResponse<T = any> {
   data: T;
@@ -49,8 +50,12 @@ const createHeaders = (customHeaders?: Record<string, string>): Headers => {
   const token = getAuthToken();
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
-    // Also set X-Ticket header for ticket service compatibility
-    headers.set("X-Ticket", token);
+  }
+
+  // Set X-Ticket header from localStorage (for video progress/ticket API)
+  const ticketToken = getLocalParam("ticket");
+  if (ticketToken) {
+    headers.set("X-Ticket", ticketToken);
   }
 
   return headers;
