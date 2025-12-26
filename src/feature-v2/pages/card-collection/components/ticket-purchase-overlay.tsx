@@ -17,6 +17,7 @@ const TicketPurchaseOverlay = ({
   const { ticketPackages } = useCardCollection();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ticketBalance, setTicketBalance] = useState<number>(currentTickets);
 
   // Auto-dismiss error after 5 seconds
   useEffect(() => {
@@ -28,6 +29,26 @@ const TicketPurchaseOverlay = ({
       return () => clearTimeout(timer);
     }
   }, [error]);
+
+  // Fetch user info to get current ticket balance
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (!isOpen) return;
+
+      try {
+        const response = await CardCollectionService.getUserInfo();
+        if (response.data?.ticketBalance !== undefined) {
+          setTicketBalance(response.data.ticketBalance);
+        }
+      } catch (err) {
+        console.error('Failed to fetch user info:', err);
+        // Fallback to prop value if API fails
+        setTicketBalance(currentTickets);
+      }
+    };
+
+    fetchUserInfo();
+  }, [isOpen, currentTickets]);
 
   if (!isOpen) return null;
 
@@ -78,7 +99,7 @@ const TicketPurchaseOverlay = ({
               className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
               style={{ backgroundImage: `url(/images/score-banner.png)` }}
             >
-              {currentTickets}
+              {ticketBalance}
 
             </div>
             <div className='absolute top-3 left-3 w-8 h-8' style={{

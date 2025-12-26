@@ -52,3 +52,10 @@ export const useTicketPackages = () => {
         queryFn: CardCollectionService.getTicketPackages,
     });
 };
+
+export const useUserInfo = () => {
+    return useQuery({
+        queryKey: [...COLLECTION_KEYS.all, "user-info"],
+        queryFn: CardCollectionService.getUserInfo,
+    });
+};

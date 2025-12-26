@@ -167,5 +167,12 @@ export const CardCollectionService = {
   // New method to create ticket order and get payment URL
   createTicketOrder: async (ticketId: string, quantity: number = 1) => {
     return await createTicketOrder(ticketId, quantity);
+  },
+
+  // Fetch user info including ticket balance
+  getUserInfo: async (): Promise<ApiResponse<{ userId: string; isVip: boolean; ticketBalance: number }>> => {
+    return apiClientVideoProgress.get<ApiResponse<{ userId: string; isVip: boolean; ticketBalance: number }>>("/user-info", {
+      "X-Ticket": getLocalParam("ticket") || "",
+    });
   }
 };
