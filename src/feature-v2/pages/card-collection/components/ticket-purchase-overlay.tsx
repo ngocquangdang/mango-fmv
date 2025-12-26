@@ -46,7 +46,7 @@ const TicketPurchaseOverlay = ({
       }));
 
       // Create order and get payment redirect URL
-      const orderResponse = await CardCollectionService.createTicketOrder(pkg.id, 1);
+      const orderResponse = await CardCollectionService.createTicketOrder(pkg.id, pkg.quantity);
 
       // Redirect to Pay1 payment gateway
       window.location.href = orderResponse.redirectURL;
