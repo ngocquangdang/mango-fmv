@@ -1,5 +1,5 @@
 import Banner from '../../../components/banner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CardCollectionService } from '../services/card-collection-service';
 import { useCardCollection } from '../hooks/use-card-collection';
 
@@ -17,6 +17,17 @@ const TicketPurchaseOverlay = ({
   const { ticketPackages } = useCardCollection();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-dismiss error after 5 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 5000); // 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   if (!isOpen) return null;
 
@@ -83,8 +94,20 @@ const TicketPurchaseOverlay = ({
       {/* Content Area - Purchase Options */}
       <div className="flex-1 w-full flex items-center justify-center p-4">
         {error && (
-          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-            {error}
+          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">⚠️</span>
+              <div>
+                <p className="font-bold">Server Error</p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="ml-4 hover:bg-red-600 rounded-full p-1 transition-colors"
+                aria-label="Close error"
+              >
+                ✕
+              </button>
+            </div>
           </div>
         )}
 
