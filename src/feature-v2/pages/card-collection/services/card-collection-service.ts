@@ -3,6 +3,8 @@
 import { apiClientVideoProgress } from "../../../../lib/api/api-client";
 import type { ApiResponse } from "../../../../lib/api/api-client";
 import { getLocalParam } from '../../../../lib/api/storage';
+import { getTicketPackages as getTicketPackagesAPI, createTicketOrder } from "../../../../lib/api/ticket-api";
+import type { TicketPackage as TicketPackageAPI } from "../../../../types/ticket.types";
 
 export interface Card {
   id?: string;
@@ -139,8 +141,31 @@ export const CardCollectionService = {
   },
 
   getTicketPackages: async (): Promise<ApiResponse<TicketPackage[]>> => {
-      return apiClientVideoProgress.get("/tickets", {
-          "X-Ticket": getLocalParam("ticket") || "",
-      });
+      // Use the new ticket API from localhost:3001
+      const packages = await getTicketPackagesAPI();
+
+      // Transform API response to match existing TicketPackage interface
+      const transformedPackages: TicketPackage[] = packages.map((pkg: TicketPackageAPI) => ({
+        id: pkg.id,
+        name: pkg.name,
+        quantity: pkg.quantity,
+        price: pkg.price,
+        totalPrice: pkg.price * pkg.quantity,
+        description: `${pkg.quantity} tickets package`,
+        status: pkg.status,
+        currency: pkg.currency,
+        createdAt: pkg.createdAt || new Date().toISOString(),
+        updatedAt: pkg.updatedAt || new Date().toISOString(),
+      }));
+
+      return {
+        data: transformedPackages,
+        success: true,
+      };
+  },
+
+  // New method to create ticket order and get payment URL
+  createTicketOrder: async (ticketId: string, quantity: number = 1) => {
+    return await createTicketOrder(ticketId, quantity);
   }
 };

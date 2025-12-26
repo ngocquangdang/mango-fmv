@@ -1,7 +1,6 @@
 import Banner from '../../../components/banner';
-
-
-
+import { useState } from 'react';
+import { CardCollectionService } from '../services/card-collection-service';
 import { useCardCollection } from '../hooks/use-card-collection';
 
 interface TicketPurchaseOverlayProps {
@@ -16,10 +15,36 @@ const TicketPurchaseOverlay = ({
   currentTickets,
 }: TicketPurchaseOverlayProps) => {
   const { ticketPackages } = useCardCollection();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const packages = ticketPackages.length > 0 ? ticketPackages : [];
+
+  const handlePackageClick = async (pkg: typeof packages[0]) => {
+    try {
+      setIsProcessing(true);
+      setError(null);
+
+      // Save pending order info to sessionStorage
+      sessionStorage.setItem('pending_ticket_order', JSON.stringify({
+        packageId: pkg.id,
+        quantity: pkg.quantity,
+        timestamp: Date.now(),
+      }));
+
+      // Create order and get payment redirect URL
+      const orderResponse = await CardCollectionService.createTicketOrder(pkg.id, 1);
+
+      // Redirect to Pay1 payment gateway
+      window.location.href = orderResponse.redirectURL;
+    } catch (err) {
+      console.error('Failed to create ticket order:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create order');
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[60] flex flex-col items-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
@@ -57,12 +82,29 @@ const TicketPurchaseOverlay = ({
 
       {/* Content Area - Purchase Options */}
       <div className="flex-1 w-full flex items-center justify-center p-4">
+        {error && (
+          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            {error}
+          </div>
+        )}
+
+        {isProcessing && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#FF4820] mx-auto mb-4"></div>
+              <p className="text-lg font-bold text-[#112953]">Đang xử lý...</p>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-5 gap-4 lg:gap-8 max-w-6xl w-full">
           {packages.map((pkg) => (
             <div
               key={pkg.id}
-              className="relative aspect-[3/4.2] flex flex-col items-center justify-center p-6 transition-transform hover:scale-105 cursor-pointer"
-              onClick={() => { /* handle purchase */ }}
+              className={`relative aspect-[3/4.2] flex flex-col items-center justify-center p-6 transition-transform ${
+                isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'
+              }`}
+              onClick={() => !isProcessing && handlePackageClick(pkg)}
             >
               {/* Background Frame */}
               <img

@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useSearchParams } from "react-router-dom";
 import Banner from "../../components/banner";
 import { useVideoPlayerContext } from "../../../contexts";
 import CollectionProgress from "./components/collection-progress";
@@ -10,12 +11,14 @@ import TicketPurchaseOverlay from "./components/ticket-purchase-overlay";
 import Button from "../../components/ui/button";
 import { CardCollectionProvider } from "./context"; // Import provider
 import { useCardCollection } from "./hooks/use-card-collection"; // Import hook
+import { getOrderStatus } from "../../../lib/api/ticket-api";
 
 import type { Card } from "./services/card-collection-service"; // Import Card type
 
 function CardCollectionContent() {
   const { setType } = useVideoPlayerContext();
-  const { stats, banners, userState, openBlindBag, isOpening } = useCardCollection();
+  const { banners, userState, openBlindBag, isOpening } = useCardCollection();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [isOpeningBulk, setIsOpeningBulk] = React.useState(false);
   const [isOpeningSingle, setIsOpeningSingle] = React.useState(false);
@@ -23,6 +26,66 @@ function CardCollectionContent() {
   const [selectedBannerIndex, setSelectedBannerIndex] = React.useState(0);
   const [openedCards, setOpenedCards] = React.useState<Card[]>([]);
   const [bonusCards, setBonusCards] = React.useState<Card[]>([]);
+  const [paymentStatus, setPaymentStatus] = React.useState<'verifying' | 'success' | 'failed' | null>(null);
+
+  // Handle payment callback from Pay1
+  React.useEffect(() => {
+    const status = searchParams.get('status');
+    const orderId = searchParams.get('orderId');
+
+    if (status && orderId) {
+      handlePaymentCallback(status, orderId);
+    }
+  }, [searchParams]);
+
+  const handlePaymentCallback = async (_status: string, orderId: string) => {
+    setPaymentStatus('verifying');
+
+    try {
+      // Poll for order status
+      const maxAttempts = 6; // 30 seconds (6 attempts * 5 seconds)
+      let attempts = 0;
+
+      const pollOrderStatus = async (): Promise<void> => {
+        if (attempts >= maxAttempts) {
+          setPaymentStatus('failed');
+          alert('Không thể xác nhận thanh toán. Vui lòng kiểm tra lại sau.');
+          clearSearchParams();
+          return;
+        }
+
+        const orderStatus = await getOrderStatus(orderId);
+
+        if (orderStatus.transaction.paymentStatus === 'SUCCESS') {
+          setPaymentStatus('success');
+          sessionStorage.removeItem('pending_ticket_order');
+          alert(`Thanh toán thành công! Bạn đã nhận ${orderStatus.quantity} vé.`);
+          clearSearchParams();
+          // Refresh the page to update ticket count
+          window.location.reload();
+        } else if (orderStatus.transaction.paymentStatus === 'FAILURE' || orderStatus.transaction.paymentStatus === 'CANCELLED') {
+          setPaymentStatus('failed');
+          alert('Thanh toán thất bại. Vui lòng thử lại.');
+          clearSearchParams();
+        } else {
+          // Still pending, poll again after 5 seconds
+          attempts++;
+          setTimeout(pollOrderStatus, 5000);
+        }
+      };
+
+      await pollOrderStatus();
+    } catch (error) {
+      console.error('Payment verification failed:', error);
+      setPaymentStatus('failed');
+      alert('Có lỗi xảy ra khi xác nhận thanh toán.');
+      clearSearchParams();
+    }
+  };
+
+  const clearSearchParams = () => {
+    setSearchParams({});
+  };
 
   const activeBanner = banners[selectedBannerIndex];
 
@@ -182,6 +245,17 @@ function CardCollectionContent() {
         currentTickets={tickets}
       // We can pass handleCreateOrder here if TicketPurchaseOverlay supported it
       />
+
+      {/* Payment Verification Overlay */}
+      {paymentStatus === 'verifying' && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-white rounded-lg p-8 text-center max-w-md">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#FF4820] mx-auto mb-4"></div>
+            <p className="text-xl font-bold text-[#112953] mb-2">Đang xác thực thanh toán...</p>
+            <p className="text-sm text-gray-600">Vui lòng đợi trong giây lát</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

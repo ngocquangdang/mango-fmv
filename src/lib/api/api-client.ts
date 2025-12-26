@@ -14,7 +14,17 @@ export class ApiError extends Error {
   }
 }
 
-const API_BASE_URL = "https://mockapi-yfhk.onrender.com/api/v1";
+// Environment-based API URLs with fallbacks
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://mockapi-yfhk.onrender.com/api/v1";
+const INTERACTIVE_LICENSE_API_URL = import.meta.env.VITE_INTERACTIVE_LICENSE_API_URL || "https://interactive-license-stg.onidservice.cloud/api/v1";
+const VIDEO_PROGRESS_API_URL = import.meta.env.VITE_VIDEO_PROGRESS_API_URL || "https://interactive-video-mango.onidservice.cloud/api/v1";
+const PROJECT_API_URL = import.meta.env.VITE_PROJECT_API_URL || "https://onlala-cms-api-stg.onidservice.cloud/api/v1";
+
+// Log environment in development
+if (import.meta.env.DEV) {
+  console.log('[API Client] Environment:', import.meta.env.VITE_ENV || 'development');
+  console.log('[API Client] Video Progress API URL (includes tickets):', VIDEO_PROGRESS_API_URL);
+}
 
 const getAuthToken = (): string | null => {
   if (typeof window !== "undefined") {
@@ -157,19 +167,19 @@ class FetchApiClient {
 
 export const apiClient = new FetchApiClient();
 export const apiClientInteractiveLicense = new FetchApiClient(
-  "https://interactive-license-stg.onidservice.cloud/api/v1"
+  INTERACTIVE_LICENSE_API_URL
 );
 export const apiClientVideoProgress = new FetchApiClient(
-  "https://interactive-video-mango.onidservice.cloud/api/v1"
+  VIDEO_PROGRESS_API_URL
 );
 
 export const apiClienProject = new FetchApiClient(
-  "https://onlala-cms-api-stg.onidservice.cloud/api/v1"
+  PROJECT_API_URL
 );
 
-// Ticket service API client (local development)
+// Ticket service uses the same API as video progress
 export const apiClientTicket = new FetchApiClient(
-  "http://localhost:3001/api/v1"
+  VIDEO_PROGRESS_API_URL
 );
 
 export type { ApiResponse as ApiResponseType };

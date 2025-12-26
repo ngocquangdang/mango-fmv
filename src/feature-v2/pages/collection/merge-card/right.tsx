@@ -1,4 +1,3 @@
-import React from "react";
 import type { CollectionItem } from "../right-side";
 import { ItemCard } from "../right-side";
 import Button from "../../../components/ui/button";
