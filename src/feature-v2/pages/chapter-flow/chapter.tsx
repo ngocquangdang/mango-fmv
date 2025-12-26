@@ -64,7 +64,7 @@ export default function ChapterPage() {
             className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
             style={{ backgroundImage: `url(/images/score-banner.png)` }}
           >
-            {(progress as any)?.points || 0}
+            {(progress as any)?.points || 400}
           </div>
           <img
             src="/images/book-with-bg-icon.png"

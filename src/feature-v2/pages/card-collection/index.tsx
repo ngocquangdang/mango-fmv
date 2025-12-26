@@ -17,7 +17,7 @@ import type { Card } from "./services/card-collection-service"; // Import Card t
 
 function CardCollectionContent() {
   const { setType } = useVideoPlayerContext();
-  const { banners, userState, openBlindBag, isOpening } = useCardCollection();
+  const { banners, userState, userInfo, openBlindBag, isOpening } = useCardCollection();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [isOpeningBulk, setIsOpeningBulk] = React.useState(false);
@@ -137,8 +137,9 @@ function CardCollectionContent() {
     setBonusCards([]);
   }
 
-  // Use real ticket count from API if available, fallback to stats (mock or other source)
-  const tickets = userState?.ticketCount ?? 0;
+  // Use real ticket count from API (userInfo has the actual balance from database)
+  // Fallback to userState for backward compatibility
+  const tickets = userInfo?.ticketBalance ?? userState?.ticketCount ?? 0;
   const collectedCount = userState?.pityCount || 0;
 
   return (
@@ -165,7 +166,6 @@ function CardCollectionContent() {
           onClick={() => setIsBuyingTickets(true)}
         >
           {tickets}
-
         </div>
         <div className='absolute top-3 left-3 w-8 h-8' style={{
           backgroundImage: "url('/images/collection/ticket.png')",
