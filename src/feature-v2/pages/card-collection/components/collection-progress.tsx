@@ -1,10 +1,8 @@
 
-// import React from "react";
-
 
 const CollectionProgress = ({
   current = 0,
-  max = 40,
+  max = 0,
   className = "",
 }: {
   current: number;
@@ -33,7 +31,7 @@ const CollectionProgress = ({
 
         {/* End Icon */}
         <div className="absolute -right-4 -top-4 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center">
-          <img src="/images/elements/card-frame.png" alt="Card Reward" className="w-full h-full object-contain rotate-12 drop-shadow-lg" />
+          <img src="/images/collection/ho-dong-quan-sr.png" alt="Card Reward" className="w-full h-full object-contain rotate-12 drop-shadow-lg" />
           {/* Fallback if card-frame is empty or invalid, user can swap */}
         </div>
       </div>

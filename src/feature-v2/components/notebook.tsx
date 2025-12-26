@@ -11,6 +11,8 @@ interface NotebookLayoutProps {
   categories: Category[];
   selectedTab: string;
   setSelectedTab: (tab: string) => void;
+  subPages?: { id: string; name: string, slug: string }[];
+  onSelectSubPage?: (subPageId: string) => void;
 }
 
 const NotebookLayout = ({
@@ -19,6 +21,8 @@ const NotebookLayout = ({
   categories,
   selectedTab,
   setSelectedTab,
+  subPages = [],
+  onSelectSubPage,
 }: NotebookLayoutProps) => {
   const BINDING_IMG = "/images/binding.png";
   const MARKER_UNSELECTED_IMG = "/images/tab-unselected.png";
@@ -26,6 +30,31 @@ const NotebookLayout = ({
 
   return (
     <div className="relative">
+      <div className="absolute -left-26 lg:-left-32 top-4 flex flex-col gap-4">
+        {subPages.map((subPage) => {
+          return (
+            <div
+              key={subPage.id}
+              className={`relative z-0`}
+              onClick={() => onSelectSubPage?.(subPage.id)}
+            >
+              <img
+                src={MARKER_UNSELECTED_IMG}
+                alt="marker"
+                className={
+                  "w-[130px] h-[40px] lg:w-[156px] lg:h-[48px]"
+                }
+              />
+              <button
+                className={`absolute top-0 left-0 w-full h-full ${selectedTab === subPage.id ? "text-[13px] lg:text-[15.6px]" : "text-[12px] lg:text-[14.4px]"
+                  }`}
+              >
+                {subPage.name}
+              </button>
+            </div>
+          );
+        })}
+      </div>
       <div className="notebook-cover w-[536px] h-[340px] lg:w-[643.2px] lg:h-[408px] z-2">
         <div className="notebook-spread">
           <div className="notebook-page page-left">{leftContent}</div>

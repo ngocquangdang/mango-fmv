@@ -7,6 +7,8 @@ type ButtonProps = {
   className?: string;
   onClick?: () => void;
   disabled?: boolean;
+  customBgImage?: string;
+  containerClassName?: string;
 };
 
 const sizeMap: Record<
@@ -39,7 +41,7 @@ const sizeMap: Record<
   },
 };
 
-const ButtonBg = "/images/small-bg-button.png";
+const buttonBg = "/images/small-bg-button.png";
 
 export default function Button({
   label,
@@ -48,14 +50,16 @@ export default function Button({
   className = "",
   onClick,
   disabled = false,
+  customBgImage = buttonBg,
+  containerClassName = "",
 }: ButtonProps) {
   const { width, height } = sizeMap[size];
   const { lgWidth, lgHeight } = sizeMap[lgSize || size];
 
   return (
     <div
-      className={`${width} ${height} ${lgWidth} ${lgHeight} bg-center bg-no-repeat bg-cover cursor-pointer inline-flex items-center justify-center `}
-      style={{ backgroundImage: `url(${ButtonBg})` }}
+      className={`${width} ${height} ${lgWidth} ${lgHeight} ${containerClassName} bg-center bg-no-repeat bg-cover cursor-pointer inline-flex items-center justify-center `}
+      style={{ backgroundImage: `url(${customBgImage})` }}
       onClick={onClick}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {

@@ -1,6 +1,7 @@
-import React from "react";
+import * as React from "react";
 import { useVideoPlayer } from "../hooks/useVideoPlayer";
 import { VideoPlayerContext } from ".";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import { PausedActionName, type Scene } from "../types/chapter";
 import { useUserContext } from "../features/user/context";
@@ -23,7 +24,8 @@ export type VideoPlayerType =
   | "ranking"
   | "playAgain"
   | "endChapter"
-  | "cardCollection";
+  | "cardCollection"
+  | "collection";
 export interface VideoPlayerContextType {
   type: VideoPlayerType;
   setType: (type: VideoPlayerType) => void;
@@ -86,16 +88,55 @@ export const VideoPlayerProvider = ({
   const { mutate: submitHotspot } = useSubmitHotspot();
   const { showToast } = useToast();
 
-  const [type, setType] = React.useState<
-    | "intro"
-    | "interactive"
-    | "story"
-    | "journal"
-    | "ranking"
-    | "playAgain"
-    | "endChapter"
-    | "cardCollection"
-  >("intro");
+  const [type, setType] = React.useState<VideoPlayerType>("intro");
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Map routes to types and vice versa
+  const routeMap: Record<string, string> = {
+    "intro": "/",
+    "story": "/chapter",
+    "journal": "/journal",
+    "ranking": "/rank",
+    "collection": "/collection",
+    "cardCollection": "/card-collection",
+    "interactive": "/watch",
+    "playAgain": "/", // Maps to home
+  };
+
+  const reverseRouteMap: Record<string, VideoPlayerType> = {
+    "/": "intro",
+    "/chapter": "story",
+    "/journal": "journal",
+    "/rank": "ranking",
+    "/collection": "collection",
+    "/card-collection": "cardCollection",
+    "/watch": "interactive",
+  }
+
+  // Sync route changes to type state (optional, for backward compatibility)
+  React.useEffect(() => {
+    const path = location.pathname;
+    // Simple matching
+    let newType = "intro";
+    if (path === "/chapter" || path === "/play") newType = "story"; // Handle legacy /play if needed
+    else if (reverseRouteMap[path]) newType = reverseRouteMap[path];
+
+    setType(newType as any);
+  }, [location.pathname]);
+
+  // Modified setType that navigates
+  const handleSetType = React.useCallback((newType: VideoPlayerType) => {
+    const targetPath = routeMap[newType];
+    if (targetPath) {
+      navigate(targetPath);
+    } else {
+      // Fallback for internal types that might not have routes or are modals
+      setType(newType);
+    }
+  }, [navigate]);
+
   const [pauseType, setPauseType] = React.useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = React.useState<Record<
     string,
@@ -625,8 +666,9 @@ export const VideoPlayerProvider = ({
 
   const quitPlayer = React.useCallback(() => {
     setType("intro");
+    navigate("/");
     pause();
-  }, [pause]);
+  }, [pause, navigate]);
 
   const onPlayPlayer = React.useCallback(
     (sceneId: string, isReviewScene?: boolean) => {
@@ -635,11 +677,12 @@ export const VideoPlayerProvider = ({
         return;
       }
       setType("interactive");
+      navigate("/watch");
       onSetCurrentSceneId(sceneId);
       onPlay(sceneId, isReviewScene);
       autoplay();
     },
-    [onSetCurrentSceneId, onPlay, autoplay]
+    [onSetCurrentSceneId, onPlay, autoplay, navigate]
   );
 
   React.useEffect(() => {
@@ -786,7 +829,7 @@ export const VideoPlayerProvider = ({
 
   const value: VideoPlayerContextType = {
     type,
-    setType,
+    setType: handleSetType,
     clips: data.scenes,
     currentSceneId,
     play,
