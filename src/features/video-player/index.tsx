@@ -10,7 +10,10 @@ export default function VideoPlayer() {
       <DetailDialogProvider>
         <div
           id="interactive-video"
-          className={`${type === "interactive" ? "block" : "hidden"} `}
+          className={`fixed inset-0 w-full h-full bg-black transition-opacity duration-300 ${type === "interactive"
+            ? "z-[999] opacity-100 pointer-events-auto"
+            : "z-[-1] opacity-0 pointer-events-none"
+            }`}
         ></div>
       </DetailDialogProvider>
       {isReviewScene && (

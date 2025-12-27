@@ -15,7 +15,7 @@ import type { Card } from "./services/card-collection-service"; // Import Card t
 
 function CardCollectionContent() {
   const { setType } = useVideoPlayerContext();
-  const { stats, banners, userState, openBlindBag, isOpening } = useCardCollection();
+  const { banners, userState, openBlindBag, isOpening } = useCardCollection();
 
   const [isOpeningBulk, setIsOpeningBulk] = React.useState(false);
   const [isOpeningSingle, setIsOpeningSingle] = React.useState(false);
@@ -97,20 +97,20 @@ function CardCollectionContent() {
       {/* Currency Top Right */}
       <div className="absolute top-0 right-0 flex items-center gap-2 p-4">
         <div
-          className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
+          className="w-20 h-10 lg:w-[164px] lg:h-[82px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-xl lg:pb-1"
           style={{ backgroundImage: `url(/images/score-banner.png)` }}
           onClick={() => setIsBuyingTickets(true)}
         >
           {tickets}
 
         </div>
-        <div className='absolute top-3 left-3 w-8 h-8' style={{
+        <div className='absolute top-3 left-3 w-8 h-8 lg:w-12 lg:h-12 lg:top-4 lg:left-5' style={{
           backgroundImage: "url('/images/collection/ticket.png')",
           backgroundSize: "contain",
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
         }}></div>
-        <div className='absolute top-6 right-1 w-8 h-8'>+</div>
+        <div className='absolute top-6 right-1 w-8 h-8 lg:top-8 lg:right-2 lg:w-10 lg:h-10 text-white font-bold text-lg'>+</div>
       </div>
 
       {/* Header Banner */}
@@ -123,7 +123,7 @@ function CardCollectionContent() {
         <CollectionProgress current={collectedCount} max={40} />
       </div>
 
-      <div className='relative z-10 top-0 w-[386px] h-[234px]' style={{
+      <div className='relative z-10 top-0 w-[386px] h-[234px] lg:w-[820px] lg:h-[496px]' style={{
         backgroundImage: "url('/images/collection/bg-inside.png')",
         backgroundSize: "contain",
         backgroundPosition: "center center",
@@ -131,7 +131,7 @@ function CardCollectionContent() {
       }}>
 
         {/* Blind Bag Area */}
-        <div className="flex-1 w-[386px] flex items-center justify-center relative z-10 mt-10">
+        <div className="flex-1 w-full h-full flex items-center justify-center relative z-10 lg:mt-8">
           <BlindBagSelector
             banners={banners}
             selectedIndex={selectedBannerIndex}
@@ -140,7 +140,7 @@ function CardCollectionContent() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-8 z-20 items-center justify-center relative -bottom-7">
+        <div className="flex gap-8 lg:gap-14 z-20 items-center justify-center relative -bottom-5 lg:-bottom-[-40px]">
           {/* Single Open */}
           <div className="flex flex-col items-center gap-2 relative">
             <Button
@@ -152,7 +152,7 @@ function CardCollectionContent() {
               disabled={isOpening}
               customBgImage="/images/collection/button-white.png"
             />
-            <img src="/images/collection/ticket-1.png" alt="ticket" className="absolute -left-2 top-0 w-10 h-7" />
+            <img src="/images/collection/ticket-1.png" alt="ticket" className="absolute -left-2 top-0 w-10 h-7 lg:w-24 lg:h-[70px] lg:-left-12 lg:-top-2" />
 
           </div>
 
@@ -168,7 +168,7 @@ function CardCollectionContent() {
               disabled={isOpening}
               customBgImage="/images/collection/button-primary.png"
             />
-            <img src="/images/collection/ticket-10.png" alt="ticket" className="absolute -left-5 top-0 w-10 h-7" />
+            <img src="/images/collection/ticket-10.png" alt="ticket" className="absolute -left-5 top-0 w-10 h-7 lg:w-24 lg:h-[70px] lg:-left-12 lg:-top-2" />
 
           </div>
         </div>

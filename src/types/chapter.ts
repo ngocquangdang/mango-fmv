@@ -41,6 +41,7 @@ export interface Scene {
   duration: number;
   order: number;
   status?: string;
+  originalAudio?: string;
   targetSceneId: string;
   hotspots?: Hotspot[];
   endingScene?: boolean;

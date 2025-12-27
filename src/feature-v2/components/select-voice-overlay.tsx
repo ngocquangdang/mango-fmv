@@ -1,0 +1,162 @@
+import { useState } from "react";
+import Button from "./ui/button";
+import { useVideoPlayerContext } from "../../contexts";
+import CreateVoiceView from "./create-voice-view";
+
+interface SelectVoiceOverlayProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
+  const { voiceType, setVoiceType } = useVideoPlayerContext();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isCreatingVoice, setIsCreatingVoice] = useState(false);
+
+  // Sync local selection with global on open/change? 
+  // Actually, we should probably just use the global state directly or sync on confirm.
+  // The UI suggests "Continue" confirms it.
+  // Let's us local state for selection and commit on "Continue" or just use global state directly for "instant" feel?
+  // User asked for "global state managing type of voice". Usually settings like this apply immediately or on confirm.
+  // Given "Continue" button, let's update global state on click (or directly if instant feedback needed).
+  // Let's assume instant update for now or local + commit. 
+  // "Nữ chính sẽ dùng voice ..." message updates dynamically.
+  // Let's use global state directly for simplicity and instant effect, unless "Continue" is "Save".
+  // If "Continue" is just "Close", then instant update is better.
+
+  if (!isOpen) return null;
+
+
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
+
+      {/* Background (Optional, if we want specific styling) */}
+
+      {/* Back Button */}
+      <div
+        onClick={() => {
+          if (isCreatingVoice) {
+            setIsCreatingVoice(false);
+          } else {
+            onClose();
+          }
+        }}
+        className="absolute top-4 left-4 lg:top-8 lg:left-8 cursor-pointer z-50 hover:scale-105 transition-transform"
+      >
+        <img src="/images/back-icon.png" alt="back" className="w-10 h-10 lg:w-14 lg:h-14 object-contain" />
+      </div>
+
+      {isCreatingVoice ? (
+        <CreateVoiceView onBack={() => setIsCreatingVoice(false)} />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center p-4 relative animate-in fade-in duration-300">
+
+          {/* Title */}
+          <div className="relative mb-8 lg:mb-12">
+            {/* Brush stroke background mock */}
+            <div className="relative z-10 bg-[#8CC63F] px-4 py-2 lg:px-8 lg:py-3 transform -rotate-1 skew-x-[-10deg] shadow-lg border-2 border-dashed border-white/30">
+              <h2 className="text-xl lg:text-3xl font-hand font-bold text-[#1A4027] uppercase text-center transform skew-x-[10deg]">
+                Chọn voice cho nhân vật tương tác
+              </h2>
+            </div>
+            {/* Decorative elements could be added here */}
+          </div>
+
+          {/* Options */}
+          <div className="flex gap-4 lg:gap-8 mb-8 lg:mb-12">
+
+            {/* Option: Default */}
+            <div
+              onClick={() => setVoiceType("default")}
+              className={`cursor-pointer group relative w-[100px] h-[130px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "default" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+            >
+              {/* Icon */}
+              <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 overflow-hidden mb-2 bg-white flex items-center justify-center">
+                <img src="/images/home/charactor.png" alt="default" className="w-full h-full object-cover object-top" />
+              </div>
+              <div className="text-center font-hand font-bold text-[#1A4027] text-xs lg:text-base leading-tight">
+                Voice mặc định
+              </div>
+              {/* Scribble border effect could be SVG or CSS */}
+            </div>
+
+            {/* Option: AI */}
+            <div
+              onClick={() => setVoiceType("ai")}
+              className={`cursor-pointer group relative w-[100px] h-[130px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "ai" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+            >
+              <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
+                <span className="font-hand font-bold text-orange-500 text-xl lg:text-3xl">AI</span>
+              </div>
+              <div className="text-center font-hand font-bold text-[#1A4027] text-xs lg:text-base leading-tight">
+                Voice của bạn
+              </div>
+            </div>
+
+            {/* Option: Mute */}
+            <div
+              onClick={() => setVoiceType("mute")}
+              className={`cursor-pointer group relative w-[100px] h-[130px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "mute" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+            >
+              <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
+                <span className="text-2xl lg:text-4xl text-orange-500">🔇</span>
+              </div>
+              <div className="text-center font-hand font-bold text-[#1A4027] text-xs lg:text-base leading-tight">
+                Tắt tiếng
+              </div>
+            </div>
+          </div>
+
+          {voiceType === "ai" && (
+            <div className="flex flex-col items-center gap-2 mb-6 animate-in slide-in-from-top-2 fade-in">
+              <Button
+                label="Tạo Voice ngay"
+                className="bg-[#E85D04] text-white px-6 py-2 shadow-lg border-2 border-white/20 text-sm lg:text-base"
+                onClick={() => setIsCreatingVoice(true)}
+              />
+              <span className="text-white text-xs lg:text-sm font-hand">
+                Dùng giọng nói của riêng bạn
+              </span>
+            </div>
+          )}
+
+          {/* Player Bar (Visual Only) */}
+          <div className="w-[90%] max-w-[500px] mb-2 relative">
+            <div className="bg-white rounded-full p-2 lg:p-3 shadow-lg border-2 border-blue-200 flex items-center gap-3">
+              <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600"
+              >
+                {isPlaying ? "||" : "▶"}
+              </button>
+
+              {/* Progress Bar Mock */}
+              <div className="flex-1 h-2 bg-orange-100 rounded-full relative overflow-hidden">
+                <div className="absolute top-0 left-0 h-full bg-orange-500 w-[30%] rounded-full"></div>
+              </div>
+
+              <span className="text-xs text-gray-500 font-bold">00:05</span>
+            </div>
+          </div>
+
+          <div className="text-white font-hand text-sm lg:text-base mb-8 shadow-black/50 text-shadow-sm">
+            Nữ chính sẽ dùng voice <span className="text-orange-300">{voiceType === "default" ? "mặc định" : voiceType === "ai" ? "của bạn" : "tắt tiếng"}</span>
+          </div>
+
+          {/* Continue Button */}
+          <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-10">
+            <Button
+              label="Tiếp tục"
+              className="bg-[#E85D04] text-white px-8 lg:px-10 shadow-lg border-2 border-white/20"
+              onClick={onClose}
+            />
+          </div>
+
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SelectVoiceOverlay;

@@ -7,7 +7,7 @@ import { VideoPlayerProvider } from "../contexts/video-player-provider";
 import { useVideoPlayerContext } from "../contexts";
 import { useUserContext } from "../features/user/context";
 
-import { BrowserRouter, Routes, Route, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet, useNavigate } from "react-router-dom";
 import VideoPlayer from "../features/video-player";
 import GameModal from "./components/ui/dialog";
 import Home from "./pages/home";
@@ -57,8 +57,8 @@ function LayoutWrapper() {
 
   const {
     type, // Still used for internal player states like 'interactive' vs others? Or we map routes to types?
+    setType,
     quitPlayer,
-    setType, // We need to sync this or replace usage
     setReviewScene,
     pause,
     onPlay,
@@ -76,7 +76,6 @@ function LayoutWrapper() {
   } = useVideoPlayerContext();
 
   const navigate = useNavigate();
-  const location = useLocation();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
 
   const loading = userLoading || isPlayerLoading;
@@ -107,11 +106,12 @@ function LayoutWrapper() {
   // we navigate to a route that renders nothing in the Outlet (or just the Player).
 
   const handleBack = () => {
+    console.log("handleBack called", { type, isReviewScene });
     if (type === "interactive") {
       if (isReviewScene) {
         pause();
         setReviewScene(false);
-        navigate("/chapter"); // Mapping 'story' to /chapter
+        setType("story");
         return;
       } else {
         setDialogName("quitPlayer");
@@ -147,7 +147,9 @@ function LayoutWrapper() {
     });
     setDialogName(null);
     setReviewScene(false);
-    navigate("/chapter"); // Go back to story
+    navigate("/"); // Go back to story (effectively home with story type if we really wanted, but user flow seems to be chapter page)
+    // Actually, simply setType('story') should show the ChapterPage because of the conditional render in AppV2
+    setType("story");
   };
 
   React.useEffect(() => {
@@ -173,8 +175,9 @@ function LayoutWrapper() {
           <LoadingBar />
         </div>
       ) : (
-        /* The Outlet renders the current route's component */
-        <Outlet />
+        <>
+          {type === "story" ? <ChapterPage /> : <Outlet />}
+        </>
       )}
 
       {/* VideoPlayer is always mounted */}
@@ -183,7 +186,7 @@ function LayoutWrapper() {
       {/* Global Back Button for Interactive Mode - Only show if type is interactive */}
       {type === "interactive" && (
         <div
-          className="fixed top-0 left-0 p-4 z-50 cursor-pointer"
+          className="fixed top-0 left-0 p-4 z-[1000] cursor-pointer"
           onClick={handleBack}
         >
           <img
@@ -268,28 +271,11 @@ function AppV2() {
             <Routes>
               <Route element={<LayoutWrapper />}>
                 <Route path="/" element={<Home />} />
-                <Route path="/chapter" element={<ChapterPage />} />
                 <Route path="/journal" element={<Journal />} />
                 <Route path="/rank" element={<Rank />} />
                 <Route path="/card-collection" element={<CardCollection />} />
                 <Route path="/collection/*" element={<CollectionPage />} />
                 <Route path="/login-qr" element={<QrLoginPage />} />
-                {/* 
-                  When playing video (interactive), we want to show NOTHING in the outlet 
-                  so the video player (which is in absolute/z-index) shows up or just sits there.
-                  If the VideoPlayer is z-indexed below the content, we need a route that renders nothing.
-                  If type === 'interactive' effectively meant "hide other pages", 
-                  then an empty route or specific 'watch' route works.
-                  
-                  Let's assume type='interactive' hides the outlet content? 
-                  No, LayoutWrapper renders <Outlet />.
-                  If we are in 'interactive' mode, we might want to navigate to a blank route 
-                  OR we rely on VideoPlayer z-index covering the Outlet.
-                  BUT, to simulate the old switch(type) behavior where 'interactive' case didn't exist (so rendered nothing),
-                  we should probably have a route for it.
-                 */
-                }
-                <Route path="/watch" element={<div />} />
               </Route>
             </Routes>
           </VideoPlayerProvider>

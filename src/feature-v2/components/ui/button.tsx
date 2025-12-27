@@ -73,7 +73,7 @@ export default function Button({
         disabled={disabled}
         aria-label={label}
         tabIndex={0}
-        className={`relative text-sm lg:text-base px-3 font-semibold text-white drop-shadow-md transition-opacity duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-orange-400 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      // className={`relative text-sm lg:text-base px-3 font-semibold text-white drop-shadow-md transition-opacity duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-orange-400 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       >
 
         <span className=" leading-none">{label}</span>

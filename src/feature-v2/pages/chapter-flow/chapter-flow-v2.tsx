@@ -7,6 +7,7 @@ import { useFlowChart } from "./context";
 import { getLayoutedElements } from "../../../features/pixel-flow/layout";
 import { useVideoPlayerContext } from "../../../contexts";
 import { useToast } from "../../../components/ui/toast-v2/use-toast";
+import { VoiceService } from "../../services/voice-service";
 
 const ChapterFlowV2 = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -170,13 +171,23 @@ const ChapterFlowV2 = () => {
         setPauseType(null);
       }
 
+      console.log("Node clicked:", { nodeId, status: scene.status, isCompleted: scene.status === "COMPLETED" });
+
       if (scene.status === "COMPLETED") {
         setReviewScene(true);
         onPlayPlayer(nodeId, true);
         return;
       }
 
-      onPlayPlayer(nodeId);
+      if (scene.originalAudio) {
+        console.log("Checking voice result for:", scene.originalAudio);
+        VoiceService.getProcessingResult(nodeId, undefined, scene.originalAudio)
+          .then(res => console.log("Voice Result:", res))
+          .catch(err => console.error("Voice Check Error:", err));
+      }
+
+      setReviewScene(false);
+      onPlayPlayer(nodeId, false);
     });
 
     lfRef.current = lf;

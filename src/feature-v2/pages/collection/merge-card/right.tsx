@@ -1,4 +1,4 @@
-import React from "react";
+
 import type { CollectionItem } from "../right-side";
 import { ItemCard } from "../right-side";
 import Button from "../../../components/ui/button";
@@ -22,12 +22,12 @@ const MergeCardRight = ({ slots, onRemoveSlot, onMerge }: MergeCardRightProps) =
       <div className="flex-1 flex flex-col gap-2 lg:gap-3 w-full relative z-10">
 
         {/* Mystery Card Placeholder */}
-        <div className="w-[90px] h-[126px] lg:w-[126px] lg:h-[171px] bg-[#D9D9D9] rounded-lg shadow-inner flex items-center justify-center relative mb-1 lg:mb-1 mx-auto">
-          <span className="text-4xl lg:text-6xl text-orange-400 font-bold opacity-50">?</span>
+        <div className="w-[90px] h-[126px] lg:w-[150px] lg:h-[205px] bg-[#D9D9D9] rounded-lg shadow-inner flex items-center justify-center relative mb-1 lg:mb-2 mx-auto">
+          <span className="text-4xl lg:text-7xl text-orange-400 font-bold opacity-50">?</span>
         </div>
 
         {/* Slots */}
-        <div className="w-[212px] mx-auto bg-[#FFFDF5] border border-orange-200 rounded-lg p-2 lg:p-3 relative max-w-[280px] lg:max-w-[400px]">
+        <div className="w-[212px] lg:w-[432px] max-w-full mx-auto bg-[#FFFDF5] border border-orange-200 rounded-lg p-2 lg:p-6 relative">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 border-orange-200  rotate-90">
             <img src="/images/chevon-left.png" alt="merge icon" className="w-4 h-4 lg:w-5 lg:h-5 object-contain" />
           </div>
@@ -36,7 +36,7 @@ const MergeCardRight = ({ slots, onRemoveSlot, onMerge }: MergeCardRightProps) =
             {slots.map((slot, index) => (
               <div
                 key={index}
-                className="w-[42px] h-[60px] lg:w-[72px] lg:h-[100px] border-2 border-dashed border-orange-300 rounded bg-white flex items-center justify-center relative"
+                className="w-[42px] h-[60px] lg:w-[90px] lg:h-[122px] border-2 border-dashed border-orange-300 rounded bg-white flex items-center justify-center relative"
               >
                 {slot ? (
                   <div className="w-full h-full relative group">
@@ -53,15 +53,16 @@ const MergeCardRight = ({ slots, onRemoveSlot, onMerge }: MergeCardRightProps) =
                 )}
               </div>
             ))}
+
           </div>
 
-          <div className="flex justify-center absolute -bottom-7 left-12">
+          <div className="flex justify-center absolute -bottom-7 left-1/2 -translate-x-1/2">
             <Button
               label="Ghép ngay"
               className="text-white"
               containerClassName="bg-contain! w-fit"
               onClick={onMerge}
-              disabled={!slots[0] || !slots[1] || !slots[2]}
+              disabled={slots.filter(s => s !== null).length < 2} // Allow merge if at least 2 items
               customBgImage="/images/collection/button-primary.png"
             />
           </div>

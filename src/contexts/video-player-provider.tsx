@@ -16,6 +16,8 @@ import RewardCollection, {
   type RewardItem,
 } from "../feature-v2/components/reward-collection";
 import RelationshipPoint from "../feature-v2/components/relationship-point";
+import { VoiceService } from "../feature-v2/services/voice-service";
+
 export type VideoPlayerType =
   | "intro"
   | "interactive"
@@ -24,7 +26,8 @@ export type VideoPlayerType =
   | "ranking"
   | "playAgain"
   | "endChapter"
-  | "cardCollection";
+  | "cardCollection"
+  | "collection";
 export interface VideoPlayerContextType {
   type: VideoPlayerType;
   setType: (type: VideoPlayerType) => void;
@@ -75,7 +78,24 @@ export interface VideoPlayerContextType {
   setIsEndingScene: React.Dispatch<React.SetStateAction<boolean>>;
   isVipModalOpen: boolean;
   setIsVipModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  voiceType: "default" | "ai" | "mute";
+  setVoiceType: React.Dispatch<React.SetStateAction<"default" | "ai" | "mute">>;
+  audioRecordings: any[];
+  setAudioRecordings: React.Dispatch<React.SetStateAction<any[]>>;
+  fetchAudioRecordings: () => Promise<void>;
+  currentSceneAudioUrl: string | null;
 }
+
+
+
+const reverseRouteMap: Record<string, "intro" | "story" | "journal" | "ranking" | "collection" | "interactive"> = {
+  "/": "intro",
+  "/chapter": "story",
+  "/journal": "journal",
+  "/rank": "ranking",
+  "/collection": "collection",
+  "/watch": "interactive",
+}; // Moved outside component to avoid recreation
 
 export const VideoPlayerProvider = ({
   children,
@@ -97,30 +117,13 @@ export const VideoPlayerProvider = ({
     | "endChapter"
     | "endChapter"
     | "collection"
+    | "cardCollection"
   >("intro");
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Map routes to types and vice versa
-  const routeMap: Record<string, string> = {
-    "intro": "/",
-    "story": "/chapter",
-    "journal": "/journal",
-    "ranking": "/rank",
-    "collection": "/collection",
-    "interactive": "/watch",
-    "playAgain": "/", // Maps to home
-  };
 
-  const reverseRouteMap: Record<string, "intro" | "story" | "journal" | "ranking" | "collection" | "interactive"> = {
-    "/": "intro",
-    "/chapter": "story",
-    "/journal": "journal",
-    "/rank": "ranking",
-    "/collection": "collection",
-    "/watch": "interactive",
-  }
 
   // Sync route changes to type state (optional, for backward compatibility)
   React.useEffect(() => {
@@ -135,13 +138,13 @@ export const VideoPlayerProvider = ({
 
   // Modified setType that navigates
   const handleSetType = React.useCallback((newType: VideoPlayerType) => {
-    const targetPath = routeMap[newType];
-    if (targetPath) {
-      navigate(targetPath);
-    } else {
-      // Fallback for internal types that might not have routes or are modals
-      setType(newType);
-    }
+    // const targetPath = routeMap[newType];
+    // if (targetPath) {
+    //   navigate(targetPath);
+    // } else {
+    // Fallback for internal types that might not have routes or are modals
+    setType(newType);
+    // }
   }, [navigate]);
 
   const [pauseType, setPauseType] = React.useState<string | null>(null);
@@ -152,7 +155,12 @@ export const VideoPlayerProvider = ({
   const [currentSceneId, setCurrentSceneId] = React.useState<string | null>(
     null
   );
-  console.log({ currentSceneId });
+
+  const dataRef = React.useRef(data);
+  React.useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
+
   const [collectionItems, setCollectionItems] = React.useState<
     Record<string, any>
   >({});
@@ -173,6 +181,55 @@ export const VideoPlayerProvider = ({
 
   const [isEndingScene, setIsEndingScene] = React.useState(false);
   const [isVipModalOpen, setIsVipModalOpen] = React.useState(false);
+  const [voiceType, setVoiceType] = React.useState<"default" | "ai" | "mute">("default");
+  const [audioRecordings, setAudioRecordings] = React.useState<any[]>([]);
+  const [currentSceneAudioUrl, setCurrentSceneAudioUrl] = React.useState<string | null>(null);
+
+  // Fetch audio for current scene
+  React.useEffect(() => {
+    if (!currentSceneId) {
+      setCurrentSceneAudioUrl(null);
+      return;
+    }
+
+    const fetchSceneAudio = async () => {
+      try {
+        // user's recorded audio is not passed here, implying we are fetching a pre-generated or specific result
+        // If we needed the user's recording, we'd need to lookup 'audioRecordings' or similar.
+        // For now, following user instruction to just call the API for the scene.
+        const result = await VoiceService.getProcessingResult(currentSceneId);
+        if (result.status === 'completed' && result.output_path) {
+          setCurrentSceneAudioUrl(result.output_path.startsWith('http') ? result.output_path : `https://storage.googleapis.com/interactive-video-audio-recordings${result.output_path}`);
+        } else {
+          setCurrentSceneAudioUrl(null);
+        }
+      } catch (error) {
+        console.warn("Failed to fetch scene audio:", error);
+        setCurrentSceneAudioUrl(null);
+      }
+    };
+
+    fetchSceneAudio();
+  }, [currentSceneId]);
+
+  const fetchAudioRecordings = React.useCallback(async () => {
+    try {
+      const response = await VoiceService.getAudioRecordings(20, 0);
+      if (response.data) {
+        // Assuming response.data is the list or contains the list.
+        // Adjust if response structure is different (e.g. response.data.items)
+        // User provided API returns list directly or valid envelope.
+        // Let's assume response.data IS the array based on typical apiClient usage.
+        setAudioRecordings(Array.isArray(response.data) ? response.data : []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch audio recordings:", error);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchAudioRecordings();
+  }, [fetchAudioRecordings]);
 
   const { data: collectedHotspotsData } = useCollectedHotspots(
     currentSceneId || ""
@@ -271,7 +328,7 @@ export const VideoPlayerProvider = ({
       setCurrentSceneId(sceneId);
       play()
     },
-    [api]
+    [api, play]
   );
 
   const showRewardCollection = React.useCallback(
@@ -351,7 +408,7 @@ export const VideoPlayerProvider = ({
         handleShowMoments(0);
       }
     },
-    [showRelationshipPoint, showRewardCollection, closeGiftSelection, pause]
+    [showRelationshipPoint, showRewardCollection, closeGiftSelection, pause, play]
   );
 
   const handleCollectionItems = React.useCallback(
@@ -564,12 +621,11 @@ export const VideoPlayerProvider = ({
     [
       api,
       collectionItems,
-      currentSceneId,
-      pause,
       openDialogInfo,
       submitHotspot,
       showToast,
-      play,
+      currentStatus?.currentSceneId,
+      data.scenes
     ]
   );
 
@@ -606,7 +662,7 @@ export const VideoPlayerProvider = ({
       setPauseType(null);
       setCurrentStatus(null);
     },
-    [data.id, updateSceneStatus, isReviewScene]
+    [updateSceneStatus, isReviewScene, data.hotspotScenes, onSetCurrentSceneId, userInfo?.vipinfo?.isvip, data.scenes]
   );
 
   const handleEnded = React.useCallback(
@@ -668,6 +724,7 @@ export const VideoPlayerProvider = ({
       pause,
       setIsEndingScene,
       onSetCurrentSceneId,
+      userInfo?.vipinfo?.isvip,
     ]
   );
 
@@ -684,12 +741,12 @@ export const VideoPlayerProvider = ({
         return;
       }
       setType("interactive");
-      navigate("/watch");
       onSetCurrentSceneId(sceneId);
+      setReviewScene(!!isReviewScene);
       onPlay(sceneId, isReviewScene);
       autoplay();
     },
-    [onSetCurrentSceneId, onPlay, autoplay, navigate]
+    [onSetCurrentSceneId, onPlay, autoplay, navigate, data?.id, data.scenes, showToast]
   );
 
   React.useEffect(() => {
@@ -704,8 +761,12 @@ export const VideoPlayerProvider = ({
   }, [data.id, data.progress?.currentScene, pauseType]);
 
   const onInit = React.useCallback(() => {
-    if (!api?.play || !data?.id) return;
-    console.log("Init player");
+    const currentData = dataRef.current;
+    if (!api?.play || !currentData?.id) {
+      console.warn("Init player skipped: Missing api or data.id", { api: !!api, dataId: currentData?.id });
+      return;
+    }
+    console.log("Init player", { dataId: currentData.id });
     const params = new URLSearchParams(window.location.search);
 
     // function ChoiceButtonWrapper({
@@ -727,7 +788,7 @@ export const VideoPlayerProvider = ({
     api.onInit?.({
       container: "#interactive-video",
       config: {
-        chapter: data,
+        chapter: currentData,
         ui: {
           fonts: {
             base: "",
@@ -762,7 +823,7 @@ export const VideoPlayerProvider = ({
         },
       },
     });
-  }, [api, data?.id]);
+  }, [api, data.id]);
 
   React.useEffect(() => {
     const handleTouchMove = (e: any) => {
@@ -792,7 +853,10 @@ export const VideoPlayerProvider = ({
 
   // One-time initialization when api is ready (only re-run when api/data change)
   React.useEffect(() => {
-    if (!ready || !api || initializedRef.current) return;
+    console.log("VideoPlayerProvider: Effect check", { ready, api: !!api, initialized: initializedRef.current, dataId: data?.id });
+
+    if (!ready || !api || initializedRef.current || !data?.id) return;
+    console.log("VideoPlayerProvider: Calling onInit from Effect");
     onInit();
     initializedRef.current = true;
 
@@ -801,7 +865,7 @@ export const VideoPlayerProvider = ({
       api.destroy?.();
       initializedRef.current = false;
     };
-  }, [ready, api, onInit]);
+  }, [ready, api, onInit, data.id]);
 
   React.useEffect(() => {
     if (!api) return;
@@ -871,6 +935,12 @@ export const VideoPlayerProvider = ({
     setIsEndingScene,
     isVipModalOpen,
     setIsVipModalOpen,
+    voiceType,
+    setVoiceType,
+    audioRecordings,
+    setAudioRecordings,
+    fetchAudioRecordings,
+    currentSceneAudioUrl,
   };
   return (
     <VideoPlayerContext.Provider value={value}>

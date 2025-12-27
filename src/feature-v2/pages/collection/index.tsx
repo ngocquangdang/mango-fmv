@@ -4,7 +4,7 @@ import NotebookLayout from "../../components/notebook";
 import Banner from "../../components/banner";
 import { useVideoPlayerContext } from "../../../contexts";
 import CardCollection from "../card-collection";
-import MergeCardPage from "./merge-card";
+import MergeCardPage from "./merge-card/index";
 import LeftSide from "./left-side";
 import RightSide from "./right-side";
 import { CollectionProvider, useCollectionContext } from './context/collection-context';
@@ -50,6 +50,8 @@ export function CollectionPageContent() {
   }
 
   const { "*": subPageParam } = useParams();
+
+  console.log("CollectionPage subPageParam:", subPageParam);
 
   if (subPageParam === "card-collection") {
     return <CardCollection />;
