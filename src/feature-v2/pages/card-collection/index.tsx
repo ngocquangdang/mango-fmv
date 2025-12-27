@@ -92,39 +92,64 @@ function CardCollectionContent() {
           return;
         }
 
-        const orderStatus = await getOrderStatus(orderId);
+        try {
+          console.log('Polling order status, attempt:', attempts + 1, 'orderId:', orderId);
+          const orderStatus = await getOrderStatus(orderId);
+          console.log('Order status response:', orderStatus);
 
-        // Handle SUCCESS or PARTIALSUCCESS as successful payment
-        if (orderStatus.transaction.paymentStatus === 'SUCCESS' ||
-            orderStatus.transaction.paymentStatus === 'PARTIALSUCCESS') {
-          setPaymentStatus('success');
-          sessionStorage.removeItem('pending_ticket_order');
-          setPaymentModalData({
-            isOpen: true,
-            title: 'Thanh toán thành công!',
-            message: `Bạn đã nhận ${orderStatus.quantity} vé. Trang sẽ tự động làm mới để cập nhật số vé.`,
-            onConfirm: () => {
-              setPaymentModalData({ ...paymentModalData, isOpen: false });
-              clearSearchParams();
-              window.location.reload();
-            },
-          });
-        } else if (orderStatus.transaction.paymentStatus === 'FAILURE' ||
-                   orderStatus.transaction.paymentStatus === 'CANCELLED') {
-          setPaymentStatus('failed');
-          setPaymentModalData({
-            isOpen: true,
-            title: 'Thanh toán thất bại',
-            message: 'Thanh toán không thành công. Vui lòng thử lại.',
-            onConfirm: () => {
-              setPaymentModalData({ ...paymentModalData, isOpen: false });
-              clearSearchParams();
-            },
-          });
-        } else {
-          // Still pending, poll again after 5 seconds
+          // Handle SUCCESS or PARTIALSUCCESS as successful payment
+          if (orderStatus.transaction.paymentStatus === 'SUCCESS' ||
+              orderStatus.transaction.paymentStatus === 'PARTIALSUCCESS') {
+            setPaymentStatus('success');
+            sessionStorage.removeItem('pending_ticket_order');
+            setPaymentModalData({
+              isOpen: true,
+              title: 'Thanh toán thành công!',
+              message: `Bạn đã nhận ${orderStatus.quantity} vé. Trang sẽ tự động làm mới để cập nhật số vé.`,
+              onConfirm: () => {
+                setPaymentModalData({ ...paymentModalData, isOpen: false });
+                clearSearchParams();
+                window.location.reload();
+              },
+            });
+          } else if (orderStatus.transaction.paymentStatus === 'FAILURE' ||
+                     orderStatus.transaction.paymentStatus === 'CANCELLED') {
+            setPaymentStatus('failed');
+            setPaymentModalData({
+              isOpen: true,
+              title: 'Thanh toán thất bại',
+              message: 'Thanh toán không thành công. Vui lòng thử lại.',
+              onConfirm: () => {
+                setPaymentModalData({ ...paymentModalData, isOpen: false });
+                clearSearchParams();
+              },
+            });
+          } else {
+            // Still pending, poll again after 5 seconds
+            console.log('Payment still pending, will retry in 5 seconds');
+            attempts++;
+            setTimeout(pollOrderStatus, 5000);
+          }
+        } catch (pollError) {
+          console.error('Error polling order status:', pollError);
+          // If polling fails, retry (don't immediately show error)
           attempts++;
-          setTimeout(pollOrderStatus, 5000);
+          if (attempts >= maxAttempts) {
+            // Only show error after max attempts
+            setPaymentStatus('failed');
+            setPaymentModalData({
+              isOpen: true,
+              title: 'Lỗi hệ thống',
+              message: 'Có lỗi xảy ra khi xác nhận thanh toán. Vui lòng thử lại sau.',
+              onConfirm: () => {
+                setPaymentModalData({ ...paymentModalData, isOpen: false });
+                clearSearchParams();
+              },
+            });
+          } else {
+            // Retry after delay
+            setTimeout(pollOrderStatus, 5000);
+          }
         }
       };
 
