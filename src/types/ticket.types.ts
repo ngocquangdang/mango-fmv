@@ -23,6 +23,7 @@ export enum PaymentStatus {
   SUCCESS = 'SUCCESS',
   FAILURE = 'FAILURE',
   CANCELLED = 'CANCELLED',
+  PARTIALSUCCESS = 'PARTIALSUCCESS',
 }
 
 // Create Order Request

@@ -30,13 +30,32 @@ function CardCollectionContent() {
 
   // Handle payment callback from Pay1
   React.useEffect(() => {
-    const status = searchParams.get('status');
-    const orderId = searchParams.get('orderId');
+    // Get raw search string
+    const searchString = window.location.search;
+
+    if (!searchString) return;
+
+    let status: string | null = null;
+    let orderId: string | null = null;
+
+    // Check if double-encoded (contains %3D or %26)
+    if (searchString.includes('%3D') || searchString.includes('%26')) {
+      // Double-encoded - decode once
+      const decodedSearch = decodeURIComponent(searchString.substring(1)); // Remove '?' and decode
+      const params = new URLSearchParams(decodedSearch);
+
+      status = params.get('status');
+      orderId = params.get('orderId');
+    } else {
+      // Normal encoding - use regular searchParams
+      status = searchParams.get('status');
+      orderId = searchParams.get('orderId');
+    }
 
     if (status && orderId) {
       handlePaymentCallback(status, orderId);
     }
-  }, [searchParams]);
+  }, [window.location.search, searchParams]);
 
   const handlePaymentCallback = async (_status: string, orderId: string) => {
     setPaymentStatus('verifying');
@@ -56,14 +75,17 @@ function CardCollectionContent() {
 
         const orderStatus = await getOrderStatus(orderId);
 
-        if (orderStatus.transaction.paymentStatus === 'SUCCESS') {
+        // Handle SUCCESS or PARTIALSUCCESS as successful payment
+        if (orderStatus.transaction.paymentStatus === 'SUCCESS' ||
+            orderStatus.transaction.paymentStatus === 'PARTIALSUCCESS') {
           setPaymentStatus('success');
           sessionStorage.removeItem('pending_ticket_order');
           alert(`Thanh toán thành công! Bạn đã nhận ${orderStatus.quantity} vé.`);
           clearSearchParams();
           // Refresh the page to update ticket count
           window.location.reload();
-        } else if (orderStatus.transaction.paymentStatus === 'FAILURE' || orderStatus.transaction.paymentStatus === 'CANCELLED') {
+        } else if (orderStatus.transaction.paymentStatus === 'FAILURE' ||
+                   orderStatus.transaction.paymentStatus === 'CANCELLED') {
           setPaymentStatus('failed');
           alert('Thanh toán thất bại. Vui lòng thử lại.');
           clearSearchParams();
