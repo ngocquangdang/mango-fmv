@@ -9,6 +9,7 @@ import BlindBagOpeningOverlay from "./components/blind-bag-opening-overlay";
 import SingleBlindBagOverlay from "./components/single-blind-bag-overlay";
 import TicketPurchaseOverlay from "./components/ticket-purchase-overlay";
 import Button from "../../components/ui/button";
+import GameModal from "../../components/ui/dialog";
 import { CardCollectionProvider } from "./context"; // Import provider
 import { useCardCollection } from "./hooks/use-card-collection"; // Import hook
 import { getOrderStatus } from "../../../lib/api/ticket-api";
@@ -27,6 +28,17 @@ function CardCollectionContent() {
   const [openedCards, setOpenedCards] = React.useState<Card[]>([]);
   const [bonusCards, setBonusCards] = React.useState<Card[]>([]);
   const [paymentStatus, setPaymentStatus] = React.useState<'verifying' | 'success' | 'failed' | null>(null);
+  const [paymentModalData, setPaymentModalData] = React.useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   // Handle payment callback from Pay1
   React.useEffect(() => {
@@ -68,8 +80,15 @@ function CardCollectionContent() {
       const pollOrderStatus = async (): Promise<void> => {
         if (attempts >= maxAttempts) {
           setPaymentStatus('failed');
-          alert('Không thể xác nhận thanh toán. Vui lòng kiểm tra lại sau.');
-          clearSearchParams();
+          setPaymentModalData({
+            isOpen: true,
+            title: 'Lỗi xác thực',
+            message: 'Không thể xác nhận thanh toán. Vui lòng kiểm tra lại sau.',
+            onConfirm: () => {
+              setPaymentModalData({ ...paymentModalData, isOpen: false });
+              clearSearchParams();
+            },
+          });
           return;
         }
 
@@ -80,15 +99,28 @@ function CardCollectionContent() {
             orderStatus.transaction.paymentStatus === 'PARTIALSUCCESS') {
           setPaymentStatus('success');
           sessionStorage.removeItem('pending_ticket_order');
-          alert(`Thanh toán thành công! Bạn đã nhận ${orderStatus.quantity} vé.`);
-          clearSearchParams();
-          // Refresh the page to update ticket count
-          window.location.reload();
+          setPaymentModalData({
+            isOpen: true,
+            title: 'Thanh toán thành công!',
+            message: `Bạn đã nhận ${orderStatus.quantity} vé. Trang sẽ tự động làm mới để cập nhật số vé.`,
+            onConfirm: () => {
+              setPaymentModalData({ ...paymentModalData, isOpen: false });
+              clearSearchParams();
+              window.location.reload();
+            },
+          });
         } else if (orderStatus.transaction.paymentStatus === 'FAILURE' ||
                    orderStatus.transaction.paymentStatus === 'CANCELLED') {
           setPaymentStatus('failed');
-          alert('Thanh toán thất bại. Vui lòng thử lại.');
-          clearSearchParams();
+          setPaymentModalData({
+            isOpen: true,
+            title: 'Thanh toán thất bại',
+            message: 'Thanh toán không thành công. Vui lòng thử lại.',
+            onConfirm: () => {
+              setPaymentModalData({ ...paymentModalData, isOpen: false });
+              clearSearchParams();
+            },
+          });
         } else {
           // Still pending, poll again after 5 seconds
           attempts++;
@@ -100,8 +132,15 @@ function CardCollectionContent() {
     } catch (error) {
       console.error('Payment verification failed:', error);
       setPaymentStatus('failed');
-      alert('Có lỗi xảy ra khi xác nhận thanh toán.');
-      clearSearchParams();
+      setPaymentModalData({
+        isOpen: true,
+        title: 'Lỗi hệ thống',
+        message: 'Có lỗi xảy ra khi xác nhận thanh toán. Vui lòng thử lại sau.',
+        onConfirm: () => {
+          setPaymentModalData({ ...paymentModalData, isOpen: false });
+          clearSearchParams();
+        },
+      });
     }
   };
 
@@ -278,6 +317,14 @@ function CardCollectionContent() {
           </div>
         </div>
       )}
+
+      {/* Payment Result Modal */}
+      <GameModal
+        isOpen={paymentModalData.isOpen}
+        onConfirm={paymentModalData.onConfirm}
+        title={paymentModalData.title}
+        message={paymentModalData.message}
+      />
     </div>
   );
 }
