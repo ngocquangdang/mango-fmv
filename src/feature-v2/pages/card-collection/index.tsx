@@ -97,9 +97,8 @@ function CardCollectionContent() {
           const orderStatus = await getOrderStatus(orderId);
           console.log('Order status response:', orderStatus);
 
-          // Handle SUCCESS or PARTIALSUCCESS as successful payment
-          if (orderStatus.transaction.paymentStatus === 'SUCCESS' ||
-              orderStatus.transaction.paymentStatus === 'PARTIALSUCCESS') {
+          // Check order status (COMPLETED means payment succeeded)
+          if (orderStatus.status === 'COMPLETED') {
             setPaymentStatus('success');
             sessionStorage.removeItem('pending_ticket_order');
             setPaymentModalData({
@@ -112,8 +111,7 @@ function CardCollectionContent() {
                 window.location.reload();
               },
             });
-          } else if (orderStatus.transaction.paymentStatus === 'FAILURE' ||
-                     orderStatus.transaction.paymentStatus === 'CANCELLED') {
+          } else if (orderStatus.status === 'CANCELLED') {
             setPaymentStatus('failed');
             setPaymentModalData({
               isOpen: true,
@@ -124,9 +122,14 @@ function CardCollectionContent() {
                 clearSearchParams();
               },
             });
-          } else {
+          } else if (orderStatus.status === 'WAITING_FOR_PAYMENT') {
             // Still pending, poll again after 5 seconds
-            console.log('Payment still pending, will retry in 5 seconds');
+            console.log('Payment still pending (WAITING_FOR_PAYMENT), will retry in 5 seconds');
+            attempts++;
+            setTimeout(pollOrderStatus, 5000);
+          } else {
+            // Unknown status, log and retry
+            console.log('Unknown order status:', orderStatus.status, 'will retry in 5 seconds');
             attempts++;
             setTimeout(pollOrderStatus, 5000);
           }
