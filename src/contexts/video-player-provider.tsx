@@ -79,8 +79,8 @@ export interface VideoPlayerContextType {
   setIsEndingScene: React.Dispatch<React.SetStateAction<boolean>>;
   isVipModalOpen: boolean;
   setIsVipModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  voiceType: "default" | "ai" | "mute";
-  setVoiceType: React.Dispatch<React.SetStateAction<"default" | "ai" | "mute">>;
+  voiceType: "original" | "ai" | "mute";
+  setVoiceType: React.Dispatch<React.SetStateAction<"original" | "ai" | "mute">>;
   audioRecordings: any[];
   setAudioRecordings: React.Dispatch<React.SetStateAction<any[]>>;
   fetchAudioRecordings: () => Promise<void>;
@@ -183,7 +183,7 @@ export const VideoPlayerProvider = ({
 
   const [isEndingScene, setIsEndingScene] = React.useState(false);
   const [isVipModalOpen, setIsVipModalOpen] = React.useState(false);
-  const [voiceType, setVoiceType] = React.useState<"default" | "ai" | "mute">("default");
+  const [voiceType, setVoiceType] = React.useState<"original" | "ai" | "mute">("original");
   const [audioRecordings, setAudioRecordings] = React.useState<any[]>([]);
   const [currentSceneAudioUrl, setCurrentSceneAudioUrl] = React.useState<string | null>(null);
 
@@ -720,7 +720,7 @@ export const VideoPlayerProvider = ({
         }
       }
       const nextScene = data.scenes[nextSceneId];
-      const isUserVip = userInfo?.vipinfo?.isvip === 1;
+      const isUserVip = userInfo?.isVip;
       if (nextScene.isVip && !isUserVip) {
         return setIsVipModalOpen(true);
       }
@@ -774,7 +774,7 @@ export const VideoPlayerProvider = ({
         const nextSceneId = (scene as any).targetSceneId;
         if (nextSceneId) {
           const nextScene = data.scenes[nextSceneId];
-          const isUserVip = userInfo?.vipinfo?.isvip === 1;
+          const isUserVip = userInfo?.isVip;
           if (nextScene?.isVip && !isUserVip) {
             return setIsVipModalOpen(true);
           }

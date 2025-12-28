@@ -9,7 +9,7 @@ interface SelectVoiceOverlayProps {
 }
 
 const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
-  const { voiceType, setVoiceType } = useVideoPlayerContext();
+  const { voiceType, setVoiceType, setUseAiAudio } = useVideoPlayerContext();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCreatingVoice, setIsCreatingVoice] = useState(false);
 
@@ -24,8 +24,12 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
   // Let's use global state directly for simplicity and instant effect, unless "Continue" is "Save".
   // If "Continue" is just "Close", then instant update is better.
 
+  const handleVoiceTypeChange = (type: "original" | "ai" | "mute") => {
+    setVoiceType(type);
+    setUseAiAudio(type);
+    onClose();
+  };
   if (!isOpen) return null;
-
 
 
   return (
@@ -68,8 +72,8 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
             {/* Option: Default */}
             <div
-              onClick={() => setVoiceType("default")}
-              className={`cursor-pointer group relative w-[100px] h-[130px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "default" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+              onClick={() => handleVoiceTypeChange("original")}
+              className={`cursor-pointer group relative w-[100px] h-[130px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "original" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
               {/* Icon */}
               <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 overflow-hidden mb-2 bg-white flex items-center justify-center">
@@ -83,7 +87,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
             {/* Option: AI */}
             <div
-              onClick={() => setVoiceType("ai")}
+              onClick={() => handleVoiceTypeChange("ai")}
               className={`cursor-pointer group relative w-[100px] h-[130px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "ai" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
               <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
@@ -96,7 +100,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
             {/* Option: Mute */}
             <div
-              onClick={() => setVoiceType("mute")}
+              onClick={() => handleVoiceTypeChange("mute")}
               className={`cursor-pointer group relative w-[100px] h-[130px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "mute" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
               <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
@@ -141,7 +145,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           </div>
 
           <div className="text-white font-hand text-sm lg:text-base mb-8 shadow-black/50 text-shadow-sm">
-            Nữ chính sẽ dùng voice <span className="text-orange-300">{voiceType === "default" ? "mặc định" : voiceType === "ai" ? "của bạn" : "tắt tiếng"}</span>
+            Nữ chính sẽ dùng voice <span className="text-orange-300">{voiceType === "original" ? "mặc định" : voiceType === "ai" ? "của bạn" : "tắt tiếng"}</span>
           </div>
 
           {/* Continue Button */}

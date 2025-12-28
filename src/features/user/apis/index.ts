@@ -484,3 +484,16 @@ export const getAudioRecordings = async (limit: number = 20, offset: number = 0)
   });
   return response;
 };
+
+export interface UserInfoResponse {
+  userId: string;
+  isVip: boolean;
+  ticketBalance: number;
+}
+
+export const getUserInfo = async () => {
+  const response = await apiClientVideoProgress.get<ApiResponse<UserInfoResponse>>("/user-info", {
+    "X-Ticket": getLocalParam("ticket") || "",
+  });
+  return response;
+};
