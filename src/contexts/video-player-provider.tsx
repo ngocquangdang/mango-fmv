@@ -400,7 +400,7 @@ export const VideoPlayerProvider = ({
       if (!data?.startSceneId || !data.scenes || !audioRecordings || audioRecordings.length === 0) return;
 
       const record = audioRecordings[0] as any;
-      const userAudioUrl = record?.cdnUrl || record?.cdn_url || record?.publicUrl;
+      const userAudioUrl = record?.cdnUrl;
       if (!userAudioUrl) return;
 
       const visited = new Set<string>();

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import NotebookLayout from "../../../components/notebook";
 import { useCollectionContext } from "../context/collection-context";
-import { useVideoPlayerContext } from "../../../../contexts";
 import Banner from "../../../components/banner";
 import type { CollectionItem } from "../right-side";
 import SingleBlindBagOverlay from "../../card-collection/components/single-blind-bag-overlay";
@@ -11,7 +10,7 @@ import MergeCardLeft from "./left";
 import MergeCardRight from "./right";
 
 export default function MergeCardPage() {
-  const { setType } = useVideoPlayerContext();
+  // const { setType } = useVideoPlayerContext();
   const navigate = useNavigate();
   const { characters, fetchCollection } = useCollectionContext();
   // const { id: characterId } = useParams(); // Get subpage param which might contain ID?
@@ -134,7 +133,7 @@ export default function MergeCardPage() {
     <div className="w-full h-full flex items-center justify-center relative">
       <div
         className="absolute top-4 left-4 z-50 cursor-pointer w-9 h-9"
-        onClick={() => setType("intro")}
+        onClick={() => navigate("/collection")}
       >
         <img src="/images/back-icon.png" alt="back-icon" className="w-9 h-9" />
       </div>
