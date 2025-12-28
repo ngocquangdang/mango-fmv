@@ -15,7 +15,7 @@ const BlindBagItem = ({ item, isActive: _isActive = false }: { item: any; isActi
       {/* {isActive && <div className="absolute inset-0 bg-white/50 blur-xl rounded-full"></div>} */}
 
       <div
-        className="flex items-center justify-center relative w-[100px] h-[90px] lg:w-[120px] lg:h-[110px]"
+        className="flex items-center justify-center relative w-[100px] h-[90px] lg:w-[255px] lg:h-[230px]"
         style={{
           backgroundImage: "url('/images/collection/blind-bag.png')",
           backgroundSize: "contain",
@@ -26,17 +26,17 @@ const BlindBagItem = ({ item, isActive: _isActive = false }: { item: any; isActi
         <img
           src={item?.image}
           alt="bag"
-          className="object-contain w-[60px] h-[40px] lg:w-[70px] lg:h-[50px] drop-shadow-md"
+          className="object-contain w-[60px] h-[40px] lg:w-[152px] lg:h-[102px] drop-shadow-md"
         />
       </div>
 
-      <div className="absolute top-[85%] left-1/2 -translate-x-1/2 flex items-center justify-center w-[90px] h-[36px] lg:w-[100px] lg:h-[40px]" style={{
+      <div className="absolute top-[85%] left-1/2 -translate-x-1/2 flex items-center justify-center w-[90px] h-[36px] lg:w-[230px] lg:h-[92px]" style={{
         backgroundImage: "url('/images/tab-selected.png')",
         backgroundSize: "contain",
         backgroundPosition: "center center",
         backgroundRepeat: "no-repeat",
       }}>
-        <div className="text-[10px] lg:text-xs font-bold text-[#3B4C7A] text-center w-[80px] line-clamp-1 pb-1">
+        <div className="text-[10px] lg:text-2xl font-bold text-[#3B4C7A] text-center w-[80px] lg:w-[195px] line-clamp-1 pb-1 lg:pb-4">
           {item?.name}
         </div>
       </div>

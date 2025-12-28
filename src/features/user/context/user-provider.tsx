@@ -10,9 +10,11 @@ import {
   useCollectedRewards,
   useInitQrSession,
   useConfirmQrSession,
+  useAudioRecordings,
 } from "../hooks";
 import { useMgSdk } from "../../../hooks/useMgSdk";
 import type { ChapterMapped } from "../../../types/chapter";
+import type { AudioRecording } from "../apis";
 import { saveLocalParams, getLocalParam } from "../../../lib/api/storage";
 import type { CollectedRewardCharacter } from "../apis";
 import { logInfo } from "../../../lib/utils/logger";
@@ -38,6 +40,7 @@ export interface UserContextType {
   refetchChapter: () => void;
   userInfo: Record<string, any>;
   isQrLoginVisible: boolean;
+  audioRecordings: AudioRecording[];
 }
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -45,6 +48,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mutate: updateStatus } = useUpdateStatus();
   const { mutate: initQrSession } = useInitQrSession();
   const { mutate: confirmQrLogin } = useConfirmQrSession();
+  const { data: audioRecordings = [] } = useAudioRecordings();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -336,6 +340,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       refetchChapter,
       userInfo,
       isQrLoginVisible,
+      audioRecordings,
     }),
     [
       chapterMapped,
@@ -348,6 +353,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       refetchChapter,
       userInfo,
       isQrLoginVisible,
+      audioRecordings,
     ]
   );
 

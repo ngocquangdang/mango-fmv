@@ -1,16 +1,16 @@
-import { useVideoPlayerContext } from "../../../contexts";
+import { useNavigate } from "react-router-dom";
 import Banner from '../../components/banner';
 import { RankProvider } from "./context/rank-provider";
 import RankLayout from "./rank-layout";
 
 function RankContent() {
-  const { setType } = useVideoPlayerContext();
+  const navigate = useNavigate();
 
   return (
     <div className="w-full h-full flex items-center justify-center relative">
       <div
         className="absolute top-4 left-4 z-50 cursor-pointer w-9 h-9"
-        onClick={() => setType("intro")}
+        onClick={() => navigate("/")}
       >
         <img src="/images/back-icon.png" alt="back-icon" className="w-9 h-9" />
       </div>

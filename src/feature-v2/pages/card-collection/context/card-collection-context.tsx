@@ -12,9 +12,9 @@ export interface UserInfo {
 export interface CardCollectionContextType {
   // Data
   stats: CollectionStats | undefined;
+  ticketPackages: TicketPackage[];
   banners: Banner[];
   userState: UserState | undefined;
-  ticketPackages: TicketPackage[];
   userInfo: UserInfo | undefined;
   isLoading: boolean;
   error: Error | null;

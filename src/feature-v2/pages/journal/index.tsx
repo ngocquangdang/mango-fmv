@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import NotebookLayout from "../../components/notebook";
-import { useVideoPlayerContext } from "../../../contexts";
 import LeftSide from "./left-side";
 import RightSide from "./right-side";
 import Banner from "../../components/banner";
@@ -9,7 +9,7 @@ import RewardDetail from "../../components/ui/reward-detail";
 import type { MomentReward } from "../../../features/user/apis";
 
 export default function Journal() {
-  const { setType } = useVideoPlayerContext();
+  const navigate = useNavigate();
   const { collectedRewards } = useUserContext();
   const [isRewardDetailOpen, setIsRewardDetailOpen] = useState(false);
   const [selectedRewardImage, setSelectedRewardImage] = useState<string | null>(
@@ -27,15 +27,15 @@ export default function Journal() {
   const [selectedUser, setSelectedUser] = useState<any>(
     users.length > 0
       ? {
-          id: users[0].id,
-          name: users[0].name,
-          avatar: users[0].avatar,
-        }
+        id: users[0].id,
+        name: users[0].name,
+        avatar: users[0].avatar,
+      }
       : {
-          id: "",
-          name: "",
-          avatar: "",
-        }
+        id: "",
+        name: "",
+        avatar: "",
+      }
   );
 
   const [selectedTab, setSelectedTab] = useState<string>(
@@ -67,13 +67,13 @@ export default function Journal() {
     setIsRewardDetailOpen(false);
     setSelectedRewardImage(null);
   };
-  
+
   return (
     <>
       <div className="w-full h-full flex items-center justify-center relative">
         <div
           className="absolute top-4 left-4 z-50 cursor-pointer w-9 h-9"
-          onClick={() => setType("intro")}
+          onClick={() => navigate("/")}
         >
           <img src="/images/back-icon.png" alt="back-icon" className="w-9 h-9" />
         </div>

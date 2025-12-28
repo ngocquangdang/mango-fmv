@@ -19,36 +19,34 @@ export default function MergeCardPage() {
   const { "*": subPageParam } = useParams();
 
   const [selectedTab, setSelectedTab] = useState<string>("");
-  const [slots, setSlots] = useState<(CollectionItem | null)[]>([null, null]);
+  const [slots, setSlots] = useState<(CollectionItem | null)[]>([null, null, null]);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [resultCard, setResultCard] = useState<Card | null>(null);
 
   const handleToggleItem = (item: CollectionItem) => {
+    console.log("handleToggleItem called for:", item.id);
     // Check if item is already in slots
     const existingIndex = slots.findIndex(s => s?.id === item.id);
+
     if (existingIndex !== -1) {
-      // Remove if exists
+      // CASE 1: Item exists -> Remove it
       const newSlots = [...slots];
       newSlots[existingIndex] = null;
       setSlots(newSlots);
     } else {
-      // Add to first empty slot
+      // CASE 2: Item does not exist -> Add to first empty slot
       const emptyIndex = slots.findIndex(s => s === null);
+
       if (emptyIndex !== -1) {
         const newSlots = [...slots];
         newSlots[emptyIndex] = item;
         setSlots(newSlots);
       } else {
-        // Full? Maybe replace the second slot or just ignore.
-        // For better UX, let's shift: [0] -> replaced by [1], [1] -> new item?
-        // Or simple: Replace the last one? 
-        // Let's implement: Replace the second "unlocked" slot or just the last slot.
-        // User requirement: "trường hợp trùng id thì loại bỏ hình đó bên phải" -> handled.
-        // "thêm vào bên phải" -> handled.
-
-        // NOTE: Optional behavior if full, replace 2nd slot.
+        // CASE 3: Slots full -> Replace the last slot (user friendly behavior for "Add")
+        // Alternatively, finding the first available slot that isn't functionally locked?
+        // But for now, just replace the last one so user sees the change.
         const newSlots = [...slots];
-        newSlots[1] = item;
+        newSlots[newSlots.length - 1] = item;
         setSlots(newSlots);
       }
     }
@@ -117,11 +115,6 @@ export default function MergeCardPage() {
     navigate(`/collection/merge-card/${id}`);
   };
 
-  const categories = characters.map(char => ({
-    id: char.id,
-    name: char.name
-  }));
-
   const subPages = [{
     slug: "card-collection",
     name: "Thu thập thẻ",
@@ -150,8 +143,8 @@ export default function MergeCardPage() {
       <NotebookLayout
         subPages={subPages}
         onSelectSubPage={handleSelectSubPage}
-        categories={categories}
-        selectedTab={selectedTab}
+        // categories={categories}
+        // selectedTab={selectedTab}
         setSelectedTab={handleTabChange}
         leftContent={
           <MergeCardLeft

@@ -25,7 +25,7 @@ const CollectionProgress = ({
           {/* Text is centered in the bar in the mockup, let's put it absolute centered in container */}
         </div>
 
-        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-xs lg:text-sm drop-shadow-md z-10">
+        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-xs lg:text-2xl drop-shadow-md z-10">
           {current}/{max}
         </span>
 
@@ -36,7 +36,7 @@ const CollectionProgress = ({
         </div>
       </div>
 
-      <p className="text-[10px] lg:text-xs text-blue-900 font-semibold text-center mt-2 max-w-full">
+      <p className="text-[10px] lg:text-xl text-blue-900 font-semibold text-center mt-2 max-w-full lg:max-w-[120%] lg:-ml-[10%]">
         Đảm bảo nhận 1 thẻ Ultra rare ngẫu nhiên khi mở 40 túi mù liên tiếp
       </p>
     </div>

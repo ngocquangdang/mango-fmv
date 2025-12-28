@@ -14,6 +14,7 @@ import {
   initQrSession,
   checkQrStatus,
   confirmQrSession,
+  getAudioRecordings,
 } from "../apis";
 import type { UpdateStatusPayload, SubmitHotspotPayload, QrConfirmRequest } from "../apis";
 import type { ChapterMapped, Character, Scene } from "../../../types/chapter";
@@ -258,3 +259,26 @@ export const useConfirmQrSession = () => {
   });
 };
 
+
+export const useAudioRecordings = () => {
+    const { data, isLoading, error, refetch } = useQuery({
+        queryKey: ["audio-recordings"],
+        queryFn: () => getAudioRecordings(),
+    });
+    
+    const sortedData = React.useMemo(() => {
+        if (!data?.data?.recordings) return [];
+        return [...data.data.recordings].sort((a, b) => {
+             const dateA = new Date(a.updatedAt || 0).getTime();
+             const dateB = new Date(b.updatedAt || 0).getTime();
+             return dateB - dateA;
+        });
+    }, [data?.data?.recordings]);
+
+    return {
+        data: sortedData,
+        isLoading,
+        error,
+        refetch
+    };
+};

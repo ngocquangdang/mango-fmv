@@ -17,7 +17,7 @@ interface RightSideProps {
 
 export const ItemCard = ({ item, borderColorClass, isLocked, className = "" }: { item: CollectionItem; borderColorClass: string; isLocked: boolean, className?: string }) => {
   return (
-    <div className={`relative rounded w-[44px] h-[60px] overflow-hidden aspect-[3/4.5] ${isLocked ? 'border-opacity-30' : 'border-opacity-60'} ${borderColorClass} ${className}`}>
+    <div className={`relative rounded w-[44px] h-[60px] lg:w-[90px] lg:h-[122px] overflow-hidden aspect-[3/4.5] ${isLocked ? 'border-opacity-30' : 'border-opacity-60'} ${borderColorClass} ${className}`}>
       {/* Background/Image */}
       <div className="w-full h-full bg-gray-300 relative">
         <img
@@ -87,9 +87,9 @@ export const CollectionFolder = ({
 
 export const URCollectionFolder = ({ items, renderItem }: { items: CollectionItem[], renderItem?: (item: CollectionItem, theme: FolderTheme) => React.ReactNode }) => {
   return (
-    <div className="w-full h-[68px] relative mt-6 mb-4">
+    <div className="w-full h-[68px] lg:h-[140px] relative mt-6 mb-4">
       {/* Container with orange border and grid bg */}
-      <div className="h-[68px] bg-[#FFFDF5] overflow-visible" style={{
+      <div className="h-[68px] lg:h-[140px] bg-[#FFFDF5] overflow-visible" style={{
         backgroundImage: 'url(/images/collection/ur-bg.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -97,10 +97,10 @@ export const URCollectionFolder = ({ items, renderItem }: { items: CollectionIte
       }}>
 
         {/* Header "Thẻ giới hạn" */}
-        <div className="absolute -top-5 left-1/2  transform -translate-x-1/2 z-0" >
+        <div className="absolute -top-5 lg:-top-9 left-1/2  transform -translate-x-1/2 z-0" >
           <div className="bg-[#FFCDB2] px-6 py-1.5 rounded-t-lg relative overflow-hidden">
             {/* Text */}
-            <h2 className="font-hand text-[#E85D04] text-[10px] lg:text-2xl font-bold whitespace-nowrap relative z-10">
+            <h2 className="font-hand text-[#E85D04] text-[10px] lg:text-3xl font-bold whitespace-nowrap relative z-10">
               Thẻ giới hạn
             </h2>
             <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-3/4 h-1 bg-[#3B64E6] rounded-full opacity-60 skew-x-12"></div>
@@ -192,7 +192,7 @@ const RightSide: React.FC<RightSideProps> = ({ renderItem }) => {
 
   // Render folders dynamically based on groups
   return (
-    <div className="w-[148px] mx-auto h-full flex flex-col overflow-y-auto pb-4 custom-scrollbar">
+    <div className="w-[148px] lg:w-[300px] mx-auto h-full flex flex-col overflow-y-auto pb-4 custom-scrollbar">
       {groups.map((group) => {
         // Customize theme based on tierCode if needed
         let themeProps: FolderTheme = {

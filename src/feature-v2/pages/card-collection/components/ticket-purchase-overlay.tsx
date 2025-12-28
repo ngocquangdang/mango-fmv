@@ -91,7 +91,7 @@ const TicketPurchaseOverlay = ({
         >
           <img src="/images/chevon-left.png" alt="back" className="w-6 h-6 lg:w-8 lg:h-8 object-contain" />
         </div>
-        <Banner text="Mua lượt xé" className='left-[unset] translate-x-[unset]' />
+        <Banner text="Mua lượt xé" />
 
 
         {/* Currency Display */}
@@ -104,12 +104,6 @@ const TicketPurchaseOverlay = ({
               {ticketBalance}
 
             </div>
-            <div className='absolute top-3 left-3 w-8 h-8' style={{
-              backgroundImage: "url('/images/collection/ticket.png')",
-              backgroundSize: "contain",
-              backgroundPosition: "center center",
-              backgroundRepeat: "no-repeat",
-            }}></div>
           </div>
         </div>
       </div>
@@ -147,51 +141,51 @@ const TicketPurchaseOverlay = ({
           {packages.map((pkg) => (
             <div
               key={pkg.id}
-              className={`relative aspect-[3/4.2] flex flex-col items-center justify-center p-6 transition-transform ${
-                isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'
-              }`}
+              className={`relative aspect-[3/4.2] flex flex-col items-center justify-center p-6 transition-transform ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'
+                }`}
               onClick={() => !isProcessing && handlePackageClick(pkg)}
             >
               {/* Background Frame */}
               <img
-                src="/images/collection/ticket-frame.png"
-                alt="frame"
-                className="absolute inset-0 w-full h-full object-fill z-0"
+                  src="/images/collection/ticket-frame.png"
+                  alt="frame"
+                  className="absolute inset-0 w-full h-full object-fill z-0"
               />
-
+              
               {/* Content */}
               <div className="relative z-10 flex flex-col items-center w-full h-full pt-4 pb-4">
-
+                
                 {/* Ticket Icon */}
                 <div className="flex-1 flex items-center justify-center">
                   <img
-                    src="/images/collection/ticket.png"
-                    alt="ticket"
-                    className="w-24 h-auto object-contain drop-shadow-sm transform -rotate-12"
+                      src="/images/collection/ticket.png"
+                      alt="ticket"
+                      className="w-24 h-auto object-contain drop-shadow-sm transform -rotate-12"
                   />
                 </div>
-
+                
                 {/* Quantity */}
                 <div className="mt-2 mb-1">
                   <span className="font-[20px] font-bold text-[#FF4820]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
                     x{pkg.quantity}
                   </span>
                 </div>
-
+                
                 {/* Divider */}
                 <img
-                  src="/images/collection/ticket-frame-hr.png"
-                  alt="divider"
-                  className="w-[80%] h-auto object-contain my-1 opacity-80"
+                    src="/images/collection/ticket-frame-hr.png"
+                    alt="divider"
+                    className="w-[80%] h-auto object-contain my-1 opacity-80"
                 />
-
+                
                 {/* Price */}
                 <div className="mt-1">
                   <span className="text-base font-bold text-[#112953]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
-                    {pkg.price.toLocaleString("vi-VN")} {pkg.currency?.toLowerCase() || 'vnđ'}
+                    {(pkg.price).toLocaleString("vi-VN")} {pkg.currency?.toLowerCase() || 'vnđ'}
                   </span>
                 </div>
               </div>
+              
             </div>
           ))}
         </div>

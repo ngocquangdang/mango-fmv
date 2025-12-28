@@ -7,6 +7,8 @@ import { useFlowChart } from "./context";
 import { getLayoutedElements } from "../../../features/pixel-flow/layout";
 import { useVideoPlayerContext } from "../../../contexts";
 import { useToast } from "../../../components/ui/toast-v2/use-toast";
+import { VoiceService } from "../../services/voice-service";
+import { useUserContext } from "../../../features/user/context";
 
 const ChapterFlowV2 = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,6 +20,7 @@ const ChapterFlowV2 = () => {
 
 
   // Ref để handler click node luôn đọc được context mới nhất
+  const { audioRecordings } = useUserContext();
   const clickContextRef = useRef({
     data,
     currentStatus: videoPlayerContext.currentStatus,
@@ -26,6 +29,7 @@ const ChapterFlowV2 = () => {
     onPlayPlayer: videoPlayerContext.onPlayPlayer,
     setReviewScene: videoPlayerContext.setReviewScene,
     showToast,
+    audioRecordings,
   });
 
   useEffect(() => {
@@ -37,6 +41,7 @@ const ChapterFlowV2 = () => {
       onPlayPlayer: videoPlayerContext.onPlayPlayer,
       setReviewScene: videoPlayerContext.setReviewScene,
       showToast,
+      audioRecordings,
     };
   }, [
     data,
@@ -46,6 +51,7 @@ const ChapterFlowV2 = () => {
     videoPlayerContext.onPlayPlayer,
     videoPlayerContext.setReviewScene,
     showToast,
+    audioRecordings,
   ]);
 
   // Prepare Data (Reuse layout logic from V1)
@@ -170,13 +176,26 @@ const ChapterFlowV2 = () => {
         setPauseType(null);
       }
 
+      console.log("Node clicked:", { nodeId, status: scene.status, isCompleted: scene.status === "COMPLETED" });
+
       if (scene.status === "COMPLETED") {
         setReviewScene(true);
         onPlayPlayer(nodeId, true);
         return;
       }
+      console.log("Checking voice result for:", scene.originalAudio);
+      if (scene.originalAudio) {
+        console.log("Checking voice result for:", scene.originalAudio);
+        const { audioRecordings } = clickContextRef.current;
+        const firstRecordingUrl = audioRecordings?.[0]?.cdnUrl || "https://cdn-audio-dev.mangoplus.vn/interactive-video-audio-recordings/audio-recordings/dcedeab9523a5e089bf0d2eafd5c3497/1766875005417-e2e-test-recording.m4a";
 
-      onPlayPlayer(nodeId);
+        VoiceService.getProcessingResult(nodeId, firstRecordingUrl, scene.originalAudio)
+          .then(res => console.log("Voice Result:", res))
+          .catch(err => console.error("Voice Check Error:", err));
+      }
+
+      setReviewScene(false);
+      onPlayPlayer(nodeId, false);
     });
 
     lfRef.current = lf;
