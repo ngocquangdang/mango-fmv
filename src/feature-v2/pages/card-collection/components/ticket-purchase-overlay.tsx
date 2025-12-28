@@ -145,31 +145,47 @@ const TicketPurchaseOverlay = ({
                 }`}
               onClick={() => !isProcessing && handlePackageClick(pkg)}
             >
-              {/* Card */}
-              <div className="bg-[#D9D9D9] border-2 border-white/50 shadow-xl w-full aspect-[3/4] flex flex-col items-center justify-center gap-2 p-4 relative group cursor-pointer hover:bg-[#E5E5E5] transition-colors">
-                {/* Ticket Icon Group */}
-                <div className="flex justify-center items-center transform -rotate-12 group-hover:rotate-0 transition-transform duration-300">
-                  <img src="/images/elements/tag-element.png" alt="ticket" className="w-16 h-12 lg:w-24 lg:h-16 object-contain drop-shadow-md" />
-                  <img src="/images/elements/tag-element.png" alt="ticket" className="w-16 h-12 lg:w-24 lg:h-16 object-contain -ml-8 lg:-ml-12 drop-shadow-md" />
-                </div>
-
-                {/* Amount Badge */}
-                <span className="text-2xl lg:text-4xl font-bold mt-2">x{pkg.quantity}</span>
-              </div>
-
-              {/* Divider */}
+              {/* Background Frame */}
               <img
-                src="/images/collection/ticket-frame-hr.png"
-                alt="divider"
-                className="w-[80%] h-auto object-contain my-1 opacity-80"
+                  src="/images/collection/ticket-frame.png"
+                  alt="frame"
+                  className="absolute inset-0 w-full h-full object-fill z-0"
               />
-
-              {/* Price */}
-              <div className="mt-1">
-                <span className="text-base font-bold text-[#112953]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
-                  {pkg.price.toLocaleString("vi-VN")} {pkg.currency?.toLowerCase() || 'vnđ'}
-                </span>
+              
+              {/* Content */}
+              <div className="relative z-10 flex flex-col items-center w-full h-full pt-4 pb-4">
+                
+                {/* Ticket Icon */}
+                <div className="flex-1 flex items-center justify-center">
+                  <img
+                      src="/images/collection/ticket.png"
+                      alt="ticket"
+                      className="w-24 h-auto object-contain drop-shadow-sm transform -rotate-12"
+                  />
+                </div>
+                
+                {/* Quantity */}
+                <div className="mt-2 mb-1">
+                  <span className="font-[20px] font-bold text-[#FF4820]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
+                    x{pkg.quantity}
+                  </span>
+                </div>
+                
+                {/* Divider */}
+                <img
+                    src="/images/collection/ticket-frame-hr.png"
+                    alt="divider"
+                    className="w-[80%] h-auto object-contain my-1 opacity-80"
+                />
+                
+                {/* Price */}
+                <div className="mt-1">
+                  <span className="text-base font-bold text-[#112953]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
+                    {(pkg.price).toLocaleString("vi-VN")} {pkg.currency?.toLowerCase() || 'vnđ'}
+                  </span>
+                </div>
               </div>
+              
             </div>
           ))}
         </div>
