@@ -27,8 +27,9 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
   const handleVoiceTypeChange = (type: "original" | "ai" | "mute") => {
     setVoiceType(type);
     if (type === "ai") {
-      setUseAiAudio(type);
+      setIsCreatingVoice(true);
     } else {
+      setUseAiAudio(type)
       onClose();
     }
   };
