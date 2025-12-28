@@ -83,7 +83,7 @@ const TicketPurchaseOverlay = ({
   return (
     <div className="fixed inset-0 z-[60] flex flex-col items-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
       {/* Header Area */}
-      <div className="w-full flex items-center justify-between p-4 lg:p-8 relative">
+      <div className="w-full flex items-center p-4 lg:p-8 relative">
         {/* Back Button */}
         <div
           className="cursor-pointer w-10 h-10 lg:w-12 lg:h-12 z-50 bg-[#FDE047] rounded-md border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_rgba(0,0,0,0.2)]"
@@ -95,15 +95,14 @@ const TicketPurchaseOverlay = ({
 
 
         {/* Currency Display */}
-        <div className="relative z-50">
-          <div className="absolute top-0 right-0 flex items-center gap-2 p-4">
-            <div
-              className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
-              style={{ backgroundImage: `url(/images/score-banner.png)` }}
-            >
-              {ticketBalance}
 
-            </div>
+        <div className="absolute top-0 right-0 flex items-center gap-2 p-4 mr-">
+          <div
+            className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
+            style={{ backgroundImage: `url(/images/score-banner.png)` }}
+          >
+            {ticketBalance}
+
           </div>
         </div>
       </div>
@@ -147,37 +146,37 @@ const TicketPurchaseOverlay = ({
             >
               {/* Background Frame */}
               <img
-                  src="/images/collection/ticket-frame.png"
-                  alt="frame"
-                  className="absolute inset-0 w-full h-full object-fill z-0"
+                src="/images/collection/ticket-frame.png"
+                alt="frame"
+                className="absolute inset-0 w-full h-full object-fill z-0"
               />
-              
+
               {/* Content */}
               <div className="relative z-10 flex flex-col items-center w-full h-full pt-4 pb-4">
-                
+
                 {/* Ticket Icon */}
                 <div className="flex-1 flex items-center justify-center">
                   <img
-                      src="/images/collection/ticket.png"
-                      alt="ticket"
-                      className="w-24 h-auto object-contain drop-shadow-sm transform -rotate-12"
+                    src="/images/collection/ticket.png"
+                    alt="ticket"
+                    className="w-24 h-auto object-contain drop-shadow-sm transform -rotate-12"
                   />
                 </div>
-                
+
                 {/* Quantity */}
                 <div className="mt-2 mb-1">
                   <span className="font-[20px] font-bold text-[#FF4820]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
                     x{pkg.quantity}
                   </span>
                 </div>
-                
+
                 {/* Divider */}
                 <img
-                    src="/images/collection/ticket-frame-hr.png"
-                    alt="divider"
-                    className="w-[80%] h-auto object-contain my-1 opacity-80"
+                  src="/images/collection/ticket-frame-hr.png"
+                  alt="divider"
+                  className="w-[80%] h-auto object-contain my-1 opacity-80"
                 />
-                
+
                 {/* Price */}
                 <div className="mt-1">
                   <span className="text-base font-bold text-[#112953]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
@@ -185,12 +184,12 @@ const TicketPurchaseOverlay = ({
                   </span>
                 </div>
               </div>
-              
+
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -26,8 +26,11 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
   const handleVoiceTypeChange = (type: "original" | "ai" | "mute") => {
     setVoiceType(type);
-    setUseAiAudio(type);
-    onClose();
+    if (type === "ai") {
+      setUseAiAudio(type);
+    } else {
+      onClose();
+    }
   };
   if (!isOpen) return null;
 
@@ -52,7 +55,10 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
       </div>
 
       {isCreatingVoice ? (
-        <CreateVoiceView onBack={() => setIsCreatingVoice(false)} />
+        <CreateVoiceView
+          onBack={() => setIsCreatingVoice(false)}
+          onSuccess={() => setIsCreatingVoice(false)}
+        />
       ) : (
         <div className="w-full h-full flex flex-col items-center justify-center p-4 relative animate-in fade-in duration-300">
 

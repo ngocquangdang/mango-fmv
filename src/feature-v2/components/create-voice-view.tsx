@@ -8,10 +8,10 @@ import { getOrderedScenes } from "../utils/scene-ordering";
 
 interface CreateVoiceViewProps {
   onBack: () => void;
-
+  onSuccess: () => void;
 }
 
-const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
+const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
   const { chapter } = useUserContext();
   const { setAiAudioList } = useVideoPlayerContext();
   const { showToast } = useToast();
@@ -181,6 +181,9 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       // 3. Confirm Upload
       await VoiceService.confirmUpload(recordingId);
 
+      // Close modal immediately after success confirm
+      onSuccess();
+
       // 4. Poll for Result
       // Note: The guide mentions using the GCS URL for polling? 
       // `audio_file_url` param. Check multiple possible keys
@@ -195,7 +198,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
 
       const resultUrl = await VoiceService.pollVoiceProcessing(sceneId, cdnUrl, originalAudio);
 
-      setAiVoiceUrl(resultUrl);
+      // setAiVoiceUrl(resultUrl); // Skip local state update as component will unmount
       setIsProcessing(false);
 
       // --- Trigger polling for first 10 scenes ---

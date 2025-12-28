@@ -134,7 +134,7 @@ export default function RankLayout() {
                   label="BÌNH CHỌN"
                   size="tiny"
                   lgSize="small"
-                  className="text-[10px] lg:text-sm p-0! lg:px-4!"
+                  containerClassName="text-[10px]! lg:text-sm p-0! lg:px-4!"
                   onClick={() => setSelectedUser(user)}
                 />
               </div>
