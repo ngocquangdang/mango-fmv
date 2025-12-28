@@ -150,7 +150,7 @@ export const CardCollectionService = {
         name: pkg.name,
         quantity: pkg.quantity,
         price: pkg.price,
-        totalPrice: pkg.price * pkg.quantity,
+        totalPrice: pkg.price, // Backend price is already the final package price
         description: `${pkg.quantity} tickets package`,
         status: pkg.status,
         currency: pkg.currency,
