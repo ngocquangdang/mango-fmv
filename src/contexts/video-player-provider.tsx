@@ -452,8 +452,10 @@ export const VideoPlayerProvider = ({
       await traverseAndFetch(data.startSceneId);
     };
 
-    fetchSceneAudio();
-  }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList]);
+    if (voiceType === "ai") {
+      fetchSceneAudio();
+    }
+  }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType]);
 
   const triggerDisplayReward = React.useCallback(
     (data: any) => {
