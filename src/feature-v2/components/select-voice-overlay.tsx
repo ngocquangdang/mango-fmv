@@ -160,7 +160,12 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             <Button
               label="Tiếp tục"
               className="bg-[#E85D04] text-white px-8 lg:px-10 shadow-lg border-2 border-white/20"
-              onClick={onClose}
+              onClick={() => {
+                if (voiceType === "ai") {
+                  setUseAiAudio("ai");
+                }
+                onClose();
+              }}
             />
           </div>
 

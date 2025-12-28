@@ -187,7 +187,7 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
       // 4. Poll for Result
       // Note: The guide mentions using the GCS URL for polling? 
       // `audio_file_url` param. Check multiple possible keys
-      const cdnUrl = uploadRes.data.cdnUrl || uploadRes.data.cdn_url || uploadRes.data.publicUrl;
+      const cdnUrl = uploadRes.data.cdnUrl || uploadRes.data.cdn_url || uploadRes.data.fileUrl;
 
       if (!cdnUrl) {
         throw new Error("Backend did not return CDN URL or Public URL");
