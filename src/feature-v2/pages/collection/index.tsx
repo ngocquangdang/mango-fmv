@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import NotebookLayout from "../../components/notebook";
 import Banner from "../../components/banner";
-import { useVideoPlayerContext } from "../../../contexts";
 import CardCollection from "../card-collection";
 import MergeCardPage from "./merge-card";
 import LeftSide from "./left-side";
@@ -11,7 +10,6 @@ import { CollectionProvider, useCollectionContext } from './context/collection-c
 
 
 export function CollectionPageContent() {
-  const { setType } = useVideoPlayerContext();
   const navigate = useNavigate();
   const { characters, fetchCollection } = useCollectionContext();
 
@@ -63,7 +61,7 @@ export function CollectionPageContent() {
     <div className="w-full h-full flex items-center justify-center relative">
       <div
         className="absolute top-4 left-4 z-50 cursor-pointer w-9 h-9"
-        onClick={() => setType("intro")}
+        onClick={() => navigate("/")}
       >
         <img src="/images/back-icon.png" alt="back-icon" className="w-9 h-9" />
       </div>

@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import HookButton from "../components/ui/hook-button";
 import HomeButton from "../components/ui/home-button";
 import { useVideoPlayerContext } from "../../contexts";
@@ -11,6 +12,7 @@ const IMAGE_VERSION = "1";
 
 export default function Home() {
   const { setType, setCollectionItems } = useVideoPlayerContext();
+  const navigate = useNavigate();
   const { chapter, refetchProgress, refetchCollectedRewards } = useUserContext();
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
@@ -34,6 +36,21 @@ export default function Home() {
       setDialogName("quitPlayer");
       return;
     }
+
+    // Handle navigation for non-story types
+    if (actionName === "journal") {
+      navigate("/journal");
+      return;
+    }
+    if (actionName === "ranking") {
+      navigate("/rank");
+      return;
+    }
+    if (actionName === "collection") {
+      navigate("/collection");
+      return;
+    }
+
     setType(actionName);
     refetchCollectedRewards();
   };
@@ -161,7 +178,7 @@ export default function Home() {
         alt="home-bg"
         className="absolute top-8 left-[50%] translate-x-[-50%] w-[263px] h-[120px] lg:w-[340px] lg:h-[144px] object-cover"
       />
-      <div className="flex flex-col h-full justify-center items-center gap-4 w-fit pl-2 relative z-100">
+      <div className="flex flex-col h-full justify-center items-center gap-4 w-fit pl-2 relative z-[100]">
         {HOME_BUTTON.map((button, index) => (
           <div
             key={index}

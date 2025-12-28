@@ -118,7 +118,6 @@ export const VideoPlayerProvider = ({
     | "ranking"
     | "playAgain"
     | "endChapter"
-    | "endChapter"
     | "collection"
     | "cardCollection"
   >("intro");

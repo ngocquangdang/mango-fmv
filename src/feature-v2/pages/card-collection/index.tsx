@@ -1,8 +1,7 @@
 
 import React from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Banner from "../../components/banner";
-import { useVideoPlayerContext } from "../../../contexts";
 import CollectionProgress from "./components/collection-progress";
 import BlindBagSelector from "./components/blind-bag-selector";
 import BlindBagOpeningOverlay from "./components/blind-bag-opening-overlay";
@@ -17,7 +16,7 @@ import { getOrderStatus } from "../../../lib/api/ticket-api";
 import type { Card } from "./services/card-collection-service"; // Import Card type
 
 function CardCollectionContent() {
-  const { setType } = useVideoPlayerContext();
+  const navigate = useNavigate();
   const { banners, userState, userInfo, openBlindBag, isOpening } = useCardCollection();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -242,7 +241,7 @@ function CardCollectionContent() {
       {/* Back Button */}
       <div
         className="absolute top-4 left-4 z-50 cursor-pointer w-9 h-9"
-        onClick={() => setType("intro")}
+        onClick={() => navigate("/collection")}
       >
         <img src="/images/back-icon.png" alt="back-icon" className="w-9 h-9" />
       </div>
