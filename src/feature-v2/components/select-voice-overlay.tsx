@@ -3,6 +3,7 @@ import Button from "./ui/button";
 import { useVideoPlayerContext } from "../../contexts";
 import CreateVoiceView from "./create-voice-view";
 import { useUserContext } from "../../features/user/context";
+import { VoiceService } from "../services/voice-service";
 
 interface SelectVoiceOverlayProps {
   isOpen: boolean;
@@ -17,6 +18,12 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  // State for recordings and processing
+  const [recordings, setRecordings] = useState<any[]>([]);
+  const [isProcessingAi, setIsProcessingAi] = useState(false);
+  const [aiProcessedAudioUrl, setAiProcessedAudioUrl] = useState<string | null>(null); // Store processed AI audio URL
+  const hasProcessedRef = useRef(false); // Track if we've already processed AI voice
 
   // Get first scene audio URL from context or chapter data
   const sceneId = currentSceneId || chapter?.startSceneId;
@@ -44,9 +51,83 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
     });
   }, [chapter, clips, currentSceneId, firstSceneAudioUrl, targetScene, voiceType]);
 
+  // Fetch recordings on mount
+  useEffect(() => {
+    VoiceService.getAudioRecordings(50, 0)
+      .then((res) => {
+        if (res.data?.recordings) {
+          setRecordings(res.data.recordings);
+          console.log('📼 Fetched recordings:', res.data.recordings);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch recordings:", err));
+  }, []);
+
+  // Auto-process AI voice when AI option is selected and recordings are available
+  useEffect(() => {
+    const processAiVoice = async () => {
+      // Only process if:
+      // 1. AI voice type is selected
+      // 2. Have recordings available
+      // 3. Not already processing
+      // 4. Have necessary scene data
+      // 5. Haven't already processed (NEW CHECK)
+      if (voiceType !== 'ai' || recordings.length === 0 || isProcessingAi || hasProcessedRef.current) {
+        return;
+      }
+
+      // Get first recording (most recent)
+      const firstRecording = recordings[0];
+      const cdnUrl = firstRecording.cdnUrl || firstRecording.cdn_url || firstRecording.publicUrl;
+
+      if (!cdnUrl) {
+        console.warn('First recording does not have CDN URL:', firstRecording);
+        return;
+      }
+
+      // Get scene info
+      const sceneId = currentSceneId || chapter?.startSceneId || chapter?.id;
+      if (!sceneId) {
+        console.warn('No scene ID available for processing');
+        return;
+      }
+
+      const currentScene = sceneId ? (clips?.[sceneId] || chapter?.scenes?.[sceneId]) : null;
+      const originalAudio = currentScene?.originalAudio;
+
+      console.log('🎯 Auto-processing AI voice:', {
+        sceneId,
+        cdnUrl,
+        originalAudio,
+        recording: firstRecording
+      });
+
+      try {
+        setIsProcessingAi(true);
+
+        // Call the API to process voice
+        const resultUrl = await VoiceService.pollVoiceProcessing(sceneId, cdnUrl, originalAudio);
+
+        console.log('✅ AI voice processing completed:', resultUrl);
+        setAiProcessedAudioUrl(resultUrl); // Store the AI processed audio URL
+        hasProcessedRef.current = true; // Mark as processed
+        setIsProcessingAi(false);
+      } catch (error) {
+        console.error('❌ Failed to process AI voice:', error);
+        setIsProcessingAi(false);
+      }
+    };
+
+    processAiVoice();
+  }, [voiceType, recordings, currentSceneId, chapter, clips, isProcessingAi]);
+
+  // Determine which audio to play based on voice type
+  const currentAudioUrl = voiceType === 'ai' ? aiProcessedAudioUrl : firstSceneAudioUrl;
+  const isAudioAvailable = voiceType === 'ai' ? !!aiProcessedAudioUrl : !!firstSceneAudioUrl;
+
   // Play/Pause toggle handler
   const togglePlayPause = () => {
-    if (!audioRef.current || !firstSceneAudioUrl) return;
+    if (!audioRef.current || !currentAudioUrl || !isAudioAvailable) return;
 
     if (isPlaying) {
       audioRef.current.pause();
@@ -93,7 +174,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
-  }, [voiceType, firstSceneAudioUrl]);
+  }, [voiceType, currentAudioUrl]);
 
   // Stop audio when switching to mute or closing overlay
   useEffect(() => {
@@ -143,7 +224,21 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
       </div>
 
       {isCreatingVoice ? (
-        <CreateVoiceView onBack={() => setIsCreatingVoice(false)} />
+        <CreateVoiceView onBack={() => {
+          setIsCreatingVoice(false);
+          // Reset AI processing state to allow processing with new recording
+          hasProcessedRef.current = false;
+          setAiProcessedAudioUrl(null);
+          setIsProcessingAi(false);
+          // Refresh recordings
+          VoiceService.getAudioRecordings(50, 0)
+            .then((res) => {
+              if (res.data?.recordings) {
+                setRecordings(res.data.recordings);
+              }
+            })
+            .catch((err) => console.error("Failed to refresh recordings:", err));
+        }} />
       ) : (
         <div className="w-full h-full flex flex-col items-center justify-center p-4 relative animate-in fade-in duration-300">
 
@@ -213,6 +308,11 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
               <span className="text-white text-xs lg:text-sm font-hand">
                 Dùng giọng nói của riêng bạn
               </span>
+              {isProcessingAi && (
+                <div className="flex items-center gap-2 bg-orange-500/20 px-4 py-2 rounded-full border border-orange-300 animate-pulse">
+                  <span className="text-orange-200 text-xs">⏳ Đang xử lý voice AI...</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -220,14 +320,14 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           {voiceType !== "mute" && (
             <div className="w-[90%] max-w-[500px] mb-2 relative">
               {/* Hidden audio element */}
-              <audio ref={audioRef} src={firstSceneAudioUrl || undefined} />
+              <audio ref={audioRef} src={currentAudioUrl || undefined} />
 
               {/* Visible player UI */}
-              <div className="bg-white rounded-full p-2 lg:p-3 shadow-lg border-2 border-blue-200 flex items-center gap-3">
+              <div className={`bg-white rounded-full p-2 lg:p-3 shadow-lg border-2 border-blue-200 flex items-center gap-3 ${!isAudioAvailable ? 'opacity-50' : ''}`}>
                 <button
                   onClick={togglePlayPause}
-                  className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition-colors"
-                  disabled={!firstSceneAudioUrl}
+                  className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!isAudioAvailable}
                 >
                   {isPlaying ? "||" : "▶"}
                 </button>
@@ -240,8 +340,17 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                   ></div>
                 </div>
 
-                <span className="text-xs text-gray-500 font-bold">Preview</span>
+                <span className="text-xs text-gray-500 font-bold">
+                  {voiceType === 'ai' && !aiProcessedAudioUrl ? 'Chưa có' : 'Preview'}
+                </span>
               </div>
+
+              {/* Info message when AI voice not available */}
+              {voiceType === 'ai' && !aiProcessedAudioUrl && !isProcessingAi && (
+                <div className="text-center text-yellow-300 text-xs mt-2 font-hand">
+                  ⚠️ Bạn cần tạo voice trước khi nghe thử
+                </div>
+              )}
             </div>
           )}
 
