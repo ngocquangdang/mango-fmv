@@ -23,6 +23,7 @@ export enum PaymentStatus {
   SUCCESS = 'SUCCESS',
   FAILURE = 'FAILURE',
   CANCELLED = 'CANCELLED',
+  PARTIALSUCCESS = 'PARTIALSUCCESS',
 }
 
 // Create Order Request
@@ -66,8 +67,12 @@ export interface OrderStatus {
   paidAt: string | null;
   createdAt: string;
   updatedAt: string;
-  transaction: OrderTransaction;
+  transaction?: OrderTransaction; // Optional - may not be included in response
   ticket?: TicketPackage;
+  // Additional fields from API
+  ticketName?: string;
+  ticketPrice?: number;
+  ticketQuantity?: number;
 }
 
 // Payment Callback Parameters (from Pay1 redirect)
