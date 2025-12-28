@@ -42,18 +42,14 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
       {/* Background (Optional, if we want specific styling) */}
 
       {/* Back Button */}
-      <div
-        onClick={() => {
-          if (isCreatingVoice) {
-            setIsCreatingVoice(false);
-          } else {
-            onClose();
-          }
-        }}
-        className="absolute top-4 left-4 lg:top-8 lg:left-8 cursor-pointer z-50 hover:scale-105 transition-transform"
-      >
-        <img src="/images/back-icon.png" alt="back" className="w-10 h-10 lg:w-14 lg:h-14 object-contain" />
-      </div>
+      {!isCreatingVoice && (
+        <div
+          onClick={() => onClose()}
+          className="absolute top-4 left-4 lg:top-8 lg:left-8 cursor-pointer z-50 hover:scale-105 transition-transform"
+        >
+          <img src="/images/back-icon.png" alt="back" className="w-10 h-10 lg:w-14 lg:h-14 object-contain" />
+        </div>
+      )}
 
       {isCreatingVoice ? (
         <CreateVoiceView
