@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import NotebookLayout from "../../../components/notebook";
 import { useCollectionContext } from "../context/collection-context";
-// import { useVideoPlayerContext } from "../../../../contexts";
 import Banner from "../../../components/banner";
 import type { CollectionItem } from "../right-side";
 import { useToast } from "../../../../components/ui/toast-v2/use-toast";

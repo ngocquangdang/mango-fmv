@@ -81,10 +81,10 @@ export interface VideoPlayerContextType {
   setIsVipModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   voiceType: "original" | "ai" | "mute";
   setVoiceType: React.Dispatch<React.SetStateAction<"original" | "ai" | "mute">>;
-  audioRecordings: any[];
-  setAudioRecordings: React.Dispatch<React.SetStateAction<any[]>>;
-  fetchAudioRecordings: () => Promise<void>;
-  currentSceneAudioUrl: string | null;
+  // audioRecordings: any[];
+  // setAudioRecordings: React.Dispatch<React.SetStateAction<any[]>>;
+  // fetchAudioRecordings: () => Promise<void>;
+  // currentSceneAudioUrl: string | null;
   setAiAudioList: (audioList: { sceneId: string; aiAudio: string }[]) => void;
   setUseAiAudio: (type: "ai" | "original" | "mute") => void;
 }
@@ -106,7 +106,8 @@ export const VideoPlayerProvider = ({
   children: React.ReactNode;
 }) => {
   const { api, ready } = useVideoPlayer();
-  const { chapter: data, updateSceneStatus, userInfo } = useUserContext();
+  const { chapter: data, updateSceneStatus, userInfo, audioRecordings } = useUserContext();
+  console.log({ audioRecordings });
   const { mutate: submitHotspot } = useSubmitHotspot();
   const { showToast } = useToast();
 
@@ -184,54 +185,32 @@ export const VideoPlayerProvider = ({
   const [isEndingScene, setIsEndingScene] = React.useState(false);
   const [isVipModalOpen, setIsVipModalOpen] = React.useState(false);
   const [voiceType, setVoiceType] = React.useState<"original" | "ai" | "mute">("original");
-  const [audioRecordings, setAudioRecordings] = React.useState<any[]>([]);
-  const [currentSceneAudioUrl, setCurrentSceneAudioUrl] = React.useState<string | null>(null);
+  // const [audioRecordings, setAudioRecordings] = React.useState<any[]>([]);
 
-  // Fetch audio for current scene
-  React.useEffect(() => {
-    if (!currentSceneId) {
-      setCurrentSceneAudioUrl(null);
-      return;
-    }
+  // const [currentSceneAudioUrl, setCurrentSceneAudioUrl] = React.useState<string | null>(null);
 
-    const fetchSceneAudio = async () => {
-      try {
-        // user's recorded audio is not passed here, implying we are fetching a pre-generated or specific result
-        // If we needed the user's recording, we'd need to lookup 'audioRecordings' or similar.
-        // For now, following user instruction to just call the API for the scene.
-        const result = await VoiceService.getProcessingResult(currentSceneId);
-        if (result.status === 'completed' && result.output_path) {
-          setCurrentSceneAudioUrl(result.output_path);
-        } else {
-          setCurrentSceneAudioUrl(null);
-        }
-      } catch (error) {
-        console.warn("Failed to fetch scene audio:", error);
-        setCurrentSceneAudioUrl(null);
-      }
-    };
+  // // Fetch audio for current scene
 
-    fetchSceneAudio();
-  }, [currentSceneId]);
 
-  const fetchAudioRecordings = React.useCallback(async () => {
-    try {
-      const response = await VoiceService.getAudioRecordings(20, 0);
-      if (response.data) {
-        // Assuming response.data is the list or contains the list.
-        // Adjust if response structure is different (e.g. response.data.items)
-        // User provided API returns list directly or valid envelope.
-        // Let's assume response.data IS the array based on typical apiClient usage.
-        setAudioRecordings(Array.isArray(response.data) ? response.data : []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch audio recordings:", error);
-    }
-  }, []);
+  // const fetchAudioRecordings = React.useCallback(async () => {
+  //   try {
+  //     const response = await VoiceService.getAudioRecordings(20, 0);
+  //     console.log(response);
+  //     if (response.data) {
+  //       // Assuming response.data is the list or contains the list.
+  //       // Adjust if response structure is different (e.g. response.data.items)
+  //       // User provided API returns list directly or valid envelope.
+  //       // Let's assume response.data IS the array based on typical apiClient usage.
+  //       setAudioRecordings(Array.isArray(response.data) ? response.data : []);
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to fetch audio recordings:", error);
+  //   }
+  // }, []);
 
-  React.useEffect(() => {
-    fetchAudioRecordings();
-  }, [fetchAudioRecordings]);
+  // React.useEffect(() => {
+  //   fetchAudioRecordings();
+  // }, [fetchAudioRecordings]);
 
   const { data: collectedHotspotsData } = useCollectedHotspots(
     currentSceneId || ""
@@ -382,33 +361,101 @@ export const VideoPlayerProvider = ({
   }, [api]);
 
   // Fetch all AI voices on mount moved below setAiAudioList declaration
-  React.useEffect(() => {
-    const fetchAllAiVoices = async () => {
-      try {
-        const response = await VoiceService.getAllVoiceResults();
-        console.log(response);
-        if (response && Array.isArray(response.items)) {
-          const mappedList = response.items.map(item => ({
-            sceneId: item.scene_id,
-            aiAudio: item.audio_url
-          }));
-
-          if (mappedList.length > 0) {
-            setAiAudioList(mappedList);
-          }
-        }
-      } catch (error) {
-        console.warn("Failed to fetch all AI voices:", error);
-      }
-    };
-
-    fetchAllAiVoices();
-  }, [setAiAudioList]);
+  // React.useEffect(() => {
+  //   const fetchAllAiVoices = async () => {
+  //     try {
+  //       const response = await VoiceService.getAllVoiceResults();
+  //       console.log(response);
+  //       if (response && Array.isArray(response.items)) {
+  //         const mappedList = response.items.map(item => ({
+  //           sceneId: item.scene_id,
+  //           aiAudio: item.audio_url
+  //         }));
+  //
+  //         if (mappedList.length > 0) {
+  //           setAiAudioList(mappedList);
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.warn("Failed to fetch all AI voices:", error);
+  //     }
+  //   };
+  //
+  //   fetchAllAiVoices();
+  // }, [setAiAudioList]);
 
   const setUseAiAudio = React.useCallback((type: "ai" | "original" | "mute") => {
     if (!api) return;
     api.setUseAiAudio?.(type);
   }, [api]);
+
+  React.useEffect(() => {
+    const fetchSceneAudio = async () => {
+      // Logic:
+      // 1. Start from data.startSceneId
+      // 2. Poll/Get result if scene has originalAudio + user audio
+      // 3. Traverse to next scenes (targetSceneId, branch options)
+      // 4. Update setAiAudioList
+
+      if (!data?.startSceneId || !data.scenes || !audioRecordings || audioRecordings.length === 0) return;
+
+      const record = audioRecordings[0] as any;
+      const userAudioUrl = record?.cdnUrl;
+      if (!userAudioUrl) return;
+
+      const visited = new Set<string>();
+      const results: { sceneId: string; aiAudio: string }[] = [];
+
+      // Recursive traversal function
+      const traverseAndFetch = async (sceneId: string, depth: number = 0) => {
+        // Limit recursion depth to avoid infinite loops or excessive fetching
+        if (depth > 10 || visited.has(sceneId)) return;
+        visited.add(sceneId);
+
+        const scene = data.scenes[sceneId];
+        if (!scene) return;
+
+        // Fetch/Poll for current scene if valid candidates exist
+        if (scene.originalAudio) {
+          try {
+            const aiAudio = await VoiceService.pollVoiceProcessing(sceneId, userAudioUrl, scene.originalAudio);
+            if (aiAudio) {
+              results.push({ sceneId, aiAudio });
+              setAiAudioList([...results]);
+            }
+          } catch (e) {
+            console.warn(`Failed to fetch/poll AI voice for scene ${sceneId}`, e);
+          }
+        }
+
+        // Determine next scenes
+        const nextSceneIds: string[] = [];
+
+        // 1. Direct target
+        if (scene.targetSceneId) {
+          nextSceneIds.push(scene.targetSceneId);
+        }
+
+        // 2. Branch options
+        if (scene.branch?.options) {
+          scene.branch.options.forEach((opt: any) => {
+            if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
+          });
+        }
+
+        // Process next scenes sequentially
+        for (const nid of nextSceneIds) {
+          await traverseAndFetch(nid, depth + 1);
+        }
+      };
+
+      await traverseAndFetch(data.startSceneId);
+    };
+
+    if (voiceType === "ai") {
+      fetchSceneAudio();
+    }
+  }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType]);
 
   const triggerDisplayReward = React.useCallback(
     (data: any) => {
@@ -505,7 +552,7 @@ export const VideoPlayerProvider = ({
       // Trigger voice polling for current and next 10 scenes
       const pollingTargets = getOrderedScenes(data.scenes, sceneId).slice(0, 10);
 
-      const userAudioUrl = audioRecordings?.[0]?.cdnUrl || audioRecordings?.[0]?.cdn_url || audioRecordings?.[0]?.publicUrl;
+      const userAudioUrl = audioRecordings?.[0]?.cdnUrl;
 
       if (userAudioUrl) {
         pollingTargets.forEach(targetId => {
@@ -1003,10 +1050,10 @@ export const VideoPlayerProvider = ({
     setIsVipModalOpen,
     voiceType,
     setVoiceType,
-    audioRecordings,
-    setAudioRecordings,
-    fetchAudioRecordings,
-    currentSceneAudioUrl,
+    // audioRecordings,
+    // setAudioRecordings,
+    // fetchAudioRecordings,
+    // currentSceneAudioUrl,
     setAiAudioList,
     setUseAiAudio,
   };

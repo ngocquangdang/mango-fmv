@@ -26,12 +26,6 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
   const handleVoiceTypeChange = (type: "original" | "ai" | "mute") => {
     setVoiceType(type);
-    if (type === "ai") {
-      setIsCreatingVoice(true);
-    } else {
-      setUseAiAudio(type)
-      onClose();
-    }
   };
   if (!isOpen) return null;
 
@@ -42,18 +36,14 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
       {/* Background (Optional, if we want specific styling) */}
 
       {/* Back Button */}
-      <div
-        onClick={() => {
-          if (isCreatingVoice) {
-            setIsCreatingVoice(false);
-          } else {
-            onClose();
-          }
-        }}
-        className="absolute top-4 left-4 lg:top-8 lg:left-8 cursor-pointer z-50 hover:scale-105 transition-transform"
-      >
-        <img src="/images/back-icon.png" alt="back" className="w-10 h-10 lg:w-14 lg:h-14 object-contain" />
-      </div>
+      {!isCreatingVoice && (
+        <div
+          onClick={() => onClose()}
+          className="absolute top-4 left-4 lg:top-8 lg:left-8 cursor-pointer z-50 hover:scale-105 transition-transform"
+        >
+          <img src="/images/back-icon.png" alt="back" className="w-10 h-10 lg:w-14 lg:h-14 object-contain" />
+        </div>
+      )}
 
       {isCreatingVoice ? (
         <CreateVoiceView
@@ -161,9 +151,9 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
               label="Tiếp tục"
               className="bg-[#E85D04] text-white px-8 lg:px-10 shadow-lg border-2 border-white/20"
               onClick={() => {
-                if (voiceType === "ai") {
-                  setUseAiAudio("ai");
-                }
+
+                setUseAiAudio(voiceType);
+
                 onClose();
               }}
             />
