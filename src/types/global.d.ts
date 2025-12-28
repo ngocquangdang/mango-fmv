@@ -21,6 +21,8 @@ declare global {
       setCollectionItems?: (collectionItems: Record<string, any>) => void;
       onCollectionSelected?: (cb: (collectionItemId: string) => void) => () => void;
       setReviewScene?: (status: boolean) => void;
+      setAiAudioList?: (audioList: {sceneId: string, aiAudio: string}[]) => void;
+      setUseAiAudio?: (type: "ai" | "original" | "mute") => void;
     };
   }
 }

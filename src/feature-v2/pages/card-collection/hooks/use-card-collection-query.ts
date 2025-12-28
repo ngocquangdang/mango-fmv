@@ -25,7 +25,7 @@ export const useOpenBlindBag = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ bannerId, quantity }: { bannerId: string; quantity: number }) => 
+    mutationFn: ({ bannerId, quantity }: { bannerId: string; quantity: number }) =>
         CardCollectionService.drawCards(bannerId, quantity),
     onSuccess: () => {
         // Invalidate all collection data to refresh tickets (in banners) and collection stats
