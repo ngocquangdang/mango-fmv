@@ -62,11 +62,13 @@ const TicketPurchaseOverlay = ({
       // Save pending order info to sessionStorage
       sessionStorage.setItem('pending_ticket_order', JSON.stringify({
         packageId: pkg.id,
-        quantity: pkg.quantity,
+        quantity: pkg.quantity, // Number of tickets in the package
         timestamp: Date.now(),
       }));
 
       // Create order and get payment redirect URL
+      // quantity = pkg.quantity (number of tickets to receive after payment)
+      // Backend will charge pkg.price (total payment amount)
       const orderResponse = await CardCollectionService.createTicketOrder(pkg.id, pkg.quantity);
 
       // Redirect to Pay1 payment gateway
@@ -186,7 +188,7 @@ const TicketPurchaseOverlay = ({
                 {/* Price */}
                 <div className="mt-1">
                   <span className="text-base font-bold text-[#112953]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
-                    {(pkg.price * pkg.quantity).toLocaleString("vi-VN")} {pkg.currency?.toLowerCase() || 'vnđ'}
+                    {pkg.price.toLocaleString("vi-VN")} {pkg.currency?.toLowerCase() || 'vnđ'}
                   </span>
                 </div>
               </div>
