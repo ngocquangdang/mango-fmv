@@ -454,3 +454,33 @@ export const confirmQrSession = async (payload: QrConfirmRequest) => {
   return response as ApiResponse<QrConfirmResponse>;
 };
 
+export interface AudioRecording {
+  id: string;
+  fileName: string;
+  fileSize: string;
+  mimeType: string;
+  uploadStatus: string;
+  updatedAt: string;
+  uploadedAt: string;
+  createdAt: string;
+  projectId: string;
+  chapterId: string;
+  sceneId: string;
+  durationSeconds: number;
+  cdnUrl: string | null;
+  filePath: string;
+  // publicUrl?: string; // Optional if needed
+}
+
+export const getAudioRecordings = async (limit: number = 20, offset: number = 0) => {
+  const queryParams = new URLSearchParams({
+    uploadStatus: 'completed',
+    limit: limit.toString(),
+    offset: offset.toString()
+  });
+
+  const response = await apiClientVideoProgress.get<ApiResponse<{ recordings: AudioRecording[] }>>(`/audio-recordings?${queryParams.toString()}`, {
+    "X-Ticket": getLocalParam("ticket") || "",
+  });
+  return response;
+};

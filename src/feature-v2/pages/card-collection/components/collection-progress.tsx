@@ -1,10 +1,8 @@
 
-// import React from "react";
-
 
 const CollectionProgress = ({
   current = 0,
-  max = 40,
+  max = 0,
   className = "",
 }: {
   current: number;
@@ -27,18 +25,18 @@ const CollectionProgress = ({
           {/* Text is centered in the bar in the mockup, let's put it absolute centered in container */}
         </div>
 
-        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-xs lg:text-sm drop-shadow-md z-10">
+        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-xs lg:text-2xl drop-shadow-md z-10">
           {current}/{max}
         </span>
 
         {/* End Icon */}
         <div className="absolute -right-4 -top-4 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center">
-          <img src="/images/elements/card-frame.png" alt="Card Reward" className="w-full h-full object-contain rotate-12 drop-shadow-lg" />
+          <img src="/images/collection/ho-dong-quan-sr.png" alt="Card Reward" className="w-full h-full object-contain rotate-12 drop-shadow-lg" />
           {/* Fallback if card-frame is empty or invalid, user can swap */}
         </div>
       </div>
 
-      <p className="text-[10px] lg:text-xs text-blue-900 font-semibold text-center mt-2 max-w-full">
+      <p className="text-[10px] lg:text-xl text-blue-900 font-semibold text-center mt-2 max-w-full lg:max-w-[120%] lg:-ml-[10%]">
         Đảm bảo nhận 1 thẻ Ultra rare ngẫu nhiên khi mở 40 túi mù liên tiếp
       </p>
     </div>

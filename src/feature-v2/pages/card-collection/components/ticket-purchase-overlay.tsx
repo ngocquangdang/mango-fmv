@@ -2,6 +2,8 @@ import Banner from '../../../components/banner';
 
 
 
+import { useCardCollection } from '../hooks/use-card-collection';
+
 interface TicketPurchaseOverlayProps {
   isOpen: boolean;
   onClose: () => void;
@@ -13,15 +15,11 @@ const TicketPurchaseOverlay = ({
   onClose,
   currentTickets,
 }: TicketPurchaseOverlayProps) => {
+  const { ticketPackages } = useCardCollection();
+
   if (!isOpen) return null;
 
-  // Mock packages based on screenshot
-  // All seem to be x10 tickets for 100.000 vnd in the mockup repeated 5 times
-  const packages = Array.from({ length: 5 }).map((_, i) => ({
-    id: i,
-    amount: 10,
-    price: "100.000 vnđ",
-  }));
+  const packages = ticketPackages.length > 0 ? ticketPackages : [];
 
   return (
     <div className="fixed inset-0 z-[60] flex flex-col items-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
@@ -34,17 +32,25 @@ const TicketPurchaseOverlay = ({
         >
           <img src="/images/chevon-left.png" alt="back" className="w-6 h-6 lg:w-8 lg:h-8 object-contain" />
         </div>
-        <Banner text="Mua lượt xé" />
+        <Banner text="Mua lượt xé" className='left-[unset] translate-x-[unset]' />
 
 
         {/* Currency Display */}
         <div className="relative z-50">
-          <div className="relative">
-            <img src="/images/elements/tag-element.png" alt="bg" className="h-10 w-auto absolute -top-1 -left-4 z-[-1]" />
-            <div className="bg-white/90 border-2 border-blue-600 rounded-full h-10 px-4 pl-8 flex items-center gap-2 min-w-[100px] shadow-lg transform -rotate-2">
-              <img src="/images/elements/tag-element.png" alt="ticket" className="w-8 h-6 absolute -left-2 top-1" />
-              <span className="text-blue-800 font-bold ml-2">{currentTickets}</span>
+          <div className="absolute top-0 right-0 flex items-center gap-2 p-4">
+            <div
+              className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
+              style={{ backgroundImage: `url(/images/score-banner.png)` }}
+            >
+              {currentTickets}
+
             </div>
+            <div className='absolute top-3 left-3 w-8 h-8' style={{
+              backgroundImage: "url('/images/collection/ticket.png')",
+              backgroundSize: "contain",
+              backgroundPosition: "center center",
+              backgroundRepeat: "no-repeat",
+            }}></div>
           </div>
         </div>
       </div>
@@ -55,23 +61,48 @@ const TicketPurchaseOverlay = ({
           {packages.map((pkg) => (
             <div
               key={pkg.id}
-              className="flex flex-col gap-2 transform transition-transform hover:scale-105"
+              className="relative aspect-[3/4.2] flex flex-col items-center justify-center p-6 transition-transform hover:scale-105 cursor-pointer"
+              onClick={() => { /* handle purchase */ }}
             >
-              {/* Card */}
-              <div className="bg-[#D9D9D9] border-2 border-white/50 shadow-xl w-full aspect-[3/4] flex flex-col items-center justify-center gap-2 p-4 relative group cursor-pointer hover:bg-[#E5E5E5] transition-colors">
-                {/* Ticket Icon Group */}
-                <div className="flex justify-center items-center transform -rotate-12 group-hover:rotate-0 transition-transform duration-300">
-                  <img src="/images/elements/tag-element.png" alt="ticket" className="w-16 h-12 lg:w-24 lg:h-16 object-contain drop-shadow-md" />
-                  <img src="/images/elements/tag-element.png" alt="ticket" className="w-16 h-12 lg:w-24 lg:h-16 object-contain -ml-8 lg:-ml-12 drop-shadow-md" />
+              {/* Background Frame */}
+              <img
+                src="/images/collection/ticket-frame.png"
+                alt="frame"
+                className="absolute inset-0 w-full h-full object-fill z-0"
+              />
+
+              {/* Content */}
+              <div className="relative z-10 flex flex-col items-center w-full h-full pt-4 pb-4">
+
+                {/* Ticket Icon */}
+                <div className="flex-1 flex items-center justify-center">
+                  <img
+                    src="/images/collection/ticket.png"
+                    alt="ticket"
+                    className="w-24 h-auto object-contain drop-shadow-sm transform -rotate-12"
+                  />
                 </div>
 
-                {/* Amount Badge */}
-                <span className="text-2xl lg:text-4xl font-bold mt-2">x{pkg.amount}</span>
-              </div>
+                {/* Quantity */}
+                <div className="mt-2 mb-1">
+                  <span className="font-[20px] font-bold text-[#FF4820]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
+                    x{pkg.quantity}
+                  </span>
+                </div>
 
-              {/* Price Tag */}
-              <div className="bg-[#E5E5E5] w-full py-2 px-1 text-center border border-black/10 shadow-sm">
-                <span className="font-bold text-sm lg:text-base text-gray-800">{pkg.price}</span>
+                {/* Divider */}
+                <img
+                  src="/images/collection/ticket-frame-hr.png"
+                  alt="divider"
+                  className="w-[80%] h-auto object-contain my-1 opacity-80"
+                />
+
+                {/* Price */}
+                <div className="mt-1">
+                  <span className="text-base font-bold text-[#112953]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
+                    {(pkg.price * pkg.quantity).toLocaleString("vi-VN")} {pkg.currency?.toLowerCase() || 'vnđ'}
+                  </span>
+                </div>
               </div>
             </div>
           ))}

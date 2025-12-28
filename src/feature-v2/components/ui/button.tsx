@@ -7,6 +7,8 @@ type ButtonProps = {
   className?: string;
   onClick?: () => void;
   disabled?: boolean;
+  customBgImage?: string;
+  containerClassName?: string;
 };
 
 const sizeMap: Record<
@@ -39,23 +41,25 @@ const sizeMap: Record<
   },
 };
 
-const ButtonBg = "/images/small-bg-button.png";
+const buttonBg = "/images/small-bg-button.png";
 
 export default function Button({
   label,
   size = "medium",
   lgSize,
-  className = "",
+
   onClick,
   disabled = false,
+  customBgImage = buttonBg,
+  containerClassName = "",
 }: ButtonProps) {
   const { width, height } = sizeMap[size];
   const { lgWidth, lgHeight } = sizeMap[lgSize || size];
 
   return (
     <div
-      className={`${width} ${height} ${lgWidth} ${lgHeight} bg-center bg-no-repeat bg-cover cursor-pointer inline-flex items-center justify-center `}
-      style={{ backgroundImage: `url(${ButtonBg})` }}
+      className={`${width} ${height} ${lgWidth} ${lgHeight} ${containerClassName} bg-center bg-no-repeat bg-cover cursor-pointer inline-flex items-center justify-center `}
+      style={{ backgroundImage: `url(${customBgImage})` }}
       onClick={onClick}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -69,7 +73,7 @@ export default function Button({
         disabled={disabled}
         aria-label={label}
         tabIndex={0}
-        className={`relative text-sm lg:text-base px-3 font-semibold text-white drop-shadow-md transition-opacity duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-orange-400 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      // className={`relative text-sm lg:text-base px-3 font-semibold text-white drop-shadow-md transition-opacity duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-orange-400 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       >
 
         <span className=" leading-none">{label}</span>

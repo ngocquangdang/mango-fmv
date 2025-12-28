@@ -5,6 +5,7 @@ import { useVideoPlayerContext } from "../../contexts";
 import { useUserContext } from "../../features/user/context";
 import { useRestartChapter } from "../../features/user/hooks";
 import GameModal from "../components/ui/dialog";
+import SelectVoiceOverlay from "../components/select-voice-overlay";
 
 const IMAGE_VERSION = "1";
 
@@ -14,6 +15,7 @@ export default function Home() {
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const [activeShakeIndex, setActiveShakeIndex] = React.useState<number>(0);
+  const [isVoiceOverlayOpen, setIsVoiceOverlayOpen] = React.useState(false);
   const [shakeOffset, setShakeOffset] = React.useState(0);
   const [paperOffset, setPaperOffset] = React.useState(0);
 
@@ -26,7 +28,7 @@ export default function Home() {
   }, [chapter.scenes, chapter.progress?.currentScene?.watchingSecond]);
 
   const handleClick = async (
-    actionName: "story" | "journal" | "ranking" | "playAgain" | "cardCollection"
+    actionName: "story" | "journal" | "ranking" | "playAgain" | "collection"
   ) => {
     if (actionName === "playAgain") {
       setDialogName("quitPlayer");
@@ -136,7 +138,7 @@ export default function Home() {
     {
       icon: `/images/book-icon.png?v=${IMAGE_VERSION}`,
       label: "Bộ sưu tập",
-      onClick: () => handleClick("cardCollection"),
+      onClick: () => handleClick("collection"),
     },
     ...(+(isPlaying || 0) > 0 ? [
       {
@@ -145,7 +147,12 @@ export default function Home() {
         onClick: () => handleClick("playAgain"),
       },
     ] : []),
-  ], [IMAGE_VERSION, handleClick, activeShakeIndex, shakeOffset]);
+    {
+      icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
+      label: "Chọn Voice",
+      onClick: () => setIsVoiceOverlayOpen(true),
+    },
+  ], [IMAGE_VERSION, handleClick, activeShakeIndex, shakeOffset, isPlaying]);
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -209,6 +216,11 @@ export default function Home() {
         title="Chơi lại"
         message="Bắt đầu một hành trình mới sẽ xoá tiến trình trò chơi của bạn. Bạn có chắc chắn muốn bắt đầu lại không?"
         onConfirm={onConfirm}
+      />
+
+      <SelectVoiceOverlay
+        isOpen={isVoiceOverlayOpen}
+        onClose={() => setIsVoiceOverlayOpen(false)}
       />
     </div>
   );

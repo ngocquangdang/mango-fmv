@@ -1,12 +1,19 @@
 
 
+import { apiClientVideoProgress } from "../../../../lib/api/api-client";
+import type { ApiResponse } from "../../../../lib/api/api-client";
+import { getLocalParam } from '../../../../lib/api/storage';
 
 export interface Card {
-  id: string;
+  id?: string;
+  cardId?: string; // API response
   name: string;
-  image: string;
-  rarity: "R" | "R+" | "SR" | "SSR";
-  isOwned: boolean;
+  image?: string;
+  imageUrl?: string; // API response
+  rarity?: "R" | "R+" | "SR" | "SSR";
+  tier?: "R" | "R+" | "SR" | "SSR"; // API response
+  isOwned?: boolean;
+  isNew?: boolean; // API response
 }
 
 export interface CollectionStats {
@@ -21,6 +28,29 @@ export interface BlindBagResponse {
   remainingTickets: number;
 }
 
+export interface Banner {
+  id: string;
+  name: string;
+  type: string;
+  imageUrl: string;
+  priority: number;
+  createdAt: string;
+  updatedAt: string;
+  description?: string;
+}
+
+export interface UserState {
+  ticketCount: number;
+  pityCount: number;
+  collectedCount?: number;
+  totalCount?: number;
+}
+
+export interface BannersResponse {
+  banners: Banner[];
+  userState: UserState;
+}
+
 // Mock Data
 const MOCK_CARDS: Card[] = Array.from({ length: 40 }).map((_, i) => ({
   id: `card-${i + 1}`,
@@ -32,7 +62,21 @@ const MOCK_CARDS: Card[] = Array.from({ length: 40 }).map((_, i) => ({
 
 let mockTickets = 100;
 
+export interface TicketPackage {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  totalPrice: number;
+  description: string;
+  status: string;
+  currency: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const CardCollectionService = {
+  // ... existing methods
   getCollection: async (): Promise<CollectionStats> => {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -46,6 +90,12 @@ export const CardCollectionService = {
       collectedCards: MOCK_CARDS.filter(c => c.isOwned).length,
       cards: MOCK_CARDS,
     };
+  },
+
+  getBanners: async (): Promise<ApiResponse<BannersResponse>> => {
+    return apiClientVideoProgress.get<ApiResponse<BannersResponse>>("/gacha/banners", {
+        "X-Ticket": getLocalParam("ticket") || "",
+    });
   },
 
   openBlindBag: async (quantity: number): Promise<BlindBagResponse> => {
@@ -76,5 +126,21 @@ export const CardCollectionService = {
      console.log(`Purchased package ${packageId}`);
      mockTickets += amount;
      return mockTickets;
+  },
+
+  drawCards: async (bannerId: string, amount: number): Promise<ApiResponse<{ results: Card[], bonusRewards: Card[], state: UserState }>> => {
+    console.log("Drawing cards for banner", bannerId, "amount", amount);
+    return apiClientVideoProgress.post("/gacha/draw", {
+        bannerId,
+        amount
+    }, {
+        "X-Ticket": getLocalParam("ticket") || "",
+    });
+  },
+
+  getTicketPackages: async (): Promise<ApiResponse<TicketPackage[]>> => {
+      return apiClientVideoProgress.get("/tickets", {
+          "X-Ticket": getLocalParam("ticket") || "",
+      });
   }
 };

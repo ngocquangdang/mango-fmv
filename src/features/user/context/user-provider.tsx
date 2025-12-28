@@ -1,5 +1,6 @@
-import React from "react";
+import * as React from "react";
 import { UserContext } from ".";
+import { useNavigate } from "react-router-dom";
 import {
   mapChapter,
   useChapter,
@@ -9,9 +10,11 @@ import {
   useCollectedRewards,
   useInitQrSession,
   useConfirmQrSession,
+  useAudioRecordings,
 } from "../hooks";
 import { useMgSdk } from "../../../hooks/useMgSdk";
 import type { ChapterMapped } from "../../../types/chapter";
+import type { AudioRecording } from "../apis";
 import { saveLocalParams, getLocalParam } from "../../../lib/api/storage";
 import type { CollectedRewardCharacter } from "../apis";
 import { logInfo } from "../../../lib/utils/logger";
@@ -37,6 +40,7 @@ export interface UserContextType {
   refetchChapter: () => void;
   userInfo: Record<string, any>;
   isQrLoginVisible: boolean;
+  audioRecordings: AudioRecording[];
 }
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -44,7 +48,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { mutate: updateStatus } = useUpdateStatus();
   const { mutate: initQrSession } = useInitQrSession();
   const { mutate: confirmQrLogin } = useConfirmQrSession();
+  const { data: audioRecordings = [] } = useAudioRecordings();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [userInfo, setUserInfo] = React.useState<Record<string, any>>({});
   const [qrSessionId, setQrSessionId] = React.useState<string | null>(null);
@@ -218,38 +224,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const isMobileLike = isIOS || isAndroid;
 
     const hasLocalTicket = !!getLocalParam("ticket");
+    // If we are in dev or mobile-like env and NO ticket, redirect to login page
     if ((import.meta.env.DEV || !isMobileLike) && !hasLocalTicket) {
       logInfo(
-        "UserProvider - Mobile detected without ticket, initializing QR session",
+        "UserProvider - Mobile/Dev detected without ticket, redirecting to QR Login",
         {},
         "UserProvider"
       );
-
-      initQrSession(undefined, {
-        onSuccess: (response: any) => {
-          const sessionId = response.data.sessionId;
-          // Generate QR URL from sessionId
-          const generatedQrUrl = `https://gocuanhamynam.mangoplus.vn?sessionId=${sessionId}`;
-
-          logInfo(
-            "UserProvider - QR session initialized",
-            { sessionId, qrUrl: generatedQrUrl },
-            "UserProvider"
-          );
-          setQrSessionId(sessionId);
-          setQrUrl(generatedQrUrl);
-          setIsQrLoginVisible(true);
-        },
-        onError: (error: any) => {
-          logInfo(
-            "UserProvider - Failed to initialize QR session",
-            { error },
-            "UserProvider"
-          );
-        },
-      });
+      navigate("/login-qr");
     }
-  }, [mgApi, isPreview, initQrSession]);
+  }, [mgApi, isPreview, navigate]);
 
   const handleQrSuccess = React.useCallback((ticket: string) => {
     logInfo(
@@ -356,6 +340,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       refetchChapter,
       userInfo,
       isQrLoginVisible,
+      audioRecordings,
     }),
     [
       chapterMapped,
@@ -368,6 +353,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       refetchChapter,
       userInfo,
       isQrLoginVisible,
+      audioRecordings,
     ]
   );
 
