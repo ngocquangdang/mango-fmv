@@ -1,7 +1,8 @@
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Button from "./ui/button";
 import { useVideoPlayerContext } from "../../contexts";
 import CreateVoiceView from "./create-voice-view";
+import { useUserContext } from "../../features/user/context";
 
 interface SelectVoiceOverlayProps {
   isOpen: boolean;
@@ -9,11 +10,105 @@ interface SelectVoiceOverlayProps {
 }
 
 const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
-  const { voiceType, setVoiceType } = useVideoPlayerContext();
+  const { voiceType, setVoiceType, clips, currentSceneId } = useVideoPlayerContext();
+  const { chapter } = useUserContext();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCreatingVoice, setIsCreatingVoice] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Get first scene audio URL from context or chapter data
+  const sceneId = currentSceneId || chapter?.startSceneId;
+  const activeScene = sceneId ? (clips?.[sceneId] || chapter?.scenes?.[sceneId]) : null;
+
+  // Fallback: If no active scene, try to get the first available scene from clips
+  const fallbackScene = !activeScene && clips ? Object.values(clips)[0] : null;
+
+  const targetScene = activeScene || fallbackScene;
+
+  // FIXME: Fallback dummy audio for testing because API data is blocked by CORS
+  // const DUMMY_AUDIO = "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3";
+  const firstSceneAudioUrl = targetScene?.originalAudio || null;
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log('🎵 Voice Overlay Debug V2:', {
+      currentSceneId,
+      startSceneId: chapter?.startSceneId,
+      hasClips: !!clips && Object.keys(clips).length > 0,
+      hasChapterScenes: !!chapter?.scenes,
+      firstSceneAudioUrl,
+      targetSceneId: targetScene?.id,
+      voiceType
+    });
+  }, [chapter, clips, currentSceneId, firstSceneAudioUrl, targetScene, voiceType]);
+
+  // Play/Pause toggle handler
+  const togglePlayPause = () => {
+    if (!audioRef.current || !firstSceneAudioUrl) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  // Sync isPlaying state with audio element
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    const handleEnded = () => setIsPlaying(false);
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+    const handleLoadedMetadata = () => {
+      // Ensure duration is finite
+      const d = audio.duration;
+      setDuration(Number.isFinite(d) ? d : 0);
+      console.log("Audio metadata loaded, duration:", d);
+    };
+
+    // Initialize state if value available
+    if (audio.duration && Number.isFinite(audio.duration)) {
+      setDuration(audio.duration);
+    }
+
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    return () => {
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, [voiceType, firstSceneAudioUrl]);
+
+  // Stop audio when switching to mute or closing overlay
+  useEffect(() => {
+    if (voiceType === 'mute' || !isOpen) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      setIsPlaying(false);
+      setCurrentTime(0); // Reset UI
+    }
+  }, [voiceType, isOpen]);
 
   // Sync local selection with global on open/change? 
+  // Actually, we should probably just use the global state directly or sync on confirm. 
   // Actually, we should probably just use the global state directly or sync on confirm.
   // The UI suggests "Continue" confirms it.
   // Let's us local state for selection and commit on "Continue" or just use global state directly for "instant" feel?
@@ -121,23 +216,31 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             </div>
           )}
 
-          {/* Player Bar (Visual Only) - Hidden when mute is selected */}
+          {/* Audio Player - Always show for default/ai, hide for mute */}
           {voiceType !== "mute" && (
             <div className="w-[90%] max-w-[500px] mb-2 relative">
+              {/* Hidden audio element */}
+              <audio ref={audioRef} src={firstSceneAudioUrl || undefined} />
+
+              {/* Visible player UI */}
               <div className="bg-white rounded-full p-2 lg:p-3 shadow-lg border-2 border-blue-200 flex items-center gap-3">
                 <button
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600"
+                  onClick={togglePlayPause}
+                  className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition-colors"
+                  disabled={!firstSceneAudioUrl}
                 >
                   {isPlaying ? "||" : "▶"}
                 </button>
 
-                {/* Progress Bar Mock */}
+                {/* Progress Bar (real-time) */}
                 <div className="flex-1 h-2 bg-orange-100 rounded-full relative overflow-hidden">
-                  <div className="absolute top-0 left-0 h-full bg-orange-500 w-[30%] rounded-full"></div>
+                  <div
+                    className="absolute top-0 left-0 h-full bg-orange-500 rounded-full transition-all duration-100"
+                    style={{ width: `${(duration > 0 && Number.isFinite(duration)) ? (currentTime / duration) * 100 : 0}%` }}
+                  ></div>
                 </div>
 
-                <span className="text-xs text-gray-500 font-bold">00:05</span>
+                <span className="text-xs text-gray-500 font-bold">Preview</span>
               </div>
             </div>
           )}
