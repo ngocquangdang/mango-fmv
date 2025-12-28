@@ -443,8 +443,10 @@ export const VideoPlayerProvider = ({
           });
         }
 
-        // Process next scenes
-        await Promise.all(nextSceneIds.map(nid => traverseAndFetch(nid, depth + 1)));
+        // Process next scenes sequentially
+        for (const nid of nextSceneIds) {
+          await traverseAndFetch(nid, depth + 1);
+        }
       };
 
       await traverseAndFetch(data.startSceneId);
