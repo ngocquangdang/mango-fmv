@@ -8,6 +8,7 @@ export interface CollectionCard {
   quantity: number;
   isOwned: boolean;
   imageUrl: string;
+  imageBlurUrl?: string;
 }
 
 export interface CollectionGroup {
@@ -44,7 +45,7 @@ export interface Character {
 export class CollectionService {
   private static instance: CollectionService;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): CollectionService {
     if (!CollectionService.instance) {
@@ -55,19 +56,20 @@ export class CollectionService {
 
   public async getCollection(characterId?: string): Promise<ApiResponse<CollectionResponse>> {
     // Construct query string manually
-    
+
     let url = "/gacha/collection";
     if (characterId) {
-        url += `?characterId=${characterId}`;
+      url += `?characterId=${characterId}`;
     }
 
     return apiClientVideoProgress.get<ApiResponse<CollectionResponse>>(url, {
-         "X-Ticket": getLocalParam("ticket") || "",
+      "X-Ticket": getLocalParam("ticket") || "",
     });
   }
 
-  public async getCharacters(projectId: string): Promise<ApiResponse<Character[]>> {
-      return apiClienProject.get<ApiResponse<Character[]>>(`/public/projects/${projectId}/characters`);
+  public async getCharacters(projectId?: string): Promise<ApiResponse<Character[]>> {
+    const finalProjectId = projectId || import.meta.env.VITE_PROJECT_ID;
+    return apiClienProject.get<ApiResponse<Character[]>>(`/public/projects/${finalProjectId}/characters`);
   }
 }
 

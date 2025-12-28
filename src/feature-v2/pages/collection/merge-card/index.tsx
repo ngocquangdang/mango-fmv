@@ -25,17 +25,14 @@ export default function MergeCardPage() {
   const [resultCard, setResultCard] = useState<Card | null>(null);
 
   const handleToggleItem = (item: CollectionItem) => {
-    console.log("handleToggleItem called for:", item.id);
-    // Check if item is already in slots
-    const existingIndex = slots.findIndex(s => s?.id === item.id);
+    // Count how many of this item is currently in slots
+    const currentCountInSlots = slots.filter(s => s?.id === item.id).length;
+    // Get max available quantity (item comes from collection with count property)
+    const maxQuantity = item.count || 1;
 
-    if (existingIndex !== -1) {
-      // CASE 1: Item exists -> Remove it
-      const newSlots = [...slots];
-      newSlots[existingIndex] = null;
-      setSlots(newSlots);
-    } else {
-      // CASE 2: Item does not exist -> Add to first empty slot
+    if (currentCountInSlots < maxQuantity) {
+      // Add to slots
+      // 1. Find first empty slot
       const emptyIndex = slots.findIndex(s => s === null);
 
       if (emptyIndex !== -1) {
@@ -43,11 +40,22 @@ export default function MergeCardPage() {
         newSlots[emptyIndex] = item;
         setSlots(newSlots);
       } else {
-        // CASE 3: Slots full -> Replace the last slot (user friendly behavior for "Add")
-        // Alternatively, finding the first available slot that isn't functionally locked?
-        // But for now, just replace the last one so user sees the change.
+        // 2. If full, replace the last slot (user friendly behavior)
         const newSlots = [...slots];
         newSlots[newSlots.length - 1] = item;
+        setSlots(newSlots);
+      }
+    } else {
+      // Already reached max quantity -> Remove ONE instance (the last one found)
+      // This allows toggling down
+      const reversedSlots = [...slots].reverse();
+      const indexInReversed = reversedSlots.findIndex(s => s?.id === item.id);
+
+      if (indexInReversed !== -1) {
+        // Calculate original index
+        const originalIndex = slots.length - 1 - indexInReversed;
+        const newSlots = [...slots];
+        newSlots[originalIndex] = null;
         setSlots(newSlots);
       }
     }
@@ -76,8 +84,8 @@ export default function MergeCardPage() {
 
       const response = await CardCollectionService.mergeCards(cardIds);
 
-      if (response.data) {
-        setResultCard(response.data);
+      if (response.data && response.data.resultCard) {
+        setResultCard(response.data.resultCard);
         setIsOverlayOpen(true);
         // Clear slots on success
         setSlots([null, null, null]);
@@ -96,7 +104,7 @@ export default function MergeCardPage() {
   const handleCloseOverlay = () => {
     setIsOverlayOpen(false);
     setResultCard(null);
-    setSlots([null, null]); // Clear slots after merge?
+    setSlots([null, null, null]); // Always keep 3 slots
   }
 
   // Parse character ID from URL or fallback
