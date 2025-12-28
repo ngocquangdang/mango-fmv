@@ -16,8 +16,6 @@ import { getOrderStatus } from "../../../lib/api/ticket-api";
 
 import type { Card } from "./services/card-collection-service"; // Import Card type
 
-import type { Card } from "./services/card-collection-service"; // Import Card type
-
 function CardCollectionContent() {
   const { setType } = useVideoPlayerContext();
   const { banners, userState, userInfo, openBlindBag, isOpening } = useCardCollection();
@@ -26,7 +24,6 @@ function CardCollectionContent() {
   const [isOpeningBulk, setIsOpeningBulk] = React.useState(false);
   const [isOpeningSingle, setIsOpeningSingle] = React.useState(false);
   const [isBuyingTickets, setIsBuyingTickets] = React.useState(false);
-  const activeBanner = banners[selectedBannerIndex];
   const [selectedBannerIndex, setSelectedBannerIndex] = React.useState(0);
   const [openedCards, setOpenedCards] = React.useState<Card[]>([]);
   const [bonusCards, setBonusCards] = React.useState<Card[]>([]);
@@ -40,7 +37,7 @@ function CardCollectionContent() {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   // Handle payment callback from Pay1
