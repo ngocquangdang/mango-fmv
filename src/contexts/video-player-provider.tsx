@@ -17,6 +17,7 @@ import RewardCollection, {
 } from "../feature-v2/components/reward-collection";
 import RelationshipPoint from "../feature-v2/components/relationship-point";
 import { VoiceService } from "../feature-v2/services/voice-service";
+import { getOrderedScenes } from "../feature-v2/utils/scene-ordering";
 
 export type VideoPlayerType =
   | "intro"
@@ -84,6 +85,8 @@ export interface VideoPlayerContextType {
   setAudioRecordings: React.Dispatch<React.SetStateAction<any[]>>;
   fetchAudioRecordings: () => Promise<void>;
   currentSceneAudioUrl: string | null;
+  setAiAudioList: (audioList: { sceneId: string; aiAudio: string }[]) => void;
+  setUseAiAudio: (type: "ai" | "original" | "mute") => void;
 }
 
 
@@ -199,7 +202,7 @@ export const VideoPlayerProvider = ({
         // For now, following user instruction to just call the API for the scene.
         const result = await VoiceService.getProcessingResult(currentSceneId);
         if (result.status === 'completed' && result.output_path) {
-          setCurrentSceneAudioUrl(result.output_path.startsWith('http') ? result.output_path : `https://storage.googleapis.com/interactive-video-audio-recordings${result.output_path}`);
+          setCurrentSceneAudioUrl(result.output_path);
         } else {
           setCurrentSceneAudioUrl(null);
         }
@@ -374,6 +377,40 @@ export const VideoPlayerProvider = ({
     setIsGiftSelectionOpen(false);
   }, []);
 
+  const setAiAudioList = React.useCallback((audioList: { sceneId: string; aiAudio: string }[]) => {
+    if (!api) return;
+    api.setAiAudioList?.(audioList);
+  }, [api]);
+
+  // Fetch all AI voices on mount moved below setAiAudioList declaration
+  React.useEffect(() => {
+    const fetchAllAiVoices = async () => {
+      try {
+        const response = await VoiceService.getAllVoiceResults();
+        console.log(response);
+        if (response && Array.isArray(response.items)) {
+          const mappedList = response.items.map(item => ({
+            sceneId: item.scene_id,
+            aiAudio: item.audio_url
+          }));
+
+          if (mappedList.length > 0) {
+            setAiAudioList(mappedList);
+          }
+        }
+      } catch (error) {
+        console.warn("Failed to fetch all AI voices:", error);
+      }
+    };
+
+    fetchAllAiVoices();
+  }, [setAiAudioList]);
+
+  const setUseAiAudio = React.useCallback((type: "ai" | "original" | "mute") => {
+    if (!api) return;
+    api.setUseAiAudio?.(type);
+  }, [api]);
+
   const triggerDisplayReward = React.useCallback(
     (data: any) => {
 
@@ -455,13 +492,43 @@ export const VideoPlayerProvider = ({
             watchingSecond: 0,
             status: "INPROGRESS",
           },
-          (data: any) => triggerDisplayReward(data)
+          (responseData: any) => triggerDisplayReward(responseData)
         );
       }
+      const scene = data.scenes[sceneId];
+      if (!scene) {
+        console.warn("Scene not found:", sceneId);
+        setCurrentSceneId(sceneId);
+        setPauseType(null);
+        return;
+      }
+
+      // Trigger voice polling for current and next 10 scenes
+      const pollingTargets = getOrderedScenes(data.scenes, sceneId).slice(0, 10);
+
+      const userAudioUrl = audioRecordings?.[0]?.cdnUrl || audioRecordings?.[0]?.cdn_url || audioRecordings?.[0]?.publicUrl;
+
+      if (userAudioUrl) {
+        pollingTargets.forEach(targetId => {
+          const targetScene = data.scenes[targetId];
+          if (targetScene?.originalAudio) {
+            VoiceService.pollVoiceProcessing(targetId, userAudioUrl, targetScene.originalAudio)
+              .then(res => {
+                if (res) {
+                  setAiAudioList([{ sceneId: targetId, aiAudio: res }]);
+                }
+              })
+              .catch(() => {
+                // Silent fail or low prio log
+              });
+          }
+        });
+      }
+
       setCurrentSceneId(sceneId);
       setPauseType(null);
     },
-    [updateSceneStatus, data.scenes, isReviewScene, triggerDisplayReward]
+    [updateSceneStatus, data.scenes, isReviewScene, triggerDisplayReward, audioRecordings, setAiAudioList]
   );
 
   const handleStop = React.useCallback(
@@ -491,7 +558,7 @@ export const VideoPlayerProvider = ({
               watchingSecond: Math.floor(payload.time || 0),
               status: "INPROGRESS",
             },
-            (data: any) => triggerDisplayReward(data)
+            (responseData: any) => triggerDisplayReward(responseData)
           );
         }
       }
@@ -941,6 +1008,8 @@ export const VideoPlayerProvider = ({
     setAudioRecordings,
     fetchAudioRecordings,
     currentSceneAudioUrl,
+    setAiAudioList,
+    setUseAiAudio,
   };
   return (
     <VideoPlayerContext.Provider value={value}>

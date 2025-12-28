@@ -1,10 +1,10 @@
 import { apiClientVideoProgress } from "../../lib/api/api-client";
 import type { ApiResponse } from "../../lib/api/api-client";
+
 import { getLocalParam } from '../../lib/api/storage';
 
 
-const API_CV_BASE_URL = "https://interactive-video-mango.onidservice.cloud";
-const CDN_BASE_URL = "https://storage.googleapis.com/interactive-video-audio-recordings";
+
 
 export interface UploadUrlRequest {
     fileName: string;
@@ -27,8 +27,18 @@ export interface VoiceProcessingResponse {
     request_id: string;
     message: string;
     output_path?: string;
+    audio_url?: string;
     scene_id?: string;
     cached?: boolean;
+}
+
+export interface VoiceResultItem {
+  scene_id: string;
+  request_id: string;
+  output_path: string;
+  audio_url: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export const VoiceService = {
@@ -62,24 +72,24 @@ export const VoiceService = {
     },
 
     // API 3: Get/Poll Processing Result
-    getProcessingResult: async (sceneId: string, audioFileUrl?: string, actorAudioPath?: string): Promise<VoiceProcessingResponse> => {
+    getProcessingResult: async (sceneId: string, audioFileUrl?: string, actorAudioPath?: string, encodedPath?: string): Promise<VoiceProcessingResponse> => {
+
         const params: Record<string, string> = {};
         if (audioFileUrl) params.audio_file_url = audioFileUrl;
-        if (actorAudioPath) params.actor_audio_path = actorAudioPath;
+        
+        if (actorAudioPath) {
+            params.actor_audio_path = actorAudioPath;
+        }
+
+        if (encodedPath) params.encoded_path = encodedPath;
         
         const queryParams = new URLSearchParams(params);
         
-        // Use fetch directly for custom handling or assume apiClientVideoProgress works
-        // The endpoint is GET /api/v1/voice/scenes/:sceneId/result
-        const response = await fetch(`${API_CV_BASE_URL}/api/v1/voice/scenes/${sceneId}/result?${queryParams.toString()}`, {
-             method: 'GET',
-             headers: {
-                 "X-Ticket": getLocalParam("ticket") || "",
-                 "Content-Type": "application/json"
-             }
+        const response = await apiClientVideoProgress.get<VoiceProcessingResponse>(`/voice/scenes/${sceneId}/result?${queryParams.toString()}`, {
+            "X-Ticket": getLocalParam("ticket") || "",
         });
         
-        return response.json();
+        return response;
     },
 
     // Helper: Poll until complete
@@ -91,8 +101,8 @@ export const VoiceService = {
             try {
                 const result = await VoiceService.getProcessingResult(sceneId, audioUrl, actorAudioPath);
 
-                if (result.status === 'completed' && result.output_path) {
-                    return `${CDN_BASE_URL}${result.output_path}`;
+                if (result.status === 'completed' && result.audio_url) {
+                    return result.audio_url;
                 }
 
                 if (result.status === 'failed') {
@@ -110,6 +120,14 @@ export const VoiceService = {
         }
 
         throw new Error('Timeout: Voice processing took too long.');
+    },
+
+    getAllVoiceResults: async (): Promise<{ items: VoiceResultItem[] }> => {
+        const response = await apiClientVideoProgress.get<{ items: VoiceResultItem[] }>('/voice/results', {
+            "X-Ticket": getLocalParam("ticket") || "",
+        });
+        
+        return response;
     },
 
     // API 4: Get Audio Recordings

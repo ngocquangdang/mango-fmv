@@ -13,6 +13,8 @@ import { getLayoutedElements } from "../../../features/pixel-flow/layout";
 import { useFlowChart } from "./context";
 import { useVideoPlayerContext } from "../../../contexts";
 import { useToast } from "../../../components/ui/toast-v2/use-toast";
+import { VoiceService } from '../../services/voice-service';
+import { useUserContext } from '../../../features/user/context';
 
 const nodeTypes = {
   chapter: ChapterNode,
@@ -23,6 +25,9 @@ const edgeTypes = {
 };
 
 const ChapterFlow = () => {
+  const { audioRecordings } = useUserContext();
+  const { setAiAudioList } = useVideoPlayerContext();
+
   const { nodes: contextNodes, edges: contextEdges, data } = useFlowChart();
   const {
     setCurrentStatus,
@@ -120,6 +125,15 @@ const ChapterFlow = () => {
             setReviewScene(true);
             onPlayPlayer(node.id, true);
             return;
+          }
+          console.log("Checking voice result for:", scene.originalAudio);
+          if (scene.originalAudio) {
+            const userCdnUrl = audioRecordings[0]?.cdnUrl || "";
+            if (userCdnUrl) {
+              VoiceService.pollVoiceProcessing(node.id, userCdnUrl, scene.originalAudio)
+                .then(res => setAiAudioList([{ sceneId: node.id, aiAudio: res }]))
+                .catch(err => console.error("Voice Polling Error:", err));
+            }
           }
           onPlayPlayer(node.id);
         }}

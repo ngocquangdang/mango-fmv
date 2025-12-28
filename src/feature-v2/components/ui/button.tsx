@@ -47,7 +47,7 @@ export default function Button({
   label,
   size = "medium",
   lgSize,
-  className = "",
+
   onClick,
   disabled = false,
   customBgImage = buttonBg,

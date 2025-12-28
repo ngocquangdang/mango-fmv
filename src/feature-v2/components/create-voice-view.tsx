@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useUserContext } from "../../features/user/context";
+import { useVideoPlayerContext } from "../../contexts";
 import { VoiceService } from "../services/voice-service";
 import { useToast } from "../../components/ui/toast-v2/use-toast";
+import { getOrderedScenes } from "../utils/scene-ordering";
 
 
 interface CreateVoiceViewProps {
@@ -11,6 +13,7 @@ interface CreateVoiceViewProps {
 
 const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
   const { chapter } = useUserContext();
+  const { setAiAudioList } = useVideoPlayerContext();
   const { showToast } = useToast();
 
   const [isRecording, setIsRecording] = useState(false);
@@ -20,6 +23,33 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
   const [aiVoiceUrl, setAiVoiceUrl] = useState<string | null>(null);
 
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [recordings, setRecordings] = useState<any[]>([]);
+
+  // Fetch recordings on mount
+  useEffect(() => {
+    VoiceService.getAudioRecordings()
+      .then((res) => {
+        if (res.data?.recordings) {
+          setRecordings(res.data.recordings);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch recordings:", err));
+  }, []);
+
+  const sortedRecordings = useMemo(() => {
+    return [...recordings].sort((a, b) => {
+      // Sort by updatedAt descending
+      const dateA = new Date(a.updatedAt || 0).getTime();
+      const dateB = new Date(b.updatedAt || 0).getTime();
+      return dateB - dateA;
+    });
+  }, [recordings]);
+
+  useEffect(() => {
+    if (sortedRecordings && sortedRecordings.length > 0) {
+      console.log("Sorted Recordings:", sortedRecordings);
+    }
+  }, [sortedRecordings])
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -168,6 +198,48 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       setAiVoiceUrl(resultUrl);
       setIsProcessing(false);
 
+      // --- Trigger polling for first 10 scenes ---
+      try {
+        if (chapter && chapter.scenes && chapter.startSceneId) {
+          const orderedIds = getOrderedScenes(chapter.scenes, chapter.startSceneId);
+          // Take first 10
+          const targets = orderedIds.slice(0, 10);
+          console.log("Triggering background polling for:", targets);
+
+          // We can let this run in background (fire and forget, or track)
+          // Since we want to update the list as they come in:
+          const results: { sceneId: string; aiAudio: string }[] = [];
+
+          // If the current scene was already processed (resultUrl), add it
+          if (sceneId && resultUrl) {
+            results.push({ sceneId, aiAudio: resultUrl });
+            setAiAudioList([...results]);
+          }
+
+          targets.forEach(tid => {
+            // Skip the one we just did if we want to avoid double calling, 
+            // OR just let it cache check (service handles cache?)
+            // The service polling just calls getProcessingResult. 
+            // If it's already done (by the main wait above), it returns instantly.
+            if (tid === sceneId && resultUrl) return;
+
+            const tScene = chapter.scenes[tid];
+            if (tScene && tScene.originalAudio) {
+              VoiceService.pollVoiceProcessing(tid, cdnUrl, tScene.originalAudio)
+                .then(res => {
+                  console.log(`Polled success for ${tid}:`, res);
+                  results.push({ sceneId: tid, aiAudio: res });
+                  setAiAudioList([...results]);
+                })
+                .catch(err => console.warn(`Bg poll failed for ${tid}`, err));
+            }
+          });
+        }
+      } catch (err) {
+        console.warn("Error in background polling sequence:", err);
+      }
+      // -------------------------------------------
+
       showToast({
         description: "Thành công: Đã tạo voice AI xong!",
       });
@@ -237,9 +309,10 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
           <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-orange-300"></div>
 
           <p className="font-hand text-xs md:text-sm text-gray-700 leading-relaxed text-center">
-            The Quick Brown Fox Jumps Over The Lazy Dog<br />
-            The Quick Brown Fox Jumps Over The Lazy Dog<br />
-            The Quick Brown Fox Jumps Over The Lazy Dog
+            Hoá ra mình đang ở cùng các thành viên của nhóm Tân binh toàn năng <br />
+            Hoá ra mình đang ở cùng các thành viên của nhóm Tân binh toàn năng <br />
+            Hoá ra mình đang ở cùng các thành viên của nhóm Tân binh toàn năng <br />
+            Hãy đọc đoạn n gắn này
           </p>
         </div>
 
