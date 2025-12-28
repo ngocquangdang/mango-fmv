@@ -47,7 +47,7 @@ export const CollectionProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchCharacters = async () => {
     try {
-      const response = await collectionService.getCharacters();
+      const response = await collectionService.getCharacters(import.meta.env.VITE_PROJECT_ID);
       if (response.data) {
         setCharacters(response.data);
       }

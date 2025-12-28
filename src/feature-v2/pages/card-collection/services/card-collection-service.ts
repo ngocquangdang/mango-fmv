@@ -174,5 +174,13 @@ export const CardCollectionService = {
     return apiClientVideoProgress.get<ApiResponse<{ userId: string; isVip: boolean; ticketBalance: number }>>("/user-info", {
       "X-Ticket": getLocalParam("ticket") || "",
     });
+  },
+
+  mergeCards: async (cardIds: string[]): Promise<ApiResponse<Card>> => {
+    return apiClientVideoProgress.post<ApiResponse<Card>>("/gacha/merge", {
+      cardIds
+    }, {
+      "X-Ticket": getLocalParam("ticket") || "",
+    });
   }
 };

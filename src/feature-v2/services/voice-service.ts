@@ -19,6 +19,7 @@ export interface UploadUrlResponse {
     cdnUrl?: string; // Original camelCase
     cdn_url?: string; // Possible snake_case
     publicUrl?: string; // Possible fallback
+    fileUrl?: string; // Allow fileUrl fallback
     expiresAt: string;
 }
 

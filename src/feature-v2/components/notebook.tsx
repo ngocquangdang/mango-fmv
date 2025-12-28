@@ -29,7 +29,7 @@ const NotebookLayout = ({
   const MARKER_SELECTED_IMG = "/images/tab-selected.png";
 
   return (
-    <div className="relative">
+    <div className="relative scale-[0.8] origin-center">
       <div className="absolute -left-26 lg:-left-[220px] top-4 flex flex-col gap-4">
         {subPages.map((subPage) => {
           return (

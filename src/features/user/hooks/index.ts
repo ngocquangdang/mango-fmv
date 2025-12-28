@@ -182,7 +182,7 @@ export const useRestartChapter = () => {
   });
 };
 
-export const useCharacters = (projectId?: string) => {
+export const useCharacters = (projectId: string) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["characters", projectId],
     queryFn: () => getCharacters(projectId),

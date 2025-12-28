@@ -388,7 +388,7 @@ export const submitHotspot = async (payload: SubmitHotspotPayload) => {
 };
 
 export const getCharacters = async (
-  projectId: string = "5bc6a77b-e4d6-4a04-a0c8-629da6b2a9d0"
+  projectId: string 
 ) => {
   const response = await apiClienProject.get(
     `/public/projects/${projectId}/characters`,
