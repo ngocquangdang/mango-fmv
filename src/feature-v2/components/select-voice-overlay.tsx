@@ -121,24 +121,26 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             </div>
           )}
 
-          {/* Player Bar (Visual Only) */}
-          <div className="w-[90%] max-w-[500px] mb-2 relative">
-            <div className="bg-white rounded-full p-2 lg:p-3 shadow-lg border-2 border-blue-200 flex items-center gap-3">
-              <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600"
-              >
-                {isPlaying ? "||" : "▶"}
-              </button>
+          {/* Player Bar (Visual Only) - Hidden when mute is selected */}
+          {voiceType !== "mute" && (
+            <div className="w-[90%] max-w-[500px] mb-2 relative">
+              <div className="bg-white rounded-full p-2 lg:p-3 shadow-lg border-2 border-blue-200 flex items-center gap-3">
+                <button
+                  onClick={() => setIsPlaying(!isPlaying)}
+                  className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600"
+                >
+                  {isPlaying ? "||" : "▶"}
+                </button>
 
-              {/* Progress Bar Mock */}
-              <div className="flex-1 h-2 bg-orange-100 rounded-full relative overflow-hidden">
-                <div className="absolute top-0 left-0 h-full bg-orange-500 w-[30%] rounded-full"></div>
+                {/* Progress Bar Mock */}
+                <div className="flex-1 h-2 bg-orange-100 rounded-full relative overflow-hidden">
+                  <div className="absolute top-0 left-0 h-full bg-orange-500 w-[30%] rounded-full"></div>
+                </div>
+
+                <span className="text-xs text-gray-500 font-bold">00:05</span>
               </div>
-
-              <span className="text-xs text-gray-500 font-bold">00:05</span>
             </div>
-          </div>
+          )}
 
           <div className="text-white font-hand text-sm lg:text-base mb-8 shadow-black/50 text-shadow-sm">
             Nữ chính sẽ dùng voice <span className="text-orange-300">{voiceType === "default" ? "mặc định" : voiceType === "ai" ? "của bạn" : "tắt tiếng"}</span>
