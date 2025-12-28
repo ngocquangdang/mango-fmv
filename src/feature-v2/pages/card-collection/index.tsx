@@ -292,7 +292,7 @@ function CardCollectionContent() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-8 lg:gap-14 z-20 items-center justify-center relative -bottom-5 lg:-bottom-[-40px]">
+        <div className="flex gap-8 lg:gap-14 z-20 items-center justify-center relative bottom-10 lg:bottom-24">
           {/* Single Open */}
           <div className="flex flex-col items-center gap-2 relative">
             <Button
