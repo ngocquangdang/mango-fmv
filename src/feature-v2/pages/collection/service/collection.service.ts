@@ -66,7 +66,7 @@ export class CollectionService {
     });
   }
 
-  public async getCharacters(projectId: string = "5bc6a77b-e4d6-4a04-a0c8-629da6b2a9d0"): Promise<ApiResponse<Character[]>> {
+  public async getCharacters(projectId: string): Promise<ApiResponse<Character[]>> {
       return apiClienProject.get<ApiResponse<Character[]>>(`/public/projects/${projectId}/characters`);
   }
 }
