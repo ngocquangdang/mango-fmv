@@ -95,9 +95,21 @@ export default function MergeCardPage() {
           fetchCollection(selectedTab);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Merge failed:", error);
-      showToast({ description: "Ghép thẻ thất bại. Vui lòng thử lại." });
+
+      let message = "Ghép thẻ thất bại. Vui lòng thử lại.";
+
+      // ApiError from api-client has a 'status' property
+      const status = error.status || error.statusCode;
+
+      // Handle 4xx errors (Client errors) - Show specific message
+      // ApiClient now correctly extracts the message from nested error objects
+      if (status && status >= 400 && status < 500 && error.message) {
+        message = error.message;
+      }
+
+      showToast({ description: message });
     }
   }
 

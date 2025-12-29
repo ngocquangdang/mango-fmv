@@ -81,9 +81,15 @@ const handleResponse = async (response: Response): Promise<any> => {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+
+    // Extract message from various potential locations
+    const message = errorData.error?.message || errorData.message || `HTTP ${response.status}`;
+    const code = errorData.error?.code || errorData.code;
+
     throw new ApiError(
-      errorData.message || `HTTP ${response.status}`,
-      response.status
+      message,
+      response.status,
+      code
     );
   }
 
