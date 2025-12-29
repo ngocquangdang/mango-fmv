@@ -212,6 +212,13 @@ export const VideoPlayerProvider = ({
   //   fetchAudioRecordings();
   // }, [fetchAudioRecordings]);
 
+  React.useEffect(() => {
+    const savedVoiceType = getLocalParam("voiceType") as "original" | "ai" | "mute";
+    if (savedVoiceType) {
+      setVoiceType(savedVoiceType);
+    }
+  }, []);
+
   const { data: collectedHotspotsData } = useCollectedHotspots(
     currentSceneId || ""
   );
@@ -386,6 +393,7 @@ export const VideoPlayerProvider = ({
 
   const setUseAiAudio = React.useCallback((type: "ai" | "original" | "mute") => {
     if (!api) return;
+    saveLocalParams({ voiceType: type });
     api.setUseAiAudio?.(type);
   }, [api]);
 

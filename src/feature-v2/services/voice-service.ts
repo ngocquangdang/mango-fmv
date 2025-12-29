@@ -34,12 +34,12 @@ export interface VoiceProcessingResponse {
 }
 
 export interface VoiceResultItem {
-  scene_id: string;
-  request_id: string;
-  output_path: string;
-  audio_url: string;
-  created_at: string;
-  updated_at: string;
+    scene_id: string;
+    request_id: string;
+    output_path: string;
+    audio_url: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export const VoiceService = {
@@ -77,19 +77,19 @@ export const VoiceService = {
 
         const params: Record<string, string> = {};
         if (audioFileUrl) params.audio_file_url = audioFileUrl;
-        
+
         if (actorAudioPath) {
             params.actor_audio_path = actorAudioPath;
         }
 
         if (encodedPath) params.encoded_path = encodedPath;
-        
+
         const queryParams = new URLSearchParams(params);
-        
+
         const response = await apiClientVideoProgress.get<VoiceProcessingResponse>(`/voice/scenes/${sceneId}/result?${queryParams.toString()}`, {
             "X-Ticket": getLocalParam("ticket") || "",
         });
-        
+
         return response;
     },
 
@@ -127,7 +127,7 @@ export const VoiceService = {
         const response = await apiClientVideoProgress.get<{ items: VoiceResultItem[] }>('/voice/results', {
             "X-Ticket": getLocalParam("ticket") || "",
         });
-        
+
         return response;
     },
 
@@ -141,6 +141,13 @@ export const VoiceService = {
 
         // Using apiClientVideoProgress which likely points to /api/v1 base
         return apiClientVideoProgress.get<ApiResponse<any>>(`/audio-recordings?${queryParams.toString()}`, {
+            "X-Ticket": getLocalParam("ticket") || "",
+        });
+    },
+
+    // API 5: Delete Audio Recording
+    deleteRecording: async (recordingId: string): Promise<ApiResponse<any>> => {
+        return apiClientVideoProgress.delete<ApiResponse<any>>(`/audio-recordings/${recordingId}`, {
             "X-Ticket": getLocalParam("ticket") || "",
         });
     }

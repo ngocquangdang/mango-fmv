@@ -1,19 +1,15 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useUserContext } from "../../features/user/context";
-import { useVideoPlayerContext } from "../../contexts";
 import { VoiceService } from "../services/voice-service";
 import { useToast } from "../../components/ui/toast-v2/use-toast";
-import { getOrderedScenes } from "../utils/scene-ordering";
 
 
 interface CreateVoiceViewProps {
   onBack: () => void;
-  onSuccess: () => void;
 }
 
-const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
+const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
   const { chapter } = useUserContext();
-  const { setAiAudioList } = useVideoPlayerContext();
   const { showToast } = useToast();
 
   const [isRecording, setIsRecording] = useState(false);
@@ -24,6 +20,30 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
 
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [recordings, setRecordings] = useState<any[]>([]);
+
+  // Recording duration tracking
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [recordedAudioDuration, setRecordedAudioDuration] = useState(0);
+  const recordingTimerRef = useRef<number | null>(null);
+  const recordingStartTimeRef = useRef<number>(0);
+
+  // Processing stage tracking
+  const [processingStage, setProcessingStage] = useState<'uploading' | 'getting-cdn' | 'processing' | 'complete' | null>(null);
+
+  // Track current recording ID for deletion
+  const [currentRecordingId, setCurrentRecordingId] = useState<string | null>(null);
+
+  // Confirmation dialog state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // AI audio playback tracking
+  const [aiCurrentTime, setAiCurrentTime] = useState(0);
+  const [aiDuration, setAiDuration] = useState(0);
+
+  // Duration constraints
+  const MIN_DURATION = 10; // seconds
+  const MAX_DURATION = 60; // seconds
+
   // Fetch recordings on mount
   useEffect(() => {
     VoiceService.getAudioRecordings()
@@ -91,18 +111,57 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
         setAudioUrl(url);
         setHasRecorded(true);
 
-        // Create audio element for playback
-        if (!audioRef.current) {
-          audioRef.current = new Audio(url);
-          audioRef.current.onended = () => setIsPlaying(false);
-        } else {
-          audioRef.current.src = url;
+        // Create audio element for playback and get actual duration
+        const audio = new Audio(url);
+        audio.addEventListener('loadedmetadata', () => {
+          const duration = audio.duration;
+          if (Number.isFinite(duration)) {
+            setRecordedAudioDuration(duration);
+            console.log('Recorded audio duration:', duration);
+
+            // Validate duration
+            if (duration < MIN_DURATION) {
+              showToast({
+                description: `Audio quá ngắn! Cần ít nhất ${MIN_DURATION} giây.`,
+              });
+            } else if (duration > MAX_DURATION) {
+              showToast({
+                description: `Audio quá dài! Tối đa ${MAX_DURATION} giây.`,
+              });
+            }
+          }
+        });
+
+        audio.onended = () => setIsPlaying(false);
+        audioRef.current = audio;
+
+        // Clear recording timer
+        if (recordingTimerRef.current) {
+          clearInterval(recordingTimerRef.current);
+          recordingTimerRef.current = null;
         }
       };
 
       mediaRecorder.start();
       setIsRecording(true);
       setHasRecorded(false);
+      setRecordingDuration(0);
+      recordingStartTimeRef.current = Date.now();
+
+      // Start duration timer
+      recordingTimerRef.current = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - recordingStartTimeRef.current) / 1000);
+        setRecordingDuration(elapsed);
+
+        // Auto-stop at MAX_DURATION
+        if (elapsed >= MAX_DURATION) {
+          stopRecording();
+          showToast({
+            description: `Đã đạt thời gian tối đa ${MAX_DURATION} giây!`,
+          });
+        }
+      }, 1000); // Update every 1 second
+
     } catch (error) {
       console.error("Error accessing microphone:", error);
       alert("Không thể truy cập micro. Vui lòng cấp quyền và thử lại.");
@@ -115,6 +174,12 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
       setIsRecording(false);
       // Stop all tracks to release microphone
       mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+
+      // Clear recording timer
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
     }
   };
 
@@ -139,29 +204,85 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
   };
 
   const handleReRecord = () => {
+    // If there's a current recording, show confirmation dialog
+    if (currentRecordingId) {
+      setShowDeleteConfirm(true);
+    } else {
+      // No recording to delete, just reset
+      resetRecordingState();
+    }
+  };
+
+  const resetRecordingState = () => {
     setHasRecorded(false);
     setAudioUrl(null);
-    setAiVoiceUrl(null); // Reset AI voice
+    setAiVoiceUrl(null);
+    setRecordedAudioDuration(0);
+    setRecordingDuration(0);
+    setCurrentRecordingId(null);
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
     setIsPlaying(false);
-  }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!currentRecordingId) return;
+
+    setShowDeleteConfirm(false);
+
+    try {
+      // Delete the current recording
+      console.log('Deleting recording:', currentRecordingId);
+      await VoiceService.deleteRecording(currentRecordingId);
+      console.log('Recording deleted successfully');
+
+      showToast({
+        description: "Đã xóa recording cũ",
+      });
+
+      // Reset all states after successful deletion
+      resetRecordingState();
+    } catch (error) {
+      console.error('Failed to delete recording:', error);
+      showToast({
+        description: "Không thể xóa recording. Vui lòng thử lại.",
+      });
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+  };
 
   const handleUseVoice = async () => {
-    // Need chapter ID or Scene ID. The user's prompt says `sceneOrChapterId` is required for polling?
-    // "GET /api/v1/voice/scenes/:sceneId/result"
-    // We'll use `chapter.id` as the sceneId for now, or fallback to a default.
-    const sceneId = chapter?.id || "scene_123";
+    // Validate duration before upload
+    if (recordedAudioDuration < MIN_DURATION) {
+      showToast({
+        description: `Audio quá ngắn! Cần ít nhất ${MIN_DURATION} giây. Hiện tại: ${Math.floor(recordedAudioDuration)}s`,
+      });
+      return;
+    }
 
+    if (recordedAudioDuration > MAX_DURATION) {
+      showToast({
+        description: `Audio quá dài! Tối đa ${MAX_DURATION} giây. Hiện tại: ${Math.floor(recordedAudioDuration)}s`,
+      });
+      return;
+    }
+
+    const sceneId = chapter?.id || "scene_123";
     if (!audioUrl) return;
 
     try {
       setIsProcessing(true);
+      setProcessingStage('uploading');
+
       const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/mpeg' });
 
       // 1. Get Upload URL
+      console.log('Step 1: Getting upload URL...');
       const uploadRes = await VoiceService.getUploadUrl({
         fileName: `recording-${Date.now()}.webm`,
         fileSize: audioBlob.size,
@@ -169,88 +290,95 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
       });
 
       if (!uploadRes.data?.uploadUrl || !uploadRes.data?.recordingId) {
-        throw new Error("Failed to get upload URL");
+        throw new Error("Không thể lấy URL upload. Vui lòng thử lại.");
       }
 
       const { uploadUrl, recordingId } = uploadRes.data;
 
+      // Store recording ID for potential deletion later
+      setCurrentRecordingId(recordingId);
+
       // 2. Upload File to GCS
+      console.log('Step 2: Uploading file to GCS...');
       await VoiceService.uploadFileToUrl(uploadUrl, audioBlob, "audio/mpeg");
 
       // 3. Confirm Upload
+      console.log('Step 3: Confirming upload...');
       await VoiceService.confirmUpload(recordingId);
 
-      // Close modal immediately after success confirm
-      onSuccess();
+      // 4. Get CDN URL - fetch the recording to get the CDN URL
+      setProcessingStage('getting-cdn');
+      console.log('Step 4: Fetching audio recordings to get CDN URL for recordingId:', recordingId);
 
-      // 4. Poll for Result
-      // Note: The guide mentions using the GCS URL for polling? 
-      // `audio_file_url` param. Check multiple possible keys
-      const cdnUrl = uploadRes.data.fileUrl;
+      // Wait a bit for backend to process the upload
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const recordingsRes = await VoiceService.getAudioRecordings(50, 0);
+
+      // Find the recording we just uploaded
+      const recording = recordingsRes.data?.recordings?.find((r: any) => r.id === recordingId || r.recordingId === recordingId);
+
+      if (!recording) {
+        console.error('Available recordings:', recordingsRes.data?.recordings);
+        throw new Error(`Không tìm thấy recording vừa upload (ID: ${recordingId}). Vui lòng thử lại.`);
+      }
+
+      const cdnUrl = recording.cdnUrl || recording.cdn_url || recording.publicUrl;
 
       if (!cdnUrl) {
-        throw new Error("Backend did not return CDN URL or Public URL");
+        console.error('Recording found but missing CDN URL:', recording);
+        throw new Error("Recording không có CDN URL. Vui lòng liên hệ support.");
       }
 
+      console.log('Successfully retrieved recording CDN URL:', cdnUrl);
+
+      // 5. Get Actor Audio Path (default voice)
       const currentScene = chapter?.scenes?.[sceneId];
-      const originalAudio = currentScene?.originalAudio;
+      let actorAudioPath = currentScene?.originalAudio;
 
-      const resultUrl = await VoiceService.pollVoiceProcessing(sceneId, cdnUrl, originalAudio);
-
-      // setAiVoiceUrl(resultUrl); // Skip local state update as component will unmount
-      setIsProcessing(false);
-
-      // --- Trigger polling for first 10 scenes ---
-      try {
-        if (chapter && chapter.scenes && chapter.startSceneId) {
-          const orderedIds = getOrderedScenes(chapter.scenes, chapter.startSceneId);
-          // Take first 10
-          const targets = orderedIds.slice(0, 10);
-          console.log("Triggering background polling for:", targets);
-
-          // We can let this run in background (fire and forget, or track)
-          // Since we want to update the list as they come in:
-          const results: { sceneId: string; aiAudio: string }[] = [];
-
-          // If the current scene was already processed (resultUrl), add it
-          if (sceneId && resultUrl) {
-            results.push({ sceneId, aiAudio: resultUrl });
-            setAiAudioList([...results]);
-          }
-
-          targets.forEach(tid => {
-            // Skip the one we just did if we want to avoid double calling, 
-            // OR just let it cache check (service handles cache?)
-            // The service polling just calls getProcessingResult. 
-            // If it's already done (by the main wait above), it returns instantly.
-            if (tid === sceneId && resultUrl) return;
-
-            const tScene = chapter.scenes[tid];
-            if (tScene && tScene.originalAudio) {
-              VoiceService.pollVoiceProcessing(tid, cdnUrl, tScene.originalAudio)
-                .then(res => {
-                  console.log(`Polled success for ${tid}:`, res);
-                  results.push({ sceneId: tid, aiAudio: res });
-                  setAiAudioList([...results]);
-                })
-                .catch(err => console.warn(`Bg poll failed for ${tid}`, err));
-            }
-          });
-        }
-      } catch (err) {
-        console.warn("Error in background polling sequence:", err);
+      // Fallback: try to get from first scene if current scene doesn't have it
+      if (!actorAudioPath && chapter?.startSceneId) {
+        const firstScene = chapter.scenes?.[chapter.startSceneId];
+        actorAudioPath = firstScene?.originalAudio;
+        console.log('Using actor audio from first scene:', actorAudioPath);
       }
-      // -------------------------------------------
+
+      if (!actorAudioPath) {
+        console.warn('No actor audio path found in chapter.scenes');
+        throw new Error("Không tìm thấy audio gốc của nhân vật. Vui lòng liên hệ support.");
+      }
+
+      console.log('Using actor audio path:', actorAudioPath);
+
+      // 6. Poll for Voice Processing Result
+      setProcessingStage('processing');
+      console.log('Step 5: Starting voice processing polling...');
+      console.log('Parameters:', {
+        sceneId,
+        recordingCDN: cdnUrl,
+        actorAudio: actorAudioPath
+      });
+
+      const resultUrl = await VoiceService.pollVoiceProcessing(sceneId, cdnUrl, actorAudioPath);
+
+      console.log('Voice processing completed! Result URL:', resultUrl);
+
+      setProcessingStage('complete');
+      setAiVoiceUrl(resultUrl);
+      setIsProcessing(false);
 
       showToast({
         description: "Thành công: Đã tạo voice AI xong!",
       });
 
     } catch (error) {
-      console.error(error);
+      console.error('Voice processing error:', error);
       setIsProcessing(false);
+      setProcessingStage(null);
+
+      const errorMessage = error instanceof Error ? error.message : "Lỗi: Không thể tạo voice. Vui lòng thử lại.";
       showToast({
-        description: "Lỗi: Không thể tạo voice. Vui lòng thử lại.",
+        description: errorMessage,
       });
     }
   };
@@ -260,15 +388,33 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
 
     if (!aiAudioRef.current) {
       aiAudioRef.current = new Audio(aiVoiceUrl);
-      aiAudioRef.current.onended = () => setIsPlaying(false);
+
+      // Attach event listeners
+      aiAudioRef.current.addEventListener('timeupdate', () => {
+        if (aiAudioRef.current) {
+          setAiCurrentTime(aiAudioRef.current.currentTime);
+        }
+      });
+
+      aiAudioRef.current.addEventListener('loadedmetadata', () => {
+        if (aiAudioRef.current && Number.isFinite(aiAudioRef.current.duration)) {
+          setAiDuration(aiAudioRef.current.duration);
+        }
+      });
+
+      aiAudioRef.current.addEventListener('ended', () => {
+        setIsPlaying(false);
+        setAiCurrentTime(0);
+      });
     }
 
     if (isPlaying) {
       aiAudioRef.current.pause();
+      setIsPlaying(false);
     } else {
       aiAudioRef.current.play();
+      setIsPlaying(true);
     }
-    setIsPlaying(!isPlaying);
   }
 
   return (
@@ -355,13 +501,25 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
               <span className="text-2xl animate-spin">⏳</span>
             </div>
             <div className="text-white font-hand font-bold text-center">
-              Đang xử lý voice AI...<br />Vui lòng đợi
+              {processingStage === 'uploading' && "Đang upload recording..."}
+              {processingStage === 'getting-cdn' && "Đang lấy thông tin file..."}
+              {processingStage === 'processing' && (
+                <>
+                  Đang xử lý voice AI...<br />Vui lòng đợi (có thể mất ~30s)
+                </>
+              )}
+              {processingStage === 'complete' && "Hoàn thành!"}
             </div>
           </div>
         ) : aiVoiceUrl ? (
           /* AI Voice Result */
           <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300 w-full max-w-[400px]">
             <div className="text-white font-hand font-bold text-xs md:text-sm mb-1.5">Voice AI của bạn</div>
+
+            {/* Instruction text */}
+            <div className="text-white/80 font-hand text-[10px] md:text-xs text-center -mt-2">
+              👇 Click nút Play để nghe thử voice vừa tạo
+            </div>
 
             {/* AI Audio Player */}
             <div className="bg-[#FFF8E7] rounded-full p-3 shadow-lg border-2 border-orange-400 flex items-center gap-4 w-full">
@@ -373,7 +531,10 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
               </button>
 
               <div className="flex-1 h-3 bg-orange-200 rounded-full relative overflow-hidden">
-                <div className="absolute top-0 left-0 h-full bg-[#E85D04] w-[60%] rounded-full"></div>
+                <div
+                  className="absolute top-0 left-0 h-full bg-[#E85D04] rounded-full transition-all duration-100"
+                  style={{ width: `${(aiDuration > 0 && Number.isFinite(aiDuration)) ? (aiCurrentTime / aiDuration) * 100 : 0}%` }}
+                ></div>
               </div>
               <span className="text-[10px] md:text-xs text-[#E85D04] font-bold shrink-0">AI Voice</span>
             </div>
@@ -441,11 +602,23 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
               </span>
             </button>
             <div className="text-white font-hand font-bold text-[10px] md:text-xs text-shadow-sm">
-              {isRecording ? "Đang ghi âm..." : "Nhấn Nút Để Bắt Đầu Ghi Âm"}
+              {isRecording ? (
+                <div className="flex flex-col items-center gap-1">
+                  <span>Đang ghi âm... {recordingDuration}s / {MAX_DURATION}s</span>
+                  {recordingDuration < MIN_DURATION && (
+                    <span className="text-yellow-300 text-[9px] md:text-[10px]">
+                      Tối thiểu {MIN_DURATION} giây
+                    </span>
+                  )}
+                </div>
+              ) : (
+                "Nhấn Nút Để Bắt Đầu Ghi Âm"
+              )}
             </div>
           </>
         )}
       </div>
+
 
       {/* Continue/Close (for demo) */}
       {/* <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-10">
@@ -455,6 +628,48 @@ const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
               onClick={onBack} // Go back for now
            />
         </div> */}
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#FFF8E7] rounded-2xl p-6 shadow-2xl border-4 border-orange-300 max-w-sm mx-4 animate-in zoom-in-95 duration-200">
+            {/* Icon */}
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
+                <span className="text-4xl">⚠️</span>
+              </div>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-xl font-hand font-bold text-[#E85D04] text-center mb-3">
+              Xác nhận ghi âm lại?
+            </h3>
+
+            {/* Message */}
+            <p className="text-gray-700 text-center mb-6 font-hand text-sm leading-relaxed">
+              Hành động này sẽ <span className="font-bold text-red-600">xóa recording hiện tại</span>.
+              <br />
+              Bạn sẽ cần tạo voice AI mới sau khi ghi âm lại.
+            </p>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancelDelete}
+                className="flex-1 bg-gray-200 text-gray-700 font-hand font-bold px-4 py-3 rounded-full hover:bg-gray-300 transition-colors border-2 border-gray-300"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="flex-1 bg-[#E85D04] text-white font-hand font-bold px-4 py-3 rounded-full hover:bg-orange-600 transition-colors border-2 border-white/20 shadow-lg"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
