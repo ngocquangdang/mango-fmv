@@ -388,7 +388,7 @@ export const submitHotspot = async (payload: SubmitHotspotPayload) => {
 };
 
 export const getCharacters = async (
-  projectId: string = "5bc6a77b-e4d6-4a04-a0c8-629da6b2a9d0"
+  projectId: string 
 ) => {
   const response = await apiClienProject.get(
     `/public/projects/${projectId}/characters`,
@@ -480,6 +480,19 @@ export const getAudioRecordings = async (limit: number = 20, offset: number = 0)
   });
 
   const response = await apiClientVideoProgress.get<ApiResponse<{ recordings: AudioRecording[] }>>(`/audio-recordings?${queryParams.toString()}`, {
+    "X-Ticket": getLocalParam("ticket") || "",
+  });
+  return response;
+};
+
+export interface UserInfoResponse {
+  userId: string;
+  isVip: boolean;
+  ticketBalance: number;
+}
+
+export const getUserInfo = async () => {
+  const response = await apiClientVideoProgress.get<ApiResponse<UserInfoResponse>>("/user-info", {
     "X-Ticket": getLocalParam("ticket") || "",
   });
   return response;

@@ -6,7 +6,6 @@ import { useToast } from "../../components/ui/toast-v2/use-toast";
 
 interface CreateVoiceViewProps {
   onBack: () => void;
-
 }
 
 const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
@@ -141,7 +140,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/mpeg' });
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
         setHasRecorded(true);
@@ -341,7 +340,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       // 1. Get Upload URL
       console.log('Step 1: Getting upload URL...');
       const uploadRes = await VoiceService.getUploadUrl({
-        fileName: `recording-${Date.now()}.mp3`,
+        fileName: `recording-${Date.now()}.webm`,
         fileSize: audioBlob.size,
         sceneId: sceneId
       });
@@ -476,6 +475,15 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-4 relative animate-in fade-in slide-in-from-bottom-4 duration-300">
+
+      {/* Back Button */}
+      <div
+        onClick={onBack}
+        className="absolute top-4 left-4 md:top-8 md:left-8 cursor-pointer z-50 hover:scale-105 transition-transform"
+      >
+        <img src="/images/back-icon.png" alt="back" className="w-10 h-10 md:w-14 md:h-14 object-contain" />
+      </div>
+
       {/* Title */}
       <div className="relative mb-0 md:mb-3 w-full flex justify-center">
         <div className="relative z-10 bg-[#8CC63F] px-3 py-1 md:px-5 md:py-1.5 transform -rotate-1 skew-x-[-10deg] shadow-lg border-2 border-dashed border-white/30 min-w-[120px] md:min-w-[200px] flex justify-center">

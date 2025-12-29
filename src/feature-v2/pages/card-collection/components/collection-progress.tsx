@@ -37,7 +37,7 @@ const CollectionProgress = ({
       </div>
 
       <p className="text-[10px] lg:text-xl text-blue-900 font-semibold text-center mt-2 max-w-full lg:max-w-[120%] lg:-ml-[10%]">
-        Đảm bảo nhận 1 thẻ Ultra rare ngẫu nhiên khi mở 40 túi mù liên tiếp
+        Đảm bảo nhận 1 thẻ SSR ngẫu nhiên khi mở 40 túi mù liên tiếp
       </p>
     </div>
   );

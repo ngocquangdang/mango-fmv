@@ -8,9 +8,9 @@ interface BlindBagSelectorProps {
   onSelect?: (index: number) => void;
 }
 
-const BlindBagItem = ({ item, isActive: _isActive = false }: { item: any; isActive?: boolean }) => {
+const BlindBagItem = ({ item, isActive = false }: { item: any; isActive?: boolean }) => {
   return (
-    <div className="relative transition-all duration-300 flex flex-col items-center z-10">
+    <div className={`relative transition-all duration-300 flex flex-col items-center ${isActive ? 'scale-[1.3] z-20' : 'scale-100 z-10 grayscale'}`}>
       {/* Light effect can be kept or removed, keeping it simple for now */}
       {/* {isActive && <div className="absolute inset-0 bg-white/50 blur-xl rounded-full"></div>} */}
 
@@ -70,10 +70,10 @@ const BlindBagSelector = ({ banners = [], selectedIndex = 0, onSelect }: BlindBa
   const rightIndex = (selectedIndex + 1) % items.length;
 
   return (
-    <div className="relative flex items-center justify-center w-full px-8 py-4">
+    <div className="relative flex items-center -top-3 lg:-top-16 justify-center w-full px-8 py-4">
       {/* Left Arrow */}
       <div
-        className="cursor-pointer absolute -left-20 z-50 hover:scale-110 transition-transform"
+        className="cursor-pointer absolute -left-20 top-[70%] z-50 hover:scale-110 transition-transform"
         onClick={handlePrev}
       >
         <img
@@ -92,7 +92,7 @@ const BlindBagSelector = ({ banners = [], selectedIndex = 0, onSelect }: BlindBa
 
       {/* Right Arrow */}
       <div
-        className="cursor-pointer absolute -right-20 z-50 hover:scale-110 transition-transform"
+        className="cursor-pointer absolute -right-20 top-[70%] z-50 hover:scale-110 transition-transform"
         onClick={handleNext}
       >
         <img

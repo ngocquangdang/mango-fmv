@@ -1,12 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { collectionService } from "../service/collection.service";
-import type { CollectionResponse, Character } from "../service/collection.service";
+import type { CollectionResponse, Character, CollectionCard } from "../service/collection.service";
 
 interface CollectionContextType {
   data: CollectionResponse | null;
   characters: Character[];
   isLoading: boolean;
   error: string | null;
+  selectedCard: CollectionCard | null;
+  setSelectedCard: (card: CollectionCard | null) => void;
+  selectedCharacterId: string | null;
   fetchCollection: (characterId?: string) => Promise<void>;
 }
 
@@ -15,6 +18,9 @@ const CollectionContext = createContext<CollectionContextType>({
   characters: [],
   isLoading: false,
   error: null,
+  selectedCard: null,
+  setSelectedCard: () => { },
+  selectedCharacterId: null,
   fetchCollection: async () => { },
 });
 
@@ -28,10 +34,15 @@ export const CollectionProvider: React.FC<{ children: React.ReactNode }> = ({
   const [characters, setCharacters] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState<CollectionCard | null>(null);
+  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
 
   const fetchCollection = async (characterId?: string) => {
     setIsLoading(true);
     setError(null);
+    if (characterId) {
+      setSelectedCharacterId(characterId);
+    }
     try {
       const response = await collectionService.getCollection(characterId);
       if (response.data) {
@@ -47,7 +58,7 @@ export const CollectionProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchCharacters = async () => {
     try {
-      const response = await collectionService.getCharacters();
+      const response = await collectionService.getCharacters(import.meta.env.VITE_PROJECT_ID);
       if (response.data) {
         setCharacters(response.data);
       }
@@ -77,6 +88,9 @@ export const CollectionProvider: React.FC<{ children: React.ReactNode }> = ({
         characters,
         isLoading,
         error,
+        selectedCard,
+        setSelectedCard,
+        selectedCharacterId,
         fetchCollection,
       }}
     >
