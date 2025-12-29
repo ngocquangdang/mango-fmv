@@ -11,7 +11,7 @@ import SelectVoiceOverlay from "../components/select-voice-overlay";
 const IMAGE_VERSION = "1";
 
 export default function Home() {
-  const { setType, setCollectionItems } = useVideoPlayerContext();
+  const { setType, setCollectionItems, setIsVipModalOpen } = useVideoPlayerContext();
   const navigate = useNavigate();
   const { chapter, refetchProgress, refetchCollectedRewards, userInfo } = useUserContext();
   console.log({ chapter })
@@ -98,13 +98,18 @@ export default function Home() {
         onClick: () => handleClick("playAgain"),
       },
     ] : []),
-    ...(userInfo && userInfo.isVip === 3 ? [
-      {
-        icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
-        label: "Chọn Voice",
-        onClick: () => setIsVoiceOverlayOpen(true),
+    {
+      icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
+      label: "Chọn Voice",
+      onClick: () => {
+        if (userInfo?.vipinfo?.isvip === 3) {
+          setIsVoiceOverlayOpen(true);
+        } else {
+          setIsVipModalOpen(true);
+        }
       },
-    ] : []),
+    },
+
 
   ], [IMAGE_VERSION, handleClick, isPlaying]);
 

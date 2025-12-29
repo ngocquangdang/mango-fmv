@@ -791,7 +791,7 @@ export const VideoPlayerProvider = ({
         }
       }
       const nextScene = data.scenes[nextSceneId];
-      const isUserVip = ![2, 3].includes(userInfo?.vipinfo?.isvip);
+      const isUserVip = ![3].includes(userInfo?.vipinfo?.isvip);
       if (nextScene.isVip && !isUserVip) {
         return setIsVipModalOpen(true);
       }
