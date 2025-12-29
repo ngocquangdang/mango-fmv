@@ -22,7 +22,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
   // State for recordings and processing
   const [recordings, setRecordings] = useState<any[]>([]);
-  const [isLoadingRecordings, setIsLoadingRecordings] = useState(true);
+  // const [isLoadingRecordings, setIsLoadingRecordings] = useState(true);
   const [isProcessingAi, setIsProcessingAi] = useState(false);
   const [aiProcessedAudioUrl, setAiProcessedAudioUrl] = useState<string | null>(null); // Store processed AI audio URL
   const hasProcessedRef = useRef(false); // Track if we've already processed AI voice
@@ -55,7 +55,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
   // Fetch recordings on mount
   useEffect(() => {
-    setIsLoadingRecordings(true);
+    // setIsLoadingRecordings(true);
     VoiceService.getAudioRecordings(50, 0)
       .then((res) => {
         if (res.data?.recordings) {
@@ -64,7 +64,9 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
         }
       })
       .catch((err) => console.error("Failed to fetch recordings:", err))
-      .finally(() => setIsLoadingRecordings(false));
+      .finally(() => {
+        // setIsLoadingRecordings(false);
+      });
   }, []);
 
   // Auto-process AI voice when AI option is selected and recordings are available
@@ -226,7 +228,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             setDuration(0);
             setIsPlaying(false);
             // Refresh recordings
-            setIsLoadingRecordings(true);
+            // setIsLoadingRecordings(true);
             VoiceService.getAudioRecordings(50, 0)
               .then((res) => {
                 if (res.data?.recordings) {
@@ -234,7 +236,9 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                 }
               })
               .catch((err) => console.error("Failed to refresh recordings:", err))
-              .finally(() => setIsLoadingRecordings(false));
+              .finally(() => {
+                // setIsLoadingRecordings(false);
+              });
           }}
           />
         </div>

@@ -11,9 +11,9 @@ import SelectVoiceOverlay from "../components/select-voice-overlay";
 const IMAGE_VERSION = "1";
 
 export default function Home() {
-  const { setType, setCollectionItems, setIsVipModalOpen } = useVideoPlayerContext();
+  const { setType, setCollectionItems, } = useVideoPlayerContext();
   const navigate = useNavigate();
-  const { chapter, refetchProgress, refetchCollectedRewards, userInfo } = useUserContext();
+  const { chapter, refetchProgress, refetchCollectedRewards, } = useUserContext();
   console.log({ chapter })
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
