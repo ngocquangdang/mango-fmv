@@ -124,7 +124,7 @@ const GiftSelection = () => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"
+      className={`fixed inset-0 z-[999] app-container flex flex-col items-center justify-center bg-black/60 transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"
         }`}
       onClick={closeGiftSelection} // Close when clicking grid backdrop
     >
