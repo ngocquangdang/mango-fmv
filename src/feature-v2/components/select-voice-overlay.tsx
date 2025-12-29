@@ -147,6 +147,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
     const handlePause = () => setIsPlaying(false);
     const handleEnded = () => setIsPlaying(false);
     const handleTimeUpdate = () => {
+      console.log('Time update:', audio.currentTime, '/', audio.duration);
       setCurrentTime(audio.currentTime);
     };
     const handleLoadedMetadata = () => {
@@ -174,7 +175,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
-  }, [voiceType, currentAudioUrl]);
+  }, [voiceType, currentAudioUrl, isCreatingVoice]); // Added isCreatingVoice to re-attach listeners when back from CreateVoiceView
 
   // Stop audio when switching to mute or closing overlay
   useEffect(() => {
@@ -228,8 +229,11 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           setIsCreatingVoice(false);
           // Reset AI processing state to allow processing with new recording
           hasProcessedRef.current = false;
-          setAiProcessedAudioUrl(null);
           setIsProcessingAi(false);
+          // Reset audio player states to force re-initialization
+          setCurrentTime(0);
+          setDuration(0);
+          setIsPlaying(false);
           // Refresh recordings
           VoiceService.getAudioRecordings(50, 0)
             .then((res) => {

@@ -34,8 +34,9 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
   // Track current recording ID for deletion
   const [currentRecordingId, setCurrentRecordingId] = useState<string | null>(null);
 
-  // Confirmation dialog state
+  // Confirmation dialog states
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showUseVoiceConfirm, setShowUseVoiceConfirm] = useState(false);
 
   // AI audio playback tracking
   const [aiCurrentTime, setAiCurrentTime] = useState(0);
@@ -257,6 +258,38 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
     setShowDeleteConfirm(false);
   };
 
+  const handleConfirmUseVoice = async () => {
+    setShowUseVoiceConfirm(false);
+
+    try {
+      // Try to delete the latest recording if exists
+      if (recordings.length > 0) {
+        const latestRecording = recordings[0]; // Assuming sorted by date, newest first
+        const recordingIdToDelete = latestRecording.id || latestRecording.recordingId;
+
+        if (recordingIdToDelete) {
+          console.log('Deleting latest recording before creating new:', recordingIdToDelete);
+          await VoiceService.deleteRecording(recordingIdToDelete);
+          console.log('Latest recording deleted successfully');
+        }
+      }
+
+      // Always proceed with new voice creation
+      await proceedWithVoiceCreation();
+    } catch (error) {
+      console.error('Failed to delete old recording:', error);
+      // Still proceed even if delete fails
+      showToast({
+        description: "Không thể xóa recording cũ nhưng sẽ tiếp tục tạo voice mới.",
+      });
+      await proceedWithVoiceCreation();
+    }
+  };
+
+  const handleCancelUseVoice = () => {
+    setShowUseVoiceConfirm(false);
+  };
+
   const handleUseVoice = async () => {
     // Validate duration before upload
     if (recordedAudioDuration < MIN_DURATION) {
@@ -273,6 +306,18 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       return;
     }
 
+    // If already has recordings in system, show confirmation before creating new one
+    if (recordings.length > 0 || aiVoiceUrl) {
+      console.log('Showing confirmation - recordings count:', recordings.length, 'aiVoiceUrl:', aiVoiceUrl);
+      setShowUseVoiceConfirm(true);
+      return;
+    }
+
+    // No existing recordings, proceed directly
+    await proceedWithVoiceCreation();
+  };
+
+  const proceedWithVoiceCreation = async () => {
     const sceneId = chapter?.id || "scene_123";
     if (!audioUrl) return;
 
@@ -421,13 +466,6 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-4 relative animate-in fade-in slide-in-from-bottom-4 duration-300">
 
-      {/* Back Button */}
-      <div
-        onClick={onBack}
-        className="absolute top-0 left-0 md:-top-4 md:-left-4 cursor-pointer z-50 hover:scale-105 transition-transform"
-      >
-        <img src="/images/back-icon.png" alt="back" className="w-10 h-10 md:w-14 md:h-14 object-contain" />
-      </div>
 
       {/* Title */}
       <div className="relative mb-2 md:mb-3 w-full flex justify-center">
@@ -663,6 +701,48 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
               </button>
               <button
                 onClick={handleConfirmDelete}
+                className="flex-1 bg-[#E85D04] text-white font-hand font-bold px-4 py-3 rounded-full hover:bg-orange-600 transition-colors border-2 border-white/20 shadow-lg"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Use Voice Confirmation Dialog */}
+      {showUseVoiceConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#FFF8E7] rounded-2xl p-6 shadow-2xl border-4 border-orange-300 max-w-sm mx-4 animate-in zoom-in-95 duration-200">
+            {/* Icon */}
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
+                <span className="text-4xl">⚠️</span>
+              </div>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-xl font-hand font-bold text-[#E85D04] text-center mb-3">
+              Tạo voice mới?
+            </h3>
+
+            {/* Message */}
+            <p className="text-gray-700 text-center mb-6 font-hand text-sm leading-relaxed">
+              Bạn đã có voice cũ.
+              <br />
+              Hành động này sẽ <span className="font-bold text-red-600">xóa voice cũ</span> và tạo voice mới từ recording này.
+            </p>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancelUseVoice}
+                className="flex-1 bg-gray-200 text-gray-700 font-hand font-bold px-4 py-3 rounded-full hover:bg-gray-300 transition-colors border-2 border-gray-300"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmUseVoice}
                 className="flex-1 bg-[#E85D04] text-white font-hand font-bold px-4 py-3 rounded-full hover:bg-orange-600 transition-colors border-2 border-white/20 shadow-lg"
               >
                 Xác nhận
