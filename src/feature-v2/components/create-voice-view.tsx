@@ -6,10 +6,9 @@ import { useToast } from "../../components/ui/toast-v2/use-toast";
 
 interface CreateVoiceViewProps {
   onBack: () => void;
-  onSuccess: () => void;
 }
 
-const CreateVoiceView = ({ onBack, onSuccess }: CreateVoiceViewProps) => {
+const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
   const { chapter } = useUserContext();
   const { showToast } = useToast();
 

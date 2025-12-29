@@ -237,7 +237,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             })
             .catch((err) => console.error("Failed to refresh recordings:", err));
         }}
-          onSuccess={() => setIsCreatingVoice(false)} />
+        />
       ) : (
         <div className="w-full h-full flex flex-col items-center justify-center p-4 relative animate-in fade-in duration-300">
 
