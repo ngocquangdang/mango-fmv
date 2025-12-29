@@ -105,7 +105,7 @@ export default function Home() {
       icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
       label: "Chọn Voice",
       onClick: () => {
-        // if (userInfo?.vipinfo?.isvip === 3) {
+        // if (userInfo?.isVip === 3) {
         setIsVoiceOverlayOpen(true);
         // } else {
         //   setIsVipModalOpen(true);

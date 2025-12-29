@@ -568,7 +568,6 @@ export const VideoPlayerProvider = ({
           if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
         });
       }
-      console.log("🚀 ~ handleStart ~ nextSceneIds:", userInfo);
 
       const userAudioUrl = audioRecordings?.[0]?.cdnUrl;
       const isUserVip = ![3].includes(userInfo?.isVip);
