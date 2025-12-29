@@ -60,7 +60,7 @@ export default function RankLayout() {
             className="w-20 h-10 lg:w-[96px] lg:h-[48px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-sm"
             style={{ backgroundImage: `url(/images/score-banner.png)` }}
           >
-            10000L
+            {totalVotes}
           </div>
         </div>
 
@@ -134,7 +134,7 @@ export default function RankLayout() {
                   label="BÌNH CHỌN"
                   size="tiny"
                   lgSize="small"
-                  className="text-[10px] lg:text-sm p-0! lg:px-4!"
+                  containerClassName="text-[10px]! lg:text-sm p-0! lg:px-4!"
                   onClick={() => setSelectedUser(user)}
                 />
               </div>

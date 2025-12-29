@@ -207,13 +207,13 @@ const tabContentData: Record<
 };
 
 function Note() {
-  const { data: chars } = useCharacters();
+  const { data: chars } = useCharacters(import.meta.env.VITE_PROJECT_ID);
   const [activeChar, setActiveChar] = useState<string>(chars?.[0]?.id ?? "");
   const [activeTab, setActiveTab] = useState<string>(tabBlocks[0]?.key ?? "");
 
   // Set default active character when data loads
   useEffect(() => {
-      if (chars?.length > 0 && !activeChar) {
+    if (chars?.length > 0 && !activeChar) {
       setActiveChar(chars[0].id);
     }
   }, [chars, activeChar]);

@@ -247,11 +247,11 @@ function CardCollectionContent() {
       </div>
 
       {/* Currency Top Right */}
-      <div className="absolute top-0 right-0 flex items-center gap-2 p-4">
+
+      <div className="absolute top-0 right-0 flex items-center gap-2 p-4" onClick={() => setIsBuyingTickets(true)}>
         <div
           className="w-20 h-10 lg:w-[164px] lg:h-[82px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-xl lg:pb-1"
           style={{ backgroundImage: `url(/images/score-banner.png)` }}
-          onClick={() => setIsBuyingTickets(true)}
         >
           {tickets}
 
@@ -262,7 +262,7 @@ function CardCollectionContent() {
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
         }}></div>
-        <div className='absolute top-6 right-1 w-8 h-8 lg:top-8 lg:right-2 lg:w-10 lg:h-10 text-white font-bold text-lg'>+</div>
+        <div className='absolute top-6 right-1 w-8 h-8 lg:top-10 lg:right-5 lg:w-10 lg:h-10  font-bold text-lg lg:text-2xl text-black'>+</div>
       </div>
 
       {/* Header Banner */}
@@ -283,7 +283,7 @@ function CardCollectionContent() {
       }}>
 
         {/* Blind Bag Area */}
-        <div className="flex-1 w-full h-full flex items-center justify-center relative z-10 lg:mt-8">
+        <div className="flex-1 w-full h-full flex items-center justify-center relative z-10 lg:mt-8 -top-8">
           <BlindBagSelector
             banners={banners}
             selectedIndex={selectedBannerIndex}
@@ -292,7 +292,7 @@ function CardCollectionContent() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-8 lg:gap-14 z-20 items-center justify-center relative -bottom-5 lg:-bottom-[-40px]">
+        <div className="flex gap-8 lg:gap-14 z-20 items-center justify-center relative bottom-10 lg:bottom-24">
           {/* Single Open */}
           <div className="flex flex-col items-center gap-2 relative">
             <Button

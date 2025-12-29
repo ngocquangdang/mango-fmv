@@ -82,7 +82,7 @@ export const CardCollectionService = {
   getCollection: async (): Promise<CollectionStats> => {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));
-    
+
     // Use apiClient to simulate usage or verify it's reachable
     // console.log("API Client ready:", !!apiClient);
 
@@ -96,23 +96,23 @@ export const CardCollectionService = {
 
   getBanners: async (): Promise<ApiResponse<BannersResponse>> => {
     return apiClientVideoProgress.get<ApiResponse<BannersResponse>>("/gacha/banners", {
-        "X-Ticket": getLocalParam("ticket") || "",
+      "X-Ticket": getLocalParam("ticket") || "",
     });
   },
 
   openBlindBag: async (quantity: number): Promise<BlindBagResponse> => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    
+
     if (mockTickets < quantity) {
       throw new Error("Not enough tickets");
     }
 
     mockTickets -= quantity;
-    
+
     // Randomly select cards
     const receivedCards = Array.from({ length: quantity }).map(() => {
-        const randomIndex = Math.floor(Math.random() * MOCK_CARDS.length);
-        return MOCK_CARDS[randomIndex];
+      const randomIndex = Math.floor(Math.random() * MOCK_CARDS.length);
+      return MOCK_CARDS[randomIndex];
     });
 
     return {
@@ -122,46 +122,46 @@ export const CardCollectionService = {
   },
 
   purchaseTickets: async (packageId: number): Promise<number> => {
-     await new Promise((resolve) => setTimeout(resolve, 800));
-     // Mock packages: all give 10 tickets
-     const amount = 10; 
-     console.log(`Purchased package ${packageId}`);
-     mockTickets += amount;
-     return mockTickets;
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    // Mock packages: all give 10 tickets
+    const amount = 10;
+    console.log(`Purchased package ${packageId}`);
+    mockTickets += amount;
+    return mockTickets;
   },
 
   drawCards: async (bannerId: string, amount: number): Promise<ApiResponse<{ results: Card[], bonusRewards: Card[], state: UserState }>> => {
     console.log("Drawing cards for banner", bannerId, "amount", amount);
     return apiClientVideoProgress.post("/gacha/draw", {
-        bannerId,
-        amount
+      bannerId,
+      amount
     }, {
-        "X-Ticket": getLocalParam("ticket") || "",
+      "X-Ticket": getLocalParam("ticket") || "",
     });
   },
 
   getTicketPackages: async (): Promise<ApiResponse<TicketPackage[]>> => {
-      // Use the new ticket API from localhost:3001
-      const packages = await getTicketPackagesAPI();
+    // Use the new ticket API from localhost:3001
+    const packages = await getTicketPackagesAPI();
 
-      // Transform API response to match existing TicketPackage interface
-      const transformedPackages: TicketPackage[] = packages.map((pkg: TicketPackageAPI) => ({
-        id: pkg.id,
-        name: pkg.name,
-        quantity: pkg.quantity,
-        price: pkg.price,
-        totalPrice: pkg.price, // Backend price is already the final package price
-        description: `${pkg.quantity} tickets package`,
-        status: pkg.status,
-        currency: pkg.currency,
-        createdAt: pkg.createdAt || new Date().toISOString(),
-        updatedAt: pkg.updatedAt || new Date().toISOString(),
-      }));
+    // Transform API response to match existing TicketPackage interface
+    const transformedPackages: TicketPackage[] = packages.map((pkg: TicketPackageAPI) => ({
+      id: pkg.id,
+      name: pkg.name,
+      quantity: pkg.quantity,
+      price: pkg.price,
+      totalPrice: pkg.price, // Backend price is already the final package price
+      description: `${pkg.quantity} tickets package`,
+      status: pkg.status,
+      currency: pkg.currency,
+      createdAt: pkg.createdAt || new Date().toISOString(),
+      updatedAt: pkg.updatedAt || new Date().toISOString(),
+    }));
 
-      return {
-        data: transformedPackages,
-        success: true,
-      };
+    return {
+      data: transformedPackages,
+      success: true,
+    };
   },
 
   // New method to create ticket order and get payment URL
@@ -172,6 +172,14 @@ export const CardCollectionService = {
   // Fetch user info including ticket balance
   getUserInfo: async (): Promise<ApiResponse<{ userId: string; isVip: boolean; ticketBalance: number }>> => {
     return apiClientVideoProgress.get<ApiResponse<{ userId: string; isVip: boolean; ticketBalance: number }>>("/user-info", {
+      "X-Ticket": getLocalParam("ticket") || "",
+    });
+  },
+
+  mergeCards: async (cardIds: string[]): Promise<ApiResponse<{ resultCard: Card }>> => {
+    return apiClientVideoProgress.post<ApiResponse<{ resultCard: Card }>>("/gacha/merge", {
+      cardIds
+    }, {
       "X-Ticket": getLocalParam("ticket") || "",
     });
   }

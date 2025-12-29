@@ -2,21 +2,22 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import NotebookLayout from "../../../components/notebook";
 import { useCollectionContext } from "../context/collection-context";
-import { useVideoPlayerContext } from "../../../../contexts";
 import Banner from "../../../components/banner";
 import type { CollectionItem } from "../right-side";
+import { useToast } from "../../../../components/ui/toast-v2/use-toast";
 import SingleBlindBagOverlay from "../../card-collection/components/single-blind-bag-overlay";
-import type { Card } from "../../card-collection/services/card-collection-service";
+import { CardCollectionService, type Card } from "../../card-collection/services/card-collection-service";
 import MergeCardLeft from "./left";
 import MergeCardRight from "./right";
 
 export default function MergeCardPage() {
-  const { setType } = useVideoPlayerContext();
+  // const { setType } = useVideoPlayerContext();
   const navigate = useNavigate();
   const { characters, fetchCollection } = useCollectionContext();
   // const { id: characterId } = useParams(); // Get subpage param which might contain ID?
   // The routing in collection/index.tsx uses wildcard: /collection/*, so params["*"] helps us
   const { "*": subPageParam } = useParams();
+  const { showToast } = useToast();
 
   const [selectedTab, setSelectedTab] = useState<string>("");
   const [slots, setSlots] = useState<(CollectionItem | null)[]>([null, null, null]);
@@ -24,17 +25,14 @@ export default function MergeCardPage() {
   const [resultCard, setResultCard] = useState<Card | null>(null);
 
   const handleToggleItem = (item: CollectionItem) => {
-    console.log("handleToggleItem called for:", item.id);
-    // Check if item is already in slots
-    const existingIndex = slots.findIndex(s => s?.id === item.id);
+    // Count how many of this item is currently in slots
+    const currentCountInSlots = slots.filter(s => s?.id === item.id).length;
+    // Get max available quantity (item comes from collection with count property)
+    const maxQuantity = item.count || 1;
 
-    if (existingIndex !== -1) {
-      // CASE 1: Item exists -> Remove it
-      const newSlots = [...slots];
-      newSlots[existingIndex] = null;
-      setSlots(newSlots);
-    } else {
-      // CASE 2: Item does not exist -> Add to first empty slot
+    if (currentCountInSlots < maxQuantity) {
+      // Add to slots
+      // 1. Find first empty slot
       const emptyIndex = slots.findIndex(s => s === null);
 
       if (emptyIndex !== -1) {
@@ -42,11 +40,22 @@ export default function MergeCardPage() {
         newSlots[emptyIndex] = item;
         setSlots(newSlots);
       } else {
-        // CASE 3: Slots full -> Replace the last slot (user friendly behavior for "Add")
-        // Alternatively, finding the first available slot that isn't functionally locked?
-        // But for now, just replace the last one so user sees the change.
+        // 2. If full, replace the last slot (user friendly behavior)
         const newSlots = [...slots];
         newSlots[newSlots.length - 1] = item;
+        setSlots(newSlots);
+      }
+    } else {
+      // Already reached max quantity -> Remove ONE instance (the last one found)
+      // This allows toggling down
+      const reversedSlots = [...slots].reverse();
+      const indexInReversed = reversedSlots.findIndex(s => s?.id === item.id);
+
+      if (indexInReversed !== -1) {
+        // Calculate original index
+        const originalIndex = slots.length - 1 - indexInReversed;
+        const newSlots = [...slots];
+        newSlots[originalIndex] = null;
         setSlots(newSlots);
       }
     }
@@ -58,28 +67,44 @@ export default function MergeCardPage() {
     setSlots(newSlots);
   }
 
-  const handleMerge = () => {
+  const handleMerge = async () => {
     console.log("Merge triggered", slots);
-    // Logic to determine result card (Mocking for now as per request "hiển thị SingleBlindBagOverlay")
-    // In real scenario, this would come from API response
-    // Let's us the first slot as the "result" or a mock card
-    if (slots[0]) {
-      const mockResult: Card = {
-        id: slots[0].id,
-        name: slots[0].name,
-        imageUrl: slots[0].image,
-        tier: slots[0].rank as any, // assuming rank matches tier roughly
-        isOwned: true
-      };
-      setResultCard(mockResult);
-      setIsOverlayOpen(true);
+
+    // Filter out empty slots
+    const validItems = slots.filter((s): s is CollectionItem => s !== null);
+
+    // Validate: need at least 2 items (or depends on game rule, logic check implies >= 2 in UI)
+    if (validItems.length < 2) {
+      showToast({ description: "Cần ít nhất 2 thẻ để ghép" });
+      return;
+    }
+
+    try {
+      const cardIds = validItems.map(item => item.id);
+
+      const response = await CardCollectionService.mergeCards(cardIds);
+
+      if (response.data && response.data.resultCard) {
+        setResultCard(response.data.resultCard);
+        setIsOverlayOpen(true);
+        // Clear slots on success
+        setSlots([null, null, null]);
+
+        // Refresh collection to reflect consumed cards and new card
+        if (selectedTab) {
+          fetchCollection(selectedTab);
+        }
+      }
+    } catch (error) {
+      console.error("Merge failed:", error);
+      showToast({ description: "Ghép thẻ thất bại. Vui lòng thử lại." });
     }
   }
 
   const handleCloseOverlay = () => {
     setIsOverlayOpen(false);
     setResultCard(null);
-    setSlots([null, null]); // Clear slots after merge?
+    setSlots([null, null, null]); // Always keep 3 slots
   }
 
   // Parse character ID from URL or fallback
@@ -134,7 +159,7 @@ export default function MergeCardPage() {
     <div className="w-full h-full flex items-center justify-center relative">
       <div
         className="absolute top-4 left-4 z-50 cursor-pointer w-9 h-9"
-        onClick={() => setType("intro")}
+        onClick={() => navigate("/collection")}
       >
         <img src="/images/back-icon.png" alt="back-icon" className="w-9 h-9" />
       </div>
