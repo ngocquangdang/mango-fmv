@@ -246,7 +246,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
         <div className="w-full h-full flex flex-col items-center justify-center p-4 relative animate-in fade-in duration-300">
 
           {/* Title */}
-          <div className="relative mb-8 landscape:mb-4 lg:mb-12">
+          <div className="relative mb-8 landscape:mb-2 lg:mb-12">
             {/* Brush stroke background mock */}
             <div className="relative z-10 bg-[#8CC63F] px-4 py-2 lg:px-8 lg:py-3 transform -rotate-1 skew-x-[-10deg] shadow-lg border-2 border-dashed border-white/30">
               <h2 className="text-xl lg:text-3xl font-hand font-bold text-[#1A4027] uppercase text-center transform skew-x-[10deg]">
@@ -257,7 +257,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           </div>
 
           {/* Options */}
-          <div className="flex gap-4 lg:gap-8 mb-8 landscape:mb-4 lg:mb-12">
+          <div className="flex gap-4 lg:gap-8 mb-8 landscape:mb-2 lg:mb-12">
 
             {/* Option: Default */}
             <div
@@ -302,18 +302,18 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           </div>
 
           {voiceType === "ai" && (
-            <div className="flex flex-col items-center gap-2 mb-6 animate-in slide-in-from-top-2 fade-in">
+            <div className="flex flex-col items-center gap-2 landscape:gap-1 mb-6 landscape:mb-1 animate-in slide-in-from-top-2 fade-in">
               <Button
                 label="Tạo Voice ngay"
-                className="bg-[#E85D04] text-white px-6 py-2 shadow-lg border-2 border-white/20 text-sm lg:text-base"
+                className="bg-[#E85D04] text-white px-6 py-2 landscape:py-1 shadow-lg border-2 border-white/20 text-sm landscape:text-xs lg:text-base"
                 onClick={() => setIsCreatingVoice(true)}
               />
-              <span className="text-white text-xs lg:text-sm font-hand">
+              <span className="text-white text-xs landscape:text-[9px] lg:text-sm font-hand">
                 Dùng giọng nói của riêng bạn
               </span>
               {isProcessingAi && (
-                <div className="flex items-center gap-2 bg-orange-500/20 px-4 py-2 rounded-full border border-orange-300 animate-pulse">
-                  <span className="text-orange-200 text-xs">⏳ Đang xử lý voice AI...</span>
+                <div className="flex items-center gap-2 bg-orange-500/20 px-4 py-2 landscape:py-1 rounded-full border border-orange-300 animate-pulse">
+                  <span className="text-orange-200 text-xs landscape:text-[9px]">⏳ Đang xử lý voice AI...</span>
                 </div>
               )}
             </div>
@@ -321,18 +321,18 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
           {/* Audio Player - Always show for default/ai, hide for mute */}
           {voiceType !== "mute" && (
-            <div className="w-[90%] max-w-[500px] mb-2 relative">
+            <div className="w-[90%] max-w-[500px] mb-2 landscape:mb-1 relative">
               {/* Hidden audio element */}
               <audio ref={audioRef} src={currentAudioUrl || undefined} />
 
               {/* Visible player UI */}
-              <div className={`bg-white rounded-full p-2 lg:p-3 shadow-lg border-2 border-blue-200 flex items-center gap-3 ${!isAudioAvailable ? 'opacity-50' : ''}`}>
+              <div className={`bg-white rounded-full p-2 landscape:p-1 lg:p-3 shadow-lg border-2 border-blue-200 flex items-center gap-3 ${!isAudioAvailable ? 'opacity-50' : ''}`}>
                 <button
                   onClick={togglePlayPause}
-                  className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-8 h-8 landscape:w-6 landscape:h-6 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!isAudioAvailable}
                 >
-                  {isPlaying ? "||" : "▶"}
+                  {isPlaying ? <span className="landscape:text-xs">||</span> : <span className="landscape:text-xs">▶</span>}
                 </button>
 
                 {/* Progress Bar (real-time) */}
@@ -343,26 +343,26 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                   ></div>
                 </div>
 
-                <span className="text-xs text-gray-500 font-bold">
+                <span className="text-xs text-gray-500 font-bold landscape:text-[9px]">
                   {voiceType === 'ai' && !aiProcessedAudioUrl ? 'Chưa có' : 'Preview'}
                 </span>
               </div>
 
               {/* Info message when AI voice not available */}
               {voiceType === 'ai' && !aiProcessedAudioUrl && !isProcessingAi && (
-                <div className="text-center text-yellow-300 text-xs mt-2 font-hand">
+                <div className="text-center text-yellow-300 text-xs landscape:text-[9px] mt-2 landscape:mt-1 font-hand">
                   ⚠️ Bạn cần tạo voice trước khi nghe thử
                 </div>
               )}
             </div>
           )}
 
-          <div className="text-white font-hand text-sm lg:text-base mb-8 landscape:mb-4 shadow-black/50 text-shadow-sm">
+          <div className="text-white font-hand text-sm landscape:text-xs lg:text-base mb-8 landscape:mb-2 shadow-black/50 text-shadow-sm">
             Nữ chính sẽ dùng voice <span className="text-orange-300">{voiceType === "original" ? "mặc định" : voiceType === "ai" ? "của bạn" : "tắt tiếng"}</span>
           </div>
 
           {/* Continue Button */}
-          <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-10">
+          <div className="absolute bottom-6 right-6 landscape:bottom-3 landscape:right-3 lg:bottom-10 lg:right-10">
             <Button
               label="Tiếp tục"
               className="bg-[#E85D04] text-white px-8 lg:px-10 shadow-lg border-2 border-white/20"
