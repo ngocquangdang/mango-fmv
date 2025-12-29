@@ -68,24 +68,12 @@ const SingleBlindBagOverlay = ({
         {/* Card Container with Glow */}
         <div className="relative mb-4 transform hover:scale-105 transition-transform duration-300">
           {/* Glow behind card */}
-          <div className="absolute inset-0 bg-white/50 blur-2xl rounded-xl"></div>
+          <img src={cardImage} alt={cardName} className="w-[200px] h-[288px] lg:w-[250px] lg:h-[360px] object-contain" />
+
+          {/* <div className="absolute inset-0 bg-white/50 blur-2xl rounded-xl"></div> */}
 
           {/* Card Frame/Image */}
-          <div className="relative w-[200px] h-[288px] lg:w-[250px] lg:h-[360px] bg-gradient-to-b from-gray-300 to-gray-100 rounded-xl p-1.5 shadow-2xl border-4 border-white/20">
-            <div className="w-full h-full bg-slate-800 rounded-lg overflow-hidden relative">
-              <img src={cardImage} alt={cardName} className="w-full h-full object-cover" />
 
-              {/* Card Name Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-10">
-                <h3 className="text-white text-lg lg:text-xl font-bold uppercase text-center tracking-wider">{cardName}</h3>
-              </div>
-
-              {/* Rarity Badge */}
-              <div className="absolute top-2 right-2 text-white font-bold text-[10px] bg-black/50 px-2 py-0.5 rounded">
-                {rarity}
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Continue Button */}
