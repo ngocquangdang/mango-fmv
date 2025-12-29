@@ -568,9 +568,10 @@ export const VideoPlayerProvider = ({
           if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
         });
       }
+      console.log("🚀 ~ handleStart ~ nextSceneIds:", userInfo);
 
       const userAudioUrl = audioRecordings?.[0]?.cdnUrl;
-      const isUserVip = ![3].includes(userInfo?.vipinfo?.isvip);
+      const isUserVip = ![3].includes(userInfo?.isVip);
       if (isUserVip) return;
       if (userAudioUrl && nextSceneIds.length > 0) {
         nextSceneIds.forEach(targetId => {
@@ -772,6 +773,8 @@ export const VideoPlayerProvider = ({
       if (isHotspot) {
         saveLocalParams({ previousSceneId: sceneId });
       } else {
+        const isUserVip = [3].includes(userInfo?.isVip);
+        console.log("🚀 ~ handleChoiceSelected ~ isUserVip:", isUserVip, userInfo);
         removeLocalParam("previousSceneId");
         if (!isReviewScene) {
           updateSceneStatus({
@@ -781,6 +784,10 @@ export const VideoPlayerProvider = ({
             status: "COMPLETED",
             points: data.scenes[sceneId]?.points || 0,
           });
+          const nextScene = data.scenes[nextSceneId];
+          if (nextScene.isVip && !isUserVip) {
+            return setIsVipModalOpen(true);
+          }
           updateSceneStatus({
             sceneId: nextSceneId,
             totalDuration: Math.floor(data.scenes[nextSceneId]?.duration || 0),
@@ -791,7 +798,8 @@ export const VideoPlayerProvider = ({
         }
       }
       const nextScene = data.scenes[nextSceneId];
-      const isUserVip = [3].includes(userInfo?.vipinfo?.isvip);
+      const isUserVip = [3].includes(userInfo?.isVip);
+
       if (nextScene.isVip && !isUserVip) {
         return setIsVipModalOpen(true);
       }
@@ -799,7 +807,7 @@ export const VideoPlayerProvider = ({
       setPauseType(null);
       setCurrentStatus(null);
     },
-    [updateSceneStatus, isReviewScene, data.hotspotScenes, onSetCurrentSceneId, userInfo?.vipinfo?.isvip, data.scenes]
+    [updateSceneStatus, isReviewScene, data.hotspotScenes, onSetCurrentSceneId, userInfo?.isVip, data.scenes]
   );
 
   const handleEnded = React.useCallback(
@@ -861,7 +869,7 @@ export const VideoPlayerProvider = ({
       pause,
       setIsEndingScene,
       onSetCurrentSceneId,
-      userInfo?.vipinfo?.isvip,
+      userInfo?.isVip,
     ]
   );
 
