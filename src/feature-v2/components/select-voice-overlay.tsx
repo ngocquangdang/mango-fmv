@@ -245,13 +245,13 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           />
         </div>
       ) : (
-        <div className="min-h-full w-full flex flex-col items-center justify-center p-4 landscape:py-2 relative animate-in fade-in duration-300">
+        <div className="min-h-full w-full flex flex-col items-center justify-center p-4 landscape:py-2 landscape:pb-16 relative animate-in fade-in duration-300">
 
           {/* Title */}
-          <div className="relative mb-6 landscape:mb-2 lg:mb-12 mt-12 landscape:mt-0">
+          <div className="relative mb-6 landscape:mb-1 lg:mb-12 mt-12 landscape:mt-0">
             {/* Brush stroke background mock */}
             <div className="relative z-10 bg-[#8CC63F] px-4 py-2 lg:px-8 lg:py-3 transform -rotate-1 skew-x-[-10deg] shadow-lg border-2 border-dashed border-white/30">
-              <h2 className="text-xl lg:text-3xl font-hand font-bold text-[#1A4027] uppercase text-center transform skew-x-[10deg]">
+              <h2 className="text-xl lg:text-3xl font-hand font-bold text-[#1A4027] uppercase text-center transform skew-x-[10deg] landscape:text-lg">
                 Chọn voice cho nhân vật tương tác
               </h2>
             </div>
@@ -259,18 +259,18 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           </div>
 
           {/* Options */}
-          <div className="flex gap-4 lg:gap-8 mb-6 landscape:mb-2 lg:mb-12 shrink-0">
+          <div className="flex gap-4 lg:gap-8 mb-6 landscape:mb-1 lg:mb-12 shrink-0">
 
             {/* Option: Default */}
             <div
               onClick={() => handleVoiceTypeChange("original")}
-              className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[80px] landscape:h-[105px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "original" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+              className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[64px] landscape:h-[84px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "original" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
               {/* Icon */}
-              <div className="w-12 h-12 landscape:w-10 landscape:h-10 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 overflow-hidden mb-2 bg-white flex items-center justify-center">
+              <div className="w-12 h-12 landscape:w-8 landscape:h-8 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 overflow-hidden mb-2 bg-white flex items-center justify-center">
                 <img src="/images/home/charactor.png" alt="default" className="w-full h-full object-cover object-top" />
               </div>
-              <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[10px] lg:text-base leading-tight">
+              <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
                 Voice mặc định
               </div>
               {/* Scribble border effect could be SVG or CSS */}
@@ -279,12 +279,12 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             {/* Option: AI */}
             <div
               onClick={() => handleVoiceTypeChange("ai")}
-              className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[80px] landscape:h-[105px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "ai" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+              className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[64px] landscape:h-[84px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "ai" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
-              <div className="w-12 h-12 landscape:w-10 landscape:h-10 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
-                <span className="font-hand font-bold text-orange-500 text-xl landscape:text-base lg:text-3xl">AI</span>
+              <div className="w-12 h-12 landscape:w-8 landscape:h-8 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
+                <span className="font-hand font-bold text-orange-500 text-xl landscape:text-xs lg:text-3xl">AI</span>
               </div>
-              <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[10px] lg:text-base leading-tight">
+              <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
                 Voice của bạn
               </div>
             </div>
@@ -292,38 +292,38 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             {/* Option: Mute */}
             <div
               onClick={() => handleVoiceTypeChange("mute")}
-              className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[80px] landscape:h-[105px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "mute" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+              className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[64px] landscape:h-[84px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "mute" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
-              <div className="w-12 h-12 landscape:w-10 landscape:h-10 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
-                <span className="text-2xl landscape:text-xl lg:text-4xl text-orange-500">🔇</span>
+              <div className="w-12 h-12 landscape:w-8 landscape:h-8 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
+                <span className="text-2xl landscape:text-base lg:text-4xl text-orange-500">🔇</span>
               </div>
-              <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[10px] lg:text-base leading-tight">
+              <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
                 Tắt tiếng
               </div>
             </div>
           </div>
 
-          <div className="w-full flex flex-col items-center justify-center min-h-[60px] landscape:min-h-[40px]">
+          <div className="w-full flex flex-col items-center justify-center min-h-[60px] landscape:min-h-[30px]">
             {voiceType === "ai" && (
               <div className="flex flex-col items-center gap-2 landscape:gap-1 mb-4 landscape:mb-1 animate-in slide-in-from-top-2 fade-in">
                 <Button
                   label="Tạo Voice ngay"
-                  className="bg-[#E85D04] text-white px-6 py-2 landscape:py-1 shadow-lg border-2 border-white/20 text-sm landscape:text-[10px] lg:text-base"
+                  className="bg-[#E85D04] text-white px-6 py-2 landscape:px-4 landscape:py-0.5 shadow-lg border-2 border-white/20 text-sm landscape:text-[9px] lg:text-base"
                   onClick={() => setIsCreatingVoice(true)}
                 />
-                <span className="text-white text-xs landscape:text-[9px] lg:text-sm font-hand">
+                <span className="text-white text-xs landscape:text-[8px] lg:text-sm font-hand">
                   Dùng giọng nói của riêng bạn
                 </span>
                 {isProcessingAi && (
-                  <div className="flex items-center gap-2 bg-orange-500/20 px-4 py-2 landscape:py-1 rounded-full border border-orange-300 animate-pulse">
-                    <span className="text-orange-200 text-xs landscape:text-[9px]">⏳ Đang xử lý...</span>
+                  <div className="flex items-center gap-2 bg-orange-500/20 px-4 py-2 landscape:py-0.5 rounded-full border border-orange-300 animate-pulse">
+                    <span className="text-orange-200 text-xs landscape:text-[8px]">⏳ Đang xử lý...</span>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Audio Player - Always show for default/ai, hide for mute */}
-            {voiceType !== "mute" && (
+            {/* Audio Player - Show for original, or for AI only if URL exists */}
+            {((voiceType === "original") || (voiceType === "ai" && !!aiProcessedAudioUrl)) && (
               <div className="w-[90%] max-w-[500px] mb-4 landscape:mb-1 relative">
                 {/* Hidden audio element */}
                 <audio ref={audioRef} src={currentAudioUrl || undefined} />
@@ -332,10 +332,10 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                 <div className={`bg-white rounded-full p-2 landscape:p-1 lg:p-3 shadow-lg border-2 border-blue-200 flex items-center gap-3 ${!isAudioAvailable ? 'opacity-50' : ''}`}>
                   <button
                     onClick={togglePlayPause}
-                    className="w-8 h-8 landscape:w-6 landscape:h-6 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-8 h-8 landscape:w-5 landscape:h-5 lg:w-10 lg:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!isAudioAvailable}
                   >
-                    {isPlaying ? <span className="text-xs landscape:text-[10px]">||</span> : <span className="text-xs landscape:text-[10px]">▶</span>}
+                    {isPlaying ? <span className="text-xs landscape:text-[8px]">||</span> : <span className="text-xs landscape:text-[8px]">▶</span>}
                   </button>
 
                   {/* Progress Bar (real-time) */}
@@ -346,22 +346,15 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                     ></div>
                   </div>
 
-                  <span className="text-xs text-gray-500 font-bold landscape:text-[9px]">
+                  <span className="text-xs text-gray-500 font-bold landscape:text-[8px]">
                     {voiceType === 'ai' && !aiProcessedAudioUrl ? 'Chưa có' : 'Preview'}
                   </span>
                 </div>
-
-                {/* Info message when AI voice not available */}
-                {voiceType === 'ai' && !aiProcessedAudioUrl && !isProcessingAi && (
-                  <div className="text-center text-yellow-300 text-xs landscape:text-[8px] mt-2 landscape:mt-1 font-hand">
-                    ⚠️ Bạn cần tạo voice trước khi nghe thử
-                  </div>
-                )}
               </div>
             )}
           </div>
 
-          <div className="text-white font-hand text-sm landscape:text-[10px] lg:text-base mb-6 landscape:mb-2 shadow-black/50 text-shadow-sm text-center px-4">
+          <div className="text-white font-hand text-sm landscape:text-[9px] lg:text-base mb-6 landscape:mb-1 shadow-black/50 text-shadow-sm text-center px-4">
             Nữ chính sẽ dùng voice <span className="text-orange-300">{voiceType === "original" ? "mặc định" : voiceType === "ai" ? "của bạn" : "tắt tiếng"}</span>
           </div>
 
@@ -370,10 +363,10 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
       {/* Continue Button - Fixed position */}
       {!isCreatingVoice && (
-        <div className="fixed bottom-6 right-6 landscape:bottom-3 landscape:right-3 lg:bottom-10 lg:right-10 z-[110]">
+        <div className="fixed bottom-6 right-6 landscape:bottom-2 landscape:right-2 lg:bottom-10 lg:right-10 z-[110]">
           <Button
             label="Tiếp tục"
-            className="bg-[#E85D04] text-white px-8 lg:px-10 shadow-lg border-2 border-white/20"
+            className="bg-[#E85D04] text-white px-8 lg:px-10 landscape:px-6 landscape:py-1 landscape:text-[10px] shadow-lg border-2 border-white/20"
             onClick={() => {
               setUseAiAudio(voiceType);
               onClose();
