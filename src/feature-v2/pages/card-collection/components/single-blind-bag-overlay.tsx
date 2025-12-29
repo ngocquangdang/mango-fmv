@@ -17,7 +17,6 @@ const SingleBlindBagOverlay = ({
 }: SingleBlindBagOverlayProps) => {
   const cardImage = card?.imageUrl || card?.image || "";
   const cardName = card?.name || "";
-  const rarity = card?.tier || card?.rarity || "R";
 
   useEffect(() => {
     let animationFrameId: number;
@@ -69,10 +68,6 @@ const SingleBlindBagOverlay = ({
         <div className="relative mb-4 transform hover:scale-105 transition-transform duration-300">
           {/* Glow behind card */}
           <img src={cardImage} alt={cardName} className="w-[200px] h-[288px] lg:w-[250px] lg:h-[360px] object-contain" />
-
-          {/* <div className="absolute inset-0 bg-white/50 blur-2xl rounded-xl"></div> */}
-
-          {/* Card Frame/Image */}
 
         </div>
 
