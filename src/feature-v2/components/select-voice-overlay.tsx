@@ -244,7 +244,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           {/* Banner Title */}
           <div className="w-full h-[60px] lg:h-[74px] shrink-0 relative mb-4 landscape:mb-1 mt-8 landscape:mt-0">
             <Banner
-              text="Chọn voice"
+              text="Chọn Giọng"
               className="!text-lg lg:!text-[28.8px] whitespace-nowrap min-w-[200px]"
             />
             <div className="text-center text-[#1A4027] text-xs lg:text-sm font-bold mt-12 lg:mt-16 landscape:hidden">
@@ -270,7 +270,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             </div>
 
             {/* Option: AI */}
-            <div
+            {/* <div
               onClick={() => handleVoiceTypeChange("ai")}
               className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[64px] landscape:h-[84px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "ai" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
@@ -280,7 +280,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
               <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
                 Giọng của bạn
               </div>
-            </div>
+            </div> */}
 
             {/* Option: Mute */}
             <div
@@ -297,12 +297,11 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           </div>
 
           <div className="w-full flex flex-col items-center justify-center min-h-[60px] landscape:min-h-[30px]">
-            {voiceType === "ai" && (
+            {/* {voiceType === "ai" && (
               <div className="flex flex-col items-center gap-2 landscape:gap-1 mb-4 landscape:mb-1 animate-in slide-in-from-top-2 fade-in">
-                {/* Only show create button if NOT loading readings AND we have NO recordings */}
                 {!isLoadingRecordings && recordings.length === 0 && (
                   <Button
-                    label="Tạo Voice ngay"
+                    label="Tạo Giọng ngay"
                     className="bg-[#E85D04] text-white px-6 py-2 landscape:px-4 landscape:py-0.5 shadow-lg border-2 border-white/20 text-sm landscape:text-[9px] lg:text-base"
                     onClick={() => setIsCreatingVoice(true)}
                   />
@@ -316,7 +315,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                   </div>
                 )}
               </div>
-            )}
+            )} */}
 
             {/* Audio Player - Show for original, or for AI only if URL exists */}
             {((voiceType === "original") || (voiceType === "ai" && !!aiProcessedAudioUrl)) && (
