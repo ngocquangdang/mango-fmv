@@ -474,7 +474,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center p-4 relative animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="w-full h-full flex flex-col items-center justify-center p-4 landscape:p-2 relative animate-in fade-in slide-in-from-bottom-4 duration-300">
 
       {/* Back Button */}
       <div
@@ -492,7 +492,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
           </h2>
         </div>
       </div>
-      <div className="flex w-full max-w-[700px] gap-2 md:gap-4 items-stretch justify-center">
+      <div className="flex w-full max-w-[700px] landscape:max-w-full landscape:w-full landscape:px-8 gap-2 md:gap-4 items-stretch justify-center">
 
         {/* Reading Card */}
         <div className="flex-1 bg-[#FFFDF5] border-2 border-orange-300 rounded-lg p-2 md:p-4 shadow-inner relative min-h-[80px] md:min-h-[110px] flex items-center justify-center">
@@ -530,23 +530,23 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       </div>
 
       {/* Mobile Tips (Horizontal) - Hidden on md+ */}
-      <div className="md:hidden flex gap-4 mt-2 w-full justify-center">
-        <div className="flex items-center gap-2 bg-[#FFF8E7] px-3 py-0.5 rounded-full border border-orange-200 text-[9px] text-gray-700">
+      <div className="md:hidden flex gap-4 mt-1 w-full justify-center">
+        <div className="flex items-center gap-1.5 bg-[#FFF8E7] px-2 py-0.5 rounded-full border border-orange-200 text-[8px] text-gray-700">
           <span>🔊</span> Yên tĩnh
         </div>
-        <div className="flex items-center gap-2 bg-[#FFF8E7] px-3 py-0.5 rounded-full border border-orange-200 text-[9px] text-gray-700">
+        <div className="flex items-center gap-1.5 bg-[#FFF8E7] px-2 py-0.5 rounded-full border border-orange-200 text-[8px] text-gray-700">
           <span>🎙️</span> Micro
         </div>
       </div>
 
       {/* Record/Playback Control */}
-      <div className="mt-1 md:mt-4 flex flex-col items-center gap-2 w-full">
+      <div className="mt-1 md:mt-4 flex flex-col items-center gap-1.5 w-full">
         {isProcessing ? (
-          <div className="flex flex-col items-center gap-3 animate-pulse">
-            <div className="w-16 h-16 rounded-full bg-orange-200 flex items-center justify-center">
-              <span className="text-2xl animate-spin">⏳</span>
+          <div className="flex flex-col items-center gap-2 animate-pulse">
+            <div className="w-12 h-12 rounded-full bg-orange-200 flex items-center justify-center">
+              <span className="text-xl animate-spin">⏳</span>
             </div>
-            <div className="text-white font-hand font-bold text-center">
+            <div className="text-white font-hand font-bold text-center text-[10px]">
               {processingStage === 'uploading' && "Đang upload recording..."}
               {processingStage === 'getting-cdn' && "Đang lấy thông tin file..."}
               {processingStage === 'processing' && (
@@ -559,11 +559,11 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
           </div>
         ) : aiVoiceUrl ? (
           /* AI Voice Result */
-          <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300 w-full max-w-[400px]">
-            <div className="text-white font-hand font-bold text-xs md:text-sm">Voice AI của bạn</div>
+          <div className="flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-300 w-full max-w-[400px]">
+            <div className="text-white font-hand font-bold text-[10px] md:text-sm">Voice AI của bạn</div>
 
             {/* Instruction text */}
-            <div className="text-white/80 font-hand text-[10px] md:text-xs text-center -mt-2">
+            <div className="text-white/80 font-hand text-[9px] md:text-xs text-center -mt-1">
               👇 Click nút Play để nghe thử voice vừa tạo
             </div>
 
@@ -571,24 +571,24 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
             <div className="bg-[#FFF8E7] rounded-full px-2 py-1 shadow-lg border-2 border-orange-400 flex items-center gap-2 w-full">
               <button
                 onClick={handlePlayAiVoice}
-                className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#E85D04] flex items-center justify-center text-white hover:bg-orange-600 transition-colors shrink-0 shadow-sm"
+                className="w-4 h-4 md:w-6 md:h-6 rounded-full bg-[#E85D04] flex items-center justify-center text-white hover:bg-orange-600 transition-colors shrink-0 shadow-sm"
               >
-                {isPlaying ? <span className="text-[8px] md:text-[10px]">||</span> : <span className="text-[8px] md:text-[10px]">▶</span>}
+                {isPlaying ? <span className="text-[7px] md:text-[10px]">||</span> : <span className="text-[7px] md:text-[10px]">▶</span>}
               </button>
 
-              <div className="flex-1 h-1.5 md:h-2 bg-orange-200 rounded-full relative overflow-hidden">
+              <div className="flex-1 h-1 md:h-2 bg-orange-200 rounded-full relative overflow-hidden">
                 <div
                   className="absolute top-0 left-0 h-full bg-[#E85D04] rounded-full transition-all duration-100"
                   style={{ width: `${(aiDuration > 0 && Number.isFinite(aiDuration)) ? (aiCurrentTime / aiDuration) * 100 : 0}%` }}
                 ></div>
               </div>
-              <span className="text-[9px] md:text-[10px] text-[#E85D04] font-bold shrink-0">AI Voice</span>
+              <span className="text-[8px] md:text-[10px] text-[#E85D04] font-bold shrink-0">AI Voice</span>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <button
                 onClick={handleReRecord}
-                className="bg-white text-[#E85D04] font-hand font-bold px-6 py-2 rounded-full shadow-md border-2 border-orange-200 hover:bg-orange-50"
+                className="bg-white text-[#E85D04] font-hand font-bold px-4 py-1.5 rounded-full shadow-md border-2 border-orange-200 hover:bg-orange-50 text-[9px]"
               >
                 Thử lại
               </button>
@@ -596,24 +596,24 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
                 onClick={() => {
                   showToast({ description: "Đã chọn voice AI" });
                   onBack(); // In real app
-                }} className="bg-[#E85D04] text-white font-hand font-bold px-6 py-2 rounded-full shadow-md hover:bg-orange-600 border-2 border-white/20"
+                }} className="bg-[#E85D04] text-white font-hand font-bold px-4 py-1.5 rounded-full shadow-md hover:bg-orange-600 border-2 border-white/20 text-[9px]"
               >
                 Dùng voice này
               </button>
             </div>
           </div>
         ) : hasRecorded ? (
-          <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300 w-full max-w-[400px]">
+          <div className="flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-300 w-full max-w-[400px]">
             {/* Audio Player Bar */}
-            <div className="bg-white/90 backdrop-blur rounded-full px-3 py-1.5 shadow-lg border-2 border-orange-200 flex items-center gap-4 w-full">
+            <div className="bg-white/90 backdrop-blur rounded-full px-2 py-1 shadow-lg border-2 border-orange-200 flex items-center gap-2 w-full">
               <button
                 onClick={handlePlayToggle}
-                className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#E85D04] flex items-center justify-center text-white hover:bg-orange-600 transition-colors shrink-0"
+                className="w-5 h-5 md:w-8 md:h-8 rounded-full bg-[#E85D04] flex items-center justify-center text-white hover:bg-orange-600 transition-colors shrink-0"
               >
-                {isPlaying ? "||" : "▶"}
+                {isPlaying ? <span className="text-[8px]">||</span> : <span className="text-[8px]">▶</span>}
               </button>
 
-              <div className="flex-1 h-1.5 md:h-2 bg-orange-200 rounded-full relative overflow-hidden cursor-pointer">
+              <div className="flex-1 h-1 md:h-2 bg-orange-200 rounded-full relative overflow-hidden cursor-pointer">
                 <div
                   className="absolute top-0 left-0 h-full bg-[#E85D04] rounded-full transition-all duration-100"
                   style={{ width: `${(recordedAudioDuration > 0) ? (playerCurrentTime / recordedAudioDuration) * 100 : 0}%` }}

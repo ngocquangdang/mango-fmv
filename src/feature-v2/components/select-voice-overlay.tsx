@@ -246,7 +246,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
         <div className="w-full h-full flex flex-col items-center justify-center p-4 relative animate-in fade-in duration-300">
 
           {/* Title */}
-          <div className="relative mb-8 lg:mb-12">
+          <div className="relative mb-8 landscape:mb-4 lg:mb-12">
             {/* Brush stroke background mock */}
             <div className="relative z-10 bg-[#8CC63F] px-4 py-2 lg:px-8 lg:py-3 transform -rotate-1 skew-x-[-10deg] shadow-lg border-2 border-dashed border-white/30">
               <h2 className="text-xl lg:text-3xl font-hand font-bold text-[#1A4027] uppercase text-center transform skew-x-[10deg]">
@@ -257,18 +257,18 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           </div>
 
           {/* Options */}
-          <div className="flex gap-4 lg:gap-8 mb-8 lg:mb-12">
+          <div className="flex gap-4 lg:gap-8 mb-8 landscape:mb-4 lg:mb-12">
 
             {/* Option: Default */}
             <div
               onClick={() => handleVoiceTypeChange("original")}
-              className={`cursor-pointer group relative w-[100px] h-[130px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "original" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+              className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[80px] landscape:h-[105px] lg:w-[150px] lg:h-[200px] lg:landscape:w-[150px] lg:landscape:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "original" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
               {/* Icon */}
-              <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 overflow-hidden mb-2 bg-white flex items-center justify-center">
+              <div className="w-12 h-12 landscape:w-10 landscape:h-10 lg:w-20 lg:h-20 lg:landscape:w-20 lg:landscape:h-20 rounded-full border-2 border-orange-400 overflow-hidden mb-2 bg-white flex items-center justify-center">
                 <img src="/images/home/charactor.png" alt="default" className="w-full h-full object-cover object-top" />
               </div>
-              <div className="text-center font-hand font-bold text-[#1A4027] text-xs lg:text-base leading-tight">
+              <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[10px] lg:text-base lg:landscape:text-base leading-tight">
                 Voice mặc định
               </div>
               {/* Scribble border effect could be SVG or CSS */}
@@ -277,12 +277,12 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             {/* Option: AI */}
             <div
               onClick={() => handleVoiceTypeChange("ai")}
-              className={`cursor-pointer group relative w-[100px] h-[130px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "ai" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+              className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[80px] landscape:h-[105px] lg:w-[150px] lg:h-[200px] lg:landscape:w-[150px] lg:landscape:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "ai" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
-              <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
-                <span className="font-hand font-bold text-orange-500 text-xl lg:text-3xl">AI</span>
+              <div className="w-12 h-12 landscape:w-10 landscape:h-10 lg:w-20 lg:h-20 lg:landscape:w-20 lg:landscape:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
+                <span className="font-hand font-bold text-orange-500 text-xl landscape:text-base lg:text-3xl lg:landscape:text-3xl">AI</span>
               </div>
-              <div className="text-center font-hand font-bold text-[#1A4027] text-xs lg:text-base leading-tight">
+              <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[10px] lg:text-base lg:landscape:text-base leading-tight">
                 Voice của bạn
               </div>
             </div>
@@ -290,12 +290,12 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             {/* Option: Mute */}
             <div
               onClick={() => handleVoiceTypeChange("mute")}
-              className={`cursor-pointer group relative w-[100px] h-[130px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "mute" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+              className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[80px] landscape:h-[105px] lg:w-[150px] lg:h-[200px] lg:landscape:w-[150px] lg:landscape:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "mute" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
-              <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
-                <span className="text-2xl lg:text-4xl text-orange-500">🔇</span>
+              <div className="w-12 h-12 landscape:w-10 landscape:h-10 lg:w-20 lg:h-20 lg:landscape:w-20 lg:landscape:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
+                <span className="text-2xl landscape:text-xl lg:text-4xl lg:landscape:text-4xl text-orange-500">🔇</span>
               </div>
-              <div className="text-center font-hand font-bold text-[#1A4027] text-xs lg:text-base leading-tight">
+              <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[10px] lg:text-base lg:landscape:text-base leading-tight">
                 Tắt tiếng
               </div>
             </div>
@@ -357,7 +357,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             </div>
           )}
 
-          <div className="text-white font-hand text-sm lg:text-base mb-8 shadow-black/50 text-shadow-sm">
+          <div className="text-white font-hand text-sm lg:text-base mb-8 landscape:mb-4 shadow-black/50 text-shadow-sm">
             Nữ chính sẽ dùng voice <span className="text-orange-300">{voiceType === "original" ? "mặc định" : voiceType === "ai" ? "của bạn" : "tắt tiếng"}</span>
           </div>
 

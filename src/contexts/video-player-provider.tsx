@@ -398,6 +398,8 @@ export const VideoPlayerProvider = ({
   }, [api]);
 
   React.useEffect(() => {
+    let isCancelled = false;
+
     const fetchSceneAudio = async () => {
       // Logic:
       // 1. Start from data.startSceneId
@@ -416,8 +418,8 @@ export const VideoPlayerProvider = ({
 
       // Recursive traversal function
       const traverseAndFetch = async (sceneId: string, depth: number = 0) => {
-        // Limit recursion depth to avoid infinite loops or excessive fetching
-        if (depth > 10 || visited.has(sceneId)) return;
+        // Stop if cancelled or depth exceeded
+        if (isCancelled || depth > 10 || visited.has(sceneId)) return;
         visited.add(sceneId);
 
         const scene = data.scenes[sceneId];
@@ -426,7 +428,13 @@ export const VideoPlayerProvider = ({
         // Fetch/Poll for current scene if valid candidates exist
         if (scene.originalAudio) {
           try {
+            // Check before async call
+            if (isCancelled) return;
             const aiAudio = await VoiceService.pollVoiceProcessing(sceneId, userAudioUrl, scene.originalAudio);
+
+            // Check after async call
+            if (isCancelled) return;
+
             if (aiAudio) {
               results.push({ sceneId, aiAudio });
               setAiAudioList([...results]);
@@ -453,6 +461,7 @@ export const VideoPlayerProvider = ({
 
         // Process next scenes sequentially
         for (const nid of nextSceneIds) {
+          if (isCancelled) break;
           await traverseAndFetch(nid, depth + 1);
         }
       };
@@ -463,6 +472,10 @@ export const VideoPlayerProvider = ({
     if (voiceType === "ai") {
       fetchSceneAudio();
     }
+
+    return () => {
+      isCancelled = true;
+    };
   }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType]);
 
   const triggerDisplayReward = React.useCallback(
