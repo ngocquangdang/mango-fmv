@@ -67,6 +67,7 @@ export default function Home() {
           window.location.reload();
         },
       });
+      refetchProgress();
     } catch (error) {
       console.error("Failed to restart chapter", error);
     }
