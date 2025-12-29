@@ -22,6 +22,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
   // State for recordings and processing
   const [recordings, setRecordings] = useState<any[]>([]);
+  const [isLoadingRecordings, setIsLoadingRecordings] = useState(true);
   const [isProcessingAi, setIsProcessingAi] = useState(false);
   const [aiProcessedAudioUrl, setAiProcessedAudioUrl] = useState<string | null>(null); // Store processed AI audio URL
   const hasProcessedRef = useRef(false); // Track if we've already processed AI voice
@@ -54,6 +55,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
   // Fetch recordings on mount
   useEffect(() => {
+    setIsLoadingRecordings(true);
     VoiceService.getAudioRecordings(50, 0)
       .then((res) => {
         if (res.data?.recordings) {
@@ -61,7 +63,8 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           console.log('📼 Fetched recordings:', res.data.recordings);
         }
       })
-      .catch((err) => console.error("Failed to fetch recordings:", err));
+      .catch((err) => console.error("Failed to fetch recordings:", err))
+      .finally(() => setIsLoadingRecordings(false));
   }, []);
 
   // Auto-process AI voice when AI option is selected and recordings are available
@@ -223,13 +226,15 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             setDuration(0);
             setIsPlaying(false);
             // Refresh recordings
+            setIsLoadingRecordings(true);
             VoiceService.getAudioRecordings(50, 0)
               .then((res) => {
                 if (res.data?.recordings) {
                   setRecordings(res.data.recordings);
                 }
               })
-              .catch((err) => console.error("Failed to refresh recordings:", err));
+              .catch((err) => console.error("Failed to refresh recordings:", err))
+              .finally(() => setIsLoadingRecordings(false));
           }}
           />
         </div>
@@ -294,11 +299,14 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           <div className="w-full flex flex-col items-center justify-center min-h-[60px] landscape:min-h-[30px]">
             {voiceType === "ai" && (
               <div className="flex flex-col items-center gap-2 landscape:gap-1 mb-4 landscape:mb-1 animate-in slide-in-from-top-2 fade-in">
-                <Button
-                  label="Tạo Voice ngay"
-                  className="bg-[#E85D04] text-white px-6 py-2 landscape:px-4 landscape:py-0.5 shadow-lg border-2 border-white/20 text-sm landscape:text-[9px] lg:text-base"
-                  onClick={() => setIsCreatingVoice(true)}
-                />
+                {/* Only show create button if NOT loading readings AND we have NO recordings */}
+                {!isLoadingRecordings && recordings.length === 0 && (
+                  <Button
+                    label="Tạo Voice ngay"
+                    className="bg-[#E85D04] text-white px-6 py-2 landscape:px-4 landscape:py-0.5 shadow-lg border-2 border-white/20 text-sm landscape:text-[9px] lg:text-base"
+                    onClick={() => setIsCreatingVoice(true)}
+                  />
+                )}
                 <span className="text-white text-xs landscape:text-[8px] lg:text-sm font-hand">
                   Dùng giọng nói của riêng bạn
                 </span>

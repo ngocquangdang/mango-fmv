@@ -13,15 +13,14 @@ const IMAGE_VERSION = "1";
 export default function Home() {
   const { setType, setCollectionItems } = useVideoPlayerContext();
   const navigate = useNavigate();
-  const { chapter, refetchProgress, refetchCollectedRewards } = useUserContext();
+  const { chapter, refetchProgress, refetchCollectedRewards, userInfo } = useUserContext();
   console.log({ chapter })
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
-  const [activeShakeIndex, setActiveShakeIndex] = React.useState<number>(0);
   const [isVoiceOverlayOpen, setIsVoiceOverlayOpen] = React.useState(false);
-  const [shakeOffset, setShakeOffset] = React.useState(0);
-  const [paperOffset, setPaperOffset] = React.useState(0);
+  /* Removed shakeState + effects in favor of CSS animations */
 
+  // Determine if the game is in progress (has progress & multiple scenes)
   const isPlaying = useMemo(() => {
     return Object.values(chapter?.progress?.scenes || {}).length > 1 || chapter.progress?.currentScene?.watchingSecond;
   }, [chapter.progress?.scenes, chapter.progress?.currentScene?.watchingSecond]);
@@ -71,68 +70,6 @@ export default function Home() {
     setDialogName(null);
   };
 
-  React.useEffect(() => {
-    const buttonCount = 5 + (+(isPlaying || 0) > 0 ? 1 : 0);
-    if (!buttonCount) {
-      return;
-    }
-
-    const intervalId = window.setInterval(() => {
-      setActiveShakeIndex((previousIndex) => {
-        const nextIndex = (previousIndex + 1) % buttonCount;
-        return nextIndex;
-      });
-    }, 2000);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [isPlaying]);
-
-  React.useEffect(() => {
-    let animationFrameId: number;
-    const startTime = performance.now();
-
-    const animateShake = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const duration = 600;
-      const progress = (elapsed % duration) / duration;
-      const wave = Math.sin(progress * 2 * Math.PI);
-      const amplitude = 2;
-
-      setShakeOffset(wave * amplitude);
-      animationFrameId = requestAnimationFrame(animateShake);
-    };
-
-    animationFrameId = requestAnimationFrame(animateShake);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
-  React.useEffect(() => {
-    let animationFrameId: number;
-    const startTime = performance.now();
-
-    const animatePaper = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const duration = 2600;
-      const progress = (elapsed % duration) / duration;
-      const wave = Math.sin(progress * 2 * Math.PI);
-      const amplitude = 3;
-
-      setPaperOffset(wave * amplitude);
-      animationFrameId = requestAnimationFrame(animatePaper);
-    };
-
-    animationFrameId = requestAnimationFrame(animatePaper);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
   const HOME_BUTTON = React.useMemo(() => [
     {
       icon: `/images/window-icon.png?v=${IMAGE_VERSION}`,
@@ -161,12 +98,15 @@ export default function Home() {
         onClick: () => handleClick("playAgain"),
       },
     ] : []),
-    {
-      icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
-      label: "Chọn Voice",
-      onClick: () => setIsVoiceOverlayOpen(true),
-    },
-  ], [IMAGE_VERSION, handleClick, activeShakeIndex, shakeOffset, isPlaying]);
+    ...(userInfo && userInfo.isVip === 3 ? [
+      {
+        icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
+        label: "Chọn Voice",
+        onClick: () => setIsVoiceOverlayOpen(true),
+      },
+    ] : []),
+
+  ], [IMAGE_VERSION, handleClick, isPlaying]);
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -179,10 +119,9 @@ export default function Home() {
         {HOME_BUTTON.map((button, index) => (
           <div
             key={index}
+            className="animate-shake-shiver"
             style={{
-              transform: `translateY(${activeShakeIndex === index ? shakeOffset : 0
-                }px)`,
-              transition: "transform 80ms linear",
+              animationDelay: `${index * 2}s`,
             }}
           >
             <HomeButton
@@ -194,12 +133,7 @@ export default function Home() {
         ))}
       </div>
       <div className="absolute -bottom-6 lg:-bottom-16 left-1/2 -translate-x-1/2 z-10">
-        <div
-          style={{
-            transform: `translateY(${paperOffset * 0.9}px)`,
-            transition: "transform 120ms linear",
-          }}
-        >
+        <div className="animate-float-paper">
           <img
             src={`/images/home/charactor.png?v=${IMAGE_VERSION}`}
             alt="paper-HDQ"

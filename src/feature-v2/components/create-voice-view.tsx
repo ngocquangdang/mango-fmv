@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useUserContext } from "../../features/user/context";
 import { VoiceService } from "../services/voice-service";
 import { useToast } from "../../components/ui/toast-v2/use-toast";
+import Banner from "./banner";
 
 
 interface CreateVoiceViewProps {
@@ -485,14 +486,11 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       </div>
 
       {/* Title */}
-      <div className="relative mb-0 md:mb-3 w-full flex justify-center">
-        <div className="relative z-10 bg-[#8CC63F] px-3 py-1 md:px-5 md:py-1.5 transform -rotate-1 skew-x-[-10deg] shadow-lg border-2 border-dashed border-white/30 min-w-[120px] md:min-w-[200px] flex justify-center">
-          <h2 className="text-xs md:text-lg font-hand font-bold text-[#1A4027] uppercase text-center transform skew-x-[10deg]">
-            TẠO VOICE CỦA RIÊNG BẠN
-          </h2>
-        </div>
+      {/* Title */}
+      <div className="w-full h-[60px] lg:h-[74px] shrink-0 relative mb-4 landscape:mb-1 mt-8 landscape:mt-0 flex justify-center">
+        <Banner text="TẠO GIỌNG CỦA RIÊNG BẠN" className="!w-auto !px-8 whitespace-nowrap !text-sm lg:!text-xl" />
       </div>
-      <div className="flex w-full max-w-[700px] landscape:max-w-full landscape:w-full landscape:px-8 gap-2 md:gap-4 items-stretch justify-center">
+      <div className="flex w-full max-w-[680px] landscape:max-w-full landscape:w-full landscape:px-8 gap-2 md:gap-4 items-stretch justify-center">
 
         {/* Reading Card */}
         <div className="flex-1 bg-[#FFFDF5] border-2 border-orange-300 rounded-lg p-2 md:p-4 shadow-inner relative min-h-[80px] md:min-h-[110px] flex items-center justify-center">

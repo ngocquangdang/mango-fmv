@@ -76,7 +76,7 @@ const GiftSelection = () => {
       >
         <div
           className="relative flex flex-col items-center animate-scale-up"
-          // Prevent closing when clicking content
+        // Prevent closing when clicking content
         >
           {/* Title */}
           <h2 className="text-xl md:text-2xl text-white font-bold mb-4 text-center drop-shadow-md px-4">
@@ -124,38 +124,36 @@ const GiftSelection = () => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 transition-opacity duration-500 ${
-        isVisible ? "opacity-100" : "opacity-0"
-      }`}
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"
+        }`}
       onClick={closeGiftSelection} // Close when clicking grid backdrop
     >
       <div
-        className={`flex flex-col items-center justify-center transition-transform duration-500 ease-out transform ${
-          isVisible ? "translate-y-0" : "translate-y-full"
-        }`}
+        className={`flex flex-col items-center justify-center transition-transform duration-500 ease-out transform ${isVisible ? "translate-y-0" : "translate-y-full"
+          }`}
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking grid content
       >
         {/* Title Section */}
-        <div className="relative mb-6 w-[360px] h-[60px] flex items-center justify-center">
+        <div className="relative mb-6 landscape:mb-1 w-[360px] h-[60px] landscape:h-[40px] flex items-center justify-center">
           <img
             src="/images/bg-title.png"
             alt="bg-title"
             className="absolute inset-0 w-full h-full object-contain"
           />
-          <h2 className="relative z-10 text-2xl text-white font-bold drop-shadow-sm pb-2">
+          <h2 className="relative z-10 text-2xl landscape:text-lg text-white font-bold drop-shadow-sm pb-2 landscape:pb-1">
             Hãy Chọn 1 Món Quà
           </h2>
           {/* Stars */}
-          <div className="absolute -top-3 left-4 text-yellow-400 text-3xl rotate-[-15deg] drop-shadow-md">
+          <div className="absolute -top-3 landscape:-top-1 left-4 text-yellow-400 text-3xl landscape:text-xl rotate-[-15deg] drop-shadow-md">
             ★
           </div>
-          <div className="absolute -top-1 right-6 text-yellow-400 text-3xl rotate-[15deg] drop-shadow-md">
+          <div className="absolute -top-1 landscape:top-0 right-6 text-yellow-400 text-3xl landscape:text-xl rotate-[15deg] drop-shadow-md">
             ★
           </div>
         </div>
 
         {/* Grid Section */}
-        <div className="grid grid-cols-3 gap-x-6 gap-y-6">
+        <div className="grid grid-cols-3 landscape:grid-cols-6 gap-x-6 gap-y-6 landscape:gap-x-2 landscape:gap-y-2">
           {Array.from({ length: 6 }).map((_, index) => {
             const isRevealed = revealedGiftIndex === index;
             const isSelected = selectedIndex === index;
@@ -165,16 +163,14 @@ const GiftSelection = () => {
               <div
                 key={index}
                 onClick={() => !isDisabled && handleGiftClick(index)}
-                className={`relative w-[152px] h-[120px] transition-all duration-200 
-                  ${
-                    !isDisabled
-                      ? "cursor-pointer hover:scale-105"
-                      : "cursor-default opacity-80"
+                className={`relative w-[152px] h-[120px] landscape:w-[90px] landscape:h-[70px] transition-all duration-200 
+                  ${!isDisabled
+                    ? "cursor-pointer hover:scale-105"
+                    : "cursor-default opacity-80"
                   }
-                  ${
-                    isSelected
-                      ? "outline outline-4 outline-[#3b82f6] scale-105"
-                      : ""
+                  ${isSelected
+                    ? "outline outline-4 outline-[#3b82f6] scale-105"
+                    : ""
                   }
                 `}
               >
@@ -186,7 +182,7 @@ const GiftSelection = () => {
                 />
 
                 {/* Inner Content (The "Photo" part) */}
-                <div className="absolute top-[6%] left-[4.5%] right-[4.5%] bottom-[22%] z-10 overflow-hidden bg-[#93c5fd]">
+                <div className="absolute top-[6%] left-[4.5%] landscape:left-[4%] right-[4.5%] landscape:right-[4%] bottom-[22%] landscape:bottom-[18%] z-10 overflow-hidden bg-[#93c5fd]">
                   <div
                     className="w-full h-full relative flex items-center justify-center"
                     style={{
@@ -204,9 +200,8 @@ const GiftSelection = () => {
                         <img
                           src="/images/gift-highlight.png"
                           alt="gift"
-                          className={`w-3/4 h-3/4 object-contain drop-shadow-sm z-10 ${
-                            isSelected && isSubmitting ? "animate-pulse" : ""
-                          }`}
+                          className={`w-3/4 h-3/4 object-contain drop-shadow-sm z-10 ${isSelected && isSubmitting ? "animate-pulse" : ""
+                            }`}
                         />
                       </>
                     ) : (
@@ -221,7 +216,7 @@ const GiftSelection = () => {
 
                 {!isRevealed && (
                   <div className="absolute bottom-[3%] left-0 w-full z-30 text-center">
-                    <span className="text-black font-bold text-lg tracking-widest leading-none">
+                    <span className="text-black font-bold text-lg landscape:text-sm tracking-widest leading-none">
                       {isSelected && isSubmitting ? "..." : "???"}
                     </span>
                   </div>

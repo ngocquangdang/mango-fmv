@@ -5,3 +5,70 @@
 @import "swiper/css/grid";
 @import "swiper/css/navigation";
 @import "@logicflow/core/dist/index.css";
+
+/* Customer Keyframes for Home Page Animations */
+@keyframes shake-vertical {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  25% {
+    transform: translateY(-2px);
+  }
+
+  75% {
+    transform: translateY(2px);
+  }
+}
+
+@keyframes float-paper {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+/* 
+  Shake Shiver: Shakes for ~0.6s then waits. 
+  Designed for a 12s cycle. 0.6s / 12s = 5%.
+*/
+@keyframes shake-shiver {
+  0% {
+    transform: translateY(0);
+  }
+
+  1.25% {
+    transform: translateY(-2px);
+  }
+
+  3.75% {
+    transform: translateY(2px);
+  }
+
+  5% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-shake-vertical {
+  animation: shake-vertical 0.6s ease-in-out infinite;
+}
+
+.animate-float-paper {
+  animation: float-paper 2.6s ease-in-out infinite;
+}
+
+.animate-shake-shiver {
+  animation: shake-shiver 12s ease-in-out infinite;
+}

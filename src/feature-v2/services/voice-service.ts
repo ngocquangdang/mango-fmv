@@ -96,7 +96,7 @@ export const VoiceService = {
     // Helper: Poll until complete
     pollVoiceProcessing: async (sceneId: string, audioUrl: string, actorAudioPath?: string): Promise<string> => {
         const maxAttempts = 30;
-        const interval = 2000; // 2 seconds
+        const interval = 2500; // 2 seconds
 
         for (let i = 0; i < maxAttempts; i++) {
             try {

@@ -73,25 +73,23 @@ const RewardCollection = ({
   // Main grid view
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 transition-opacity duration-500 ${
-        isVisible ? "opacity-100" : "opacity-0"
-      }`}
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"
+        }`}
       onClick={handleCloseAll} // Close everything when clicking main backdrop
     >
       <div
-        className={`flex flex-col items-center justify-center transition-transform duration-500 ease-out transform ${
-          isVisible ? "translate-y-0" : "translate-y-full"
-        }`}
+        className={`flex flex-col items-center justify-center transition-transform duration-500 ease-out transform ${isVisible ? "translate-y-0" : "translate-y-full"
+          }`}
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking grid content
       >
         {/* Title Section */}
-        <div className="relative mb-6 h-[90px] flex items-center justify-center">
+        <div className="relative mb-6 landscape:mb-1 h-[90px] landscape:h-[50px] flex items-center justify-center">
           <img
             src="/images/bg-title.png"
             alt="bg-title"
             className="absolute inset-0 w-full h-full "
           />
-          <h2 className="relative z-10 text-xl text-white font-bold drop-shadow-sm px-4 py-8">
+          <h2 className="relative z-10 text-xl text-white font-bold drop-shadow-sm px-4 py-8 landscape:py-4">
             {title || ""}
           </h2>
           {/* Stars */}
@@ -104,13 +102,13 @@ const RewardCollection = ({
         </div>
 
         {/* Grid Section */}
-        <div className="flex flex-row justify-center gap-6">
+        <div className="flex flex-row justify-center gap-6 landscape:gap-3">
           {items.map((item, index) => {
             return (
               <div
                 key={item.rewardId || index}
                 onClick={() => handleGiftClick(index)}
-                className="relative w-[152px] h-[120px] transition-all duration-200 cursor-pointer hover:scale-105"
+                className="relative w-[152px] h-[120px] landscape:w-[100px] landscape:h-[80px] transition-all duration-200 cursor-pointer hover:scale-105"
               >
                 {/* The Frame Image acting as container background */}
                 <img

@@ -8,10 +8,12 @@ import { useUserContext } from "../../../features/user/context";
 import { FlowChartContextProvider } from "./context/flow-chart-provider";
 import Banner from '../../components/banner';
 import ChapterFlow from './chapter-flow';
+import { useNavigate } from "react-router-dom";
 
 export default function ChapterPage() {
   const { onPlayPlayer, setType } = useVideoPlayerContext();
   const { chapter, } = useUserContext();
+  const navigate = useNavigate();
   const { progress } = chapter;
 
   // Tối ưu: Chỉ render component được hiển thị dựa trên màn hình
@@ -70,7 +72,7 @@ export default function ChapterPage() {
             src="/images/book-with-bg-icon.png"
             alt="book-icon"
             className="w-9 h-9 lg:w-[43.2px] lg:h-[43.2px] cursor-pointer"
-            onClick={() => setType("journal")}
+            onClick={() => navigate("/journal")}
           />
           <img
             src="/images/ask-icon.png"

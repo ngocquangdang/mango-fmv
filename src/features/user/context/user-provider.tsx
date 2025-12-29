@@ -253,12 +253,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       showToast({ description: "Đăng nhập QR thành công!" });
       setLoading(true);
 
-      // Comprehensive refetch to update UI
-      refetchUserInfo();
-      refetchChapter();
-      refetchCollectedRewards();
-      refetchVideos();
-      refetchProgress();
+      // Reload to ensure fresh state
+      window.location.reload();
     }, 0);
   }, [refetchProgress, refetchUserInfo, refetchChapter, refetchCollectedRewards, refetchVideos, showToast]);
 

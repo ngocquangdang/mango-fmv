@@ -570,7 +570,8 @@ export const VideoPlayerProvider = ({
       }
 
       const userAudioUrl = audioRecordings?.[0]?.cdnUrl;
-
+      const isUserVip = ![3].includes(userInfo?.vipinfo?.isvip);
+      if (isUserVip) return;
       if (userAudioUrl && nextSceneIds.length > 0) {
         nextSceneIds.forEach(targetId => {
           const targetScene = data.scenes[targetId];
@@ -790,7 +791,7 @@ export const VideoPlayerProvider = ({
         }
       }
       const nextScene = data.scenes[nextSceneId];
-      const isUserVip = userInfo?.isVip;
+      const isUserVip = ![2, 3].includes(userInfo?.vipinfo?.isvip);
       if (nextScene.isVip && !isUserVip) {
         return setIsVipModalOpen(true);
       }
