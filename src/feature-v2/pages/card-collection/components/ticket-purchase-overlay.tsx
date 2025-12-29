@@ -102,8 +102,13 @@ const TicketPurchaseOverlay = ({
             style={{ backgroundImage: `url(/images/score-banner.png)` }}
           >
             {ticketBalance}
-
           </div>
+          <div className='absolute top-5 left-3 w-7 h-7 lg:w-8 lg:h-8 lg:top-5 lg:left-3' style={{
+            backgroundImage: "url('/images/collection/coin-icon.png')",
+            backgroundSize: "contain",
+            backgroundPosition: "center center",
+            backgroundRepeat: "no-repeat",
+          }}></div>
         </div>
       </div>
 
@@ -157,7 +162,7 @@ const TicketPurchaseOverlay = ({
                 {/* Ticket Icon */}
                 <div className="flex-1 flex items-center justify-center">
                   <img
-                    src="/images/collection/ticket.png"
+                    src="/images/collection/coin-icon.png"
                     alt="ticket"
                     className="w-24 h-auto object-contain drop-shadow-sm transform -rotate-12"
                   />

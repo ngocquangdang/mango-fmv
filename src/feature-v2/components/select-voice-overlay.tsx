@@ -4,6 +4,7 @@ import { useVideoPlayerContext } from "../../contexts";
 import CreateVoiceView from "./create-voice-view";
 import { useUserContext } from "../../features/user/context";
 import { VoiceService } from "../services/voice-service";
+import Banner from "./banner";
 
 interface SelectVoiceOverlayProps {
   isOpen: boolean;
@@ -189,18 +190,6 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
     }
   }, [voiceType, isOpen]);
 
-  // Sync local selection with global on open/change? 
-  // Actually, we should probably just use the global state directly or sync on confirm. 
-  // Actually, we should probably just use the global state directly or sync on confirm.
-  // The UI suggests "Continue" confirms it.
-  // Let's us local state for selection and commit on "Continue" or just use global state directly for "instant" feel?
-  // User asked for "global state managing type of voice". Usually settings like this apply immediately or on confirm.
-  // Given "Continue" button, let's update global state on click (or directly if instant feedback needed).
-  // Let's assume instant update for now or local + commit. 
-  // "Nữ chính sẽ dùng voice ..." message updates dynamically.
-  // Let's use global state directly for simplicity and instant effect, unless "Continue" is "Save".
-  // If "Continue" is just "Close", then instant update is better.
-
   const handleVoiceTypeChange = (type: "original" | "ai" | "mute") => {
     setVoiceType(type);
   };
@@ -247,15 +236,15 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
       ) : (
         <div className="min-h-full w-full flex flex-col items-center justify-center p-4 landscape:py-2 landscape:pb-16 relative animate-in fade-in duration-300">
 
-          {/* Title */}
-          <div className="relative mb-6 landscape:mb-1 lg:mb-12 mt-12 landscape:mt-0">
-            {/* Brush stroke background mock */}
-            <div className="relative z-10 bg-[#8CC63F] px-4 py-2 lg:px-8 lg:py-3 transform -rotate-1 skew-x-[-10deg] shadow-lg border-2 border-dashed border-white/30">
-              <h2 className="text-xl lg:text-3xl font-hand font-bold text-[#1A4027] uppercase text-center transform skew-x-[10deg] landscape:text-lg">
-                Chọn voice cho nhân vật tương tác
-              </h2>
+          {/* Banner Title */}
+          <div className="w-full h-[60px] lg:h-[74px] shrink-0 relative mb-4 landscape:mb-1 mt-8 landscape:mt-0">
+            <Banner
+              text="Chọn voice"
+              className="!text-lg lg:!text-[28.8px] whitespace-nowrap min-w-[200px]"
+            />
+            <div className="text-center text-[#1A4027] text-xs lg:text-sm font-bold mt-12 lg:mt-16 landscape:hidden">
+              cho nhân vật tương tác
             </div>
-            {/* Decorative elements could be added here */}
           </div>
 
           {/* Options */}
@@ -273,7 +262,6 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
               <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
                 Giọng mặc định
               </div>
-              {/* Scribble border effect could be SVG or CSS */}
             </div>
 
             {/* Option: AI */}

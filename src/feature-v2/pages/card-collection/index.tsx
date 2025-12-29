@@ -256,13 +256,13 @@ function CardCollectionContent() {
           {tickets}
 
         </div>
-        <div className='absolute top-3 left-3 w-8 h-8 lg:w-12 lg:h-12 lg:top-4 lg:left-5' style={{
-          backgroundImage: "url('/images/collection/ticket.png')",
+        <div className='absolute top-4 left-0 w-8 h-8 lg:w-13 lg:h-13 lg:top-5 lg:left-3' style={{
+          backgroundImage: "url('/images/collection/coin-icon.png')",
           backgroundSize: "contain",
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
         }}></div>
-        <div className='absolute top-6 right-1 w-8 h-8 lg:top-10 lg:right-5 lg:w-10 lg:h-10  font-bold text-lg lg:text-2xl text-black'>+</div>
+        <div className='absolute top-6 right-1 w-8 h-8 lg:top-10 lg:right-5 lg:w-10 lg:h-10  font-bold text-lg lg:text-2xl text-[#FF4820]'>+</div>
       </div>
 
       {/* Header Banner */}

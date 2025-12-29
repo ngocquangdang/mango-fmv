@@ -252,9 +252,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       setIsQrLoginVisible(false);
       showToast({ description: "Đăng nhập QR thành công!" });
       setLoading(true);
+
+      // Comprehensive refetch to update UI
+      refetchUserInfo();
+      refetchChapter();
+      refetchCollectedRewards();
+      refetchVideos();
       refetchProgress();
     }, 0);
-  }, [refetchProgress]);
+  }, [refetchProgress, refetchUserInfo, refetchChapter, refetchCollectedRewards, refetchVideos, showToast]);
 
   const handleQrError = React.useCallback((error: Error) => {
     logInfo(

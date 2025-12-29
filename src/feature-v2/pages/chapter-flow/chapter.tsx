@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import HookButton from "../../components/ui/hook-button";
-import PhotoFrame from "../../components/ui/photo-frame";
+// import PhotoFrame from "../../components/ui/photo-frame";
 import RewardProgress from "../../components/ui/progress";
 import ChapterFlowV2 from "./chapter-flow-v2";
 import { useVideoPlayerContext } from "../../../contexts";
@@ -92,8 +92,8 @@ export default function ChapterPage() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <div className="absolute bottom-4 flex items-end justify-between w-[74%] lg:w-[86%] mt-auto">
-          <div className="flex items-center pl-0 lg:pl-6">
+        <div className="absolute bottom-4 flex items-end justify-center w-[74%] lg:w-[86%] mt-auto">
+          {/* <div className="flex items-center pl-0 lg:pl-6">
             {progress?.characters?.map((item: any) => (
               <PhotoFrame
                 key={item.id}
@@ -102,7 +102,7 @@ export default function ChapterPage() {
                 className={`w-10 h-10 lg:w-[68px] lg:h-[68px]`}
               />
             ))}
-          </div>
+          </div> */}
           <div className='flex items-center gap-2'>
             <div className="flex items-center gap-2">
               <div

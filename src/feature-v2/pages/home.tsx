@@ -14,6 +14,7 @@ export default function Home() {
   const { setType, setCollectionItems } = useVideoPlayerContext();
   const navigate = useNavigate();
   const { chapter, refetchProgress, refetchCollectedRewards } = useUserContext();
+  console.log({ chapter })
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const [activeShakeIndex, setActiveShakeIndex] = React.useState<number>(0);
@@ -22,12 +23,8 @@ export default function Home() {
   const [paperOffset, setPaperOffset] = React.useState(0);
 
   const isPlaying = useMemo(() => {
-    return (
-      Object.values(chapter.scenes || {})?.some(
-        (scene) => scene.status === "COMPLETED"
-      ) || chapter.progress?.currentScene?.watchingSecond
-    );
-  }, [chapter.scenes, chapter.progress?.currentScene?.watchingSecond]);
+    return Object.values(chapter?.progress?.scenes || {}).length > 1 || chapter.progress?.currentScene?.watchingSecond;
+  }, [chapter.progress?.scenes, chapter.progress?.currentScene?.watchingSecond]);
 
   const handleClick = async (
     actionName: "story" | "journal" | "ranking" | "playAgain" | "collection" | "cardCollection"
@@ -75,7 +72,7 @@ export default function Home() {
   };
 
   React.useEffect(() => {
-    const buttonCount = 3 + (+(isPlaying || 0) > 0 ? 1 : 0);
+    const buttonCount = 5 + (+(isPlaying || 0) > 0 ? 1 : 0);
     if (!buttonCount) {
       return;
     }
@@ -153,7 +150,7 @@ export default function Home() {
       onClick: () => handleClick("ranking"),
     },
     {
-      icon: `/images/book-icon.png?v=${IMAGE_VERSION}`,
+      icon: `/images/home/collection.png?v=${IMAGE_VERSION}`,
       label: "Bộ sưu tập",
       onClick: () => handleClick("collection"),
     },
