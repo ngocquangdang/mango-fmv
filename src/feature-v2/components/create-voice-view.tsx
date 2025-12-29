@@ -24,6 +24,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
   // Recording duration tracking
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [recordedAudioDuration, setRecordedAudioDuration] = useState(0);
+  const [playerCurrentTime, setPlayerCurrentTime] = useState(0);
   const recordingTimerRef = useRef<number | null>(null);
   const recordingStartTimeRef = useRef<number>(0);
 
@@ -33,8 +34,9 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
   // Track current recording ID for deletion
   const [currentRecordingId, setCurrentRecordingId] = useState<string | null>(null);
 
-  // Confirmation dialog state
+  // Confirmation dialog states
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showUseVoiceConfirm, setShowUseVoiceConfirm] = useState(false);
 
   // AI audio playback tracking
   const [aiCurrentTime, setAiCurrentTime] = useState(0);
@@ -76,20 +78,52 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
   const aiAudioRef = useRef<HTMLAudioElement | null>(null); // Separate ref for AI voice
 
   useEffect(() => {
-    return () => {
-      // Cleanup URL object
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
-      }
-      if (audioRef.current) {
-        audioRef.current.pause();
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+
+      const handleLoadedMetadata = () => {
+        const duration = audio.duration;
+        if (Number.isFinite(duration)) {
+          setRecordedAudioDuration(duration);
+          console.log('Recorded audio duration:', duration);
+
+          // Validate duration
+          if (duration < MIN_DURATION) {
+            showToast({
+              description: `Audio quá ngắn! Cần ít nhất ${MIN_DURATION} giây.`,
+            });
+          } else if (duration > MAX_DURATION) {
+            showToast({
+              description: `Audio quá dài! Tối đa ${MAX_DURATION} giây.`,
+            });
+          }
+        }
+      };
+
+      const handleTimeUpdate = () => {
+        setPlayerCurrentTime(audio.currentTime);
+      };
+
+      const handleEnded = () => {
+        setIsPlaying(false);
+        setPlayerCurrentTime(0);
+      };
+
+      audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.addEventListener('timeupdate', handleTimeUpdate);
+      audio.addEventListener('ended', handleEnded);
+
+      audioRef.current = audio;
+
+      return () => {
+        audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        audio.removeEventListener('timeupdate', handleTimeUpdate);
+        audio.removeEventListener('ended', handleEnded);
+        audio.pause();
         audioRef.current = null;
-      }
-      if (aiAudioRef.current) {
-        aiAudioRef.current.pause();
-        aiAudioRef.current = null;
-      }
-    };
+        URL.revokeObjectURL(audioUrl);
+      };
+    }
   }, [audioUrl]);
 
   const startRecording = async () => {
@@ -110,30 +144,6 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
         setHasRecorded(true);
-
-        // Create audio element for playback and get actual duration
-        const audio = new Audio(url);
-        audio.addEventListener('loadedmetadata', () => {
-          const duration = audio.duration;
-          if (Number.isFinite(duration)) {
-            setRecordedAudioDuration(duration);
-            console.log('Recorded audio duration:', duration);
-
-            // Validate duration
-            if (duration < MIN_DURATION) {
-              showToast({
-                description: `Audio quá ngắn! Cần ít nhất ${MIN_DURATION} giây.`,
-              });
-            } else if (duration > MAX_DURATION) {
-              showToast({
-                description: `Audio quá dài! Tối đa ${MAX_DURATION} giây.`,
-              });
-            }
-          }
-        });
-
-        audio.onended = () => setIsPlaying(false);
-        audioRef.current = audio;
 
         // Clear recording timer
         if (recordingTimerRef.current) {
@@ -167,6 +177,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       alert("Không thể truy cập micro. Vui lòng cấp quyền và thử lại.");
     }
   };
+
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
@@ -218,6 +229,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
     setAudioUrl(null);
     setAiVoiceUrl(null);
     setRecordedAudioDuration(0);
+    setPlayerCurrentTime(0);
     setRecordingDuration(0);
     setCurrentRecordingId(null);
     if (audioRef.current) {
@@ -256,6 +268,38 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
     setShowDeleteConfirm(false);
   };
 
+  const handleConfirmUseVoice = async () => {
+    setShowUseVoiceConfirm(false);
+
+    try {
+      // Try to delete the latest recording if exists
+      if (recordings.length > 0) {
+        const latestRecording = recordings[0]; // Assuming sorted by date, newest first
+        const recordingIdToDelete = latestRecording.id || latestRecording.recordingId;
+
+        if (recordingIdToDelete) {
+          console.log('Deleting latest recording before creating new:', recordingIdToDelete);
+          await VoiceService.deleteRecording(recordingIdToDelete);
+          console.log('Latest recording deleted successfully');
+        }
+      }
+
+      // Always proceed with new voice creation
+      await proceedWithVoiceCreation();
+    } catch (error) {
+      console.error('Failed to delete old recording:', error);
+      // Still proceed even if delete fails
+      showToast({
+        description: "Không thể xóa recording cũ nhưng sẽ tiếp tục tạo voice mới.",
+      });
+      await proceedWithVoiceCreation();
+    }
+  };
+
+  const handleCancelUseVoice = () => {
+    setShowUseVoiceConfirm(false);
+  };
+
   const handleUseVoice = async () => {
     // Validate duration before upload
     if (recordedAudioDuration < MIN_DURATION) {
@@ -272,6 +316,18 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       return;
     }
 
+    // If already has recordings in system, show confirmation before creating new one
+    if (recordings.length > 0 || aiVoiceUrl) {
+      console.log('Showing confirmation - recordings count:', recordings.length, 'aiVoiceUrl:', aiVoiceUrl);
+      setShowUseVoiceConfirm(true);
+      return;
+    }
+
+    // No existing recordings, proceed directly
+    await proceedWithVoiceCreation();
+  };
+
+  const proceedWithVoiceCreation = async () => {
     const sceneId = chapter?.id || "scene_123";
     if (!audioUrl) return;
 
@@ -429,53 +485,43 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       </div>
 
       {/* Title */}
-      <div className="relative mb-2 md:mb-3 w-full flex justify-center">
+      <div className="relative mb-0 md:mb-3 w-full flex justify-center">
         <div className="relative z-10 bg-[#8CC63F] px-3 py-1 md:px-5 md:py-1.5 transform -rotate-1 skew-x-[-10deg] shadow-lg border-2 border-dashed border-white/30 min-w-[120px] md:min-w-[200px] flex justify-center">
-          <h2 className="text-sm md:text-lg font-hand font-bold text-[#1A4027] uppercase text-center transform skew-x-[10deg]">
+          <h2 className="text-xs md:text-lg font-hand font-bold text-[#1A4027] uppercase text-center transform skew-x-[10deg]">
             TẠO VOICE CỦA RIÊNG BẠN
           </h2>
         </div>
       </div>
-
-      {/* Subtitle */}
-      <div className="relative mb-1 md:mb-2">
-        <div className="bg-[#FFAB91] px-3 py-1 rounded-full border-2 border-orange-200 transform rotate-2 shadow-md">
-          <span className="font-hand font-bold text-[#E85D04] text-[9px] md:text-[11px]">
-            Đọc đoạn ngắn dưới đây
-          </span>
-        </div>
-      </div>
-
-      <div className="flex w-full max-w-[480px] gap-2 md:gap-4 items-stretch justify-center">
+      <div className="flex w-full max-w-[700px] gap-2 md:gap-4 items-stretch justify-center">
 
         {/* Reading Card */}
-        <div className="flex-1 bg-[#FFFDF5] border-2 border-orange-300 rounded-lg p-3 md:p-4 shadow-inner relative min-h-[110px] flex items-center justify-center">
+        <div className="flex-1 bg-[#FFFDF5] border-2 border-orange-300 rounded-lg p-2 md:p-4 shadow-inner relative min-h-[80px] md:min-h-[110px] flex items-center justify-center">
           {/* Decor corners */}
-          <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-orange-300"></div>
-          <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-orange-300"></div>
-          <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-orange-300"></div>
-          <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-orange-300"></div>
+          <div className="absolute top-2 left-2 w-3 h-3 md:w-4 md:h-4 border-t-2 border-l-2 border-orange-300"></div>
+          <div className="absolute top-2 right-2 w-3 h-3 md:w-4 md:h-4 border-t-2 border-r-2 border-orange-300"></div>
+          <div className="absolute bottom-2 left-2 w-3 h-3 md:w-4 md:h-4 border-b-2 border-l-2 border-orange-300"></div>
+          <div className="absolute bottom-2 right-2 w-3 h-3 md:w-4 md:h-4 border-b-2 border-r-2 border-orange-300"></div>
 
-          <p className="font-hand text-xs md:text-sm text-gray-700 leading-relaxed text-center">
-            Hoá ra mình đang ở cùng các thành viên của nhóm Tân binh toàn năng <br />
-            Hoá ra mình đang ở cùng các thành viên của nhóm Tân binh toàn năng <br />
-            Hoá ra mình đang ở cùng các thành viên của nhóm Tân binh toàn năng <br />
-            Hãy đọc đoạn n gắn này
+          <p className="font-hand text-[10px] md:text-sm text-gray-700 leading-relaxed text-center whitespace-pre-line">
+            Hoá ra mình đang ở cùng các thành viên của nhóm Tân binh toàn năng{"\n"}
+            Hoá ra mình đang ở cùng các thành viên của nhóm Tân binh toàn năng{"\n"}
+            Hoá ra mình đang ở cùng các thành viên của nhóm Tân binh toàn năng{"\n"}
+            Hãy đọc đoạn ngắn này
           </p>
         </div>
 
-        <div className="hidden md:flex w-[100px] md:w-[130px] bg-[#FFF8E7] border border-orange-200 rounded-lg p-2 flex-col gap-1.5 shadow-sm">
+        <div className="hidden md:flex w-[100px] md:w-[140px] bg-[#FFF8E7] border border-orange-200 rounded-lg p-2 flex-col gap-1 shadow-sm">
           <h3 className="font-bold text-[#E85D04] text-[9px] md:text-[11px] border-b border-orange-200 pb-1">
             Để Tạo Giọng Nói Chính Xác, Hãy Đảm Bảo:
           </h3>
-          <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-700">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-2 text-[9px] md:text-xs text-gray-700">
+            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0 text-[10px] md:text-base">
               🔊
             </div>
             <span>Ghi Âm Ở Nơi Yên Tĩnh</span>
           </div>
-          <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-700">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-2 text-[9px] md:text-xs text-gray-700">
+            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0 text-[10px] md:text-base">
               🎙️
             </div>
             <span>Cho Phép Truy Cập Micro</span>
@@ -484,17 +530,17 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
       </div>
 
       {/* Mobile Tips (Horizontal) - Hidden on md+ */}
-      <div className="md:hidden flex gap-4 mt-4 w-full justify-center">
-        <div className="flex items-center gap-2 bg-[#FFF8E7] px-3 py-1 rounded-full border border-orange-200 text-[10px] text-gray-700">
+      <div className="md:hidden flex gap-4 mt-2 w-full justify-center">
+        <div className="flex items-center gap-2 bg-[#FFF8E7] px-3 py-0.5 rounded-full border border-orange-200 text-[9px] text-gray-700">
           <span>🔊</span> Yên tĩnh
         </div>
-        <div className="flex items-center gap-2 bg-[#FFF8E7] px-3 py-1 rounded-full border border-orange-200 text-[10px] text-gray-700">
+        <div className="flex items-center gap-2 bg-[#FFF8E7] px-3 py-0.5 rounded-full border border-orange-200 text-[9px] text-gray-700">
           <span>🎙️</span> Micro
         </div>
       </div>
 
       {/* Record/Playback Control */}
-      <div className="mt-2 md:mt-4 flex flex-col items-center gap-2 w-full">
+      <div className="mt-1 md:mt-4 flex flex-col items-center gap-2 w-full">
         {isProcessing ? (
           <div className="flex flex-col items-center gap-3 animate-pulse">
             <div className="w-16 h-16 rounded-full bg-orange-200 flex items-center justify-center">
@@ -514,7 +560,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
         ) : aiVoiceUrl ? (
           /* AI Voice Result */
           <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300 w-full max-w-[400px]">
-            <div className="text-white font-hand font-bold text-xs md:text-sm mb-1.5">Voice AI của bạn</div>
+            <div className="text-white font-hand font-bold text-xs md:text-sm">Voice AI của bạn</div>
 
             {/* Instruction text */}
             <div className="text-white/80 font-hand text-[10px] md:text-xs text-center -mt-2">
@@ -522,24 +568,24 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
             </div>
 
             {/* AI Audio Player */}
-            <div className="bg-[#FFF8E7] rounded-full p-3 shadow-lg border-2 border-orange-400 flex items-center gap-4 w-full">
+            <div className="bg-[#FFF8E7] rounded-full px-2 py-1 shadow-lg border-2 border-orange-400 flex items-center gap-2 w-full">
               <button
                 onClick={handlePlayAiVoice}
-                className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#E85D04] flex items-center justify-center text-white hover:bg-orange-600 transition-colors shrink-0 shadow-sm"
+                className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#E85D04] flex items-center justify-center text-white hover:bg-orange-600 transition-colors shrink-0 shadow-sm"
               >
-                {isPlaying ? "||" : "▶"}
+                {isPlaying ? <span className="text-[8px] md:text-[10px]">||</span> : <span className="text-[8px] md:text-[10px]">▶</span>}
               </button>
 
-              <div className="flex-1 h-3 bg-orange-200 rounded-full relative overflow-hidden">
+              <div className="flex-1 h-1.5 md:h-2 bg-orange-200 rounded-full relative overflow-hidden">
                 <div
                   className="absolute top-0 left-0 h-full bg-[#E85D04] rounded-full transition-all duration-100"
                   style={{ width: `${(aiDuration > 0 && Number.isFinite(aiDuration)) ? (aiCurrentTime / aiDuration) * 100 : 0}%` }}
                 ></div>
               </div>
-              <span className="text-[10px] md:text-xs text-[#E85D04] font-bold shrink-0">AI Voice</span>
+              <span className="text-[9px] md:text-[10px] text-[#E85D04] font-bold shrink-0">AI Voice</span>
             </div>
 
-            <div className="flex gap-4 mt-4">
+            <div className="flex gap-4">
               <button
                 onClick={handleReRecord}
                 className="bg-white text-[#E85D04] font-hand font-bold px-6 py-2 rounded-full shadow-md border-2 border-orange-200 hover:bg-orange-50"
@@ -549,7 +595,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
               <button
                 onClick={() => {
                   showToast({ description: "Đã chọn voice AI" });
-                  // onClose(); // In real app
+                  onBack(); // In real app
                 }} className="bg-[#E85D04] text-white font-hand font-bold px-6 py-2 rounded-full shadow-md hover:bg-orange-600 border-2 border-white/20"
               >
                 Dùng voice này
@@ -559,7 +605,7 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
         ) : hasRecorded ? (
           <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300 w-full max-w-[400px]">
             {/* Audio Player Bar */}
-            <div className="bg-white/90 backdrop-blur rounded-full p-3 shadow-lg border-2 border-orange-200 flex items-center gap-4 w-full">
+            <div className="bg-white/90 backdrop-blur rounded-full px-3 py-1.5 shadow-lg border-2 border-orange-200 flex items-center gap-4 w-full">
               <button
                 onClick={handlePlayToggle}
                 className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#E85D04] flex items-center justify-center text-white hover:bg-orange-600 transition-colors shrink-0"
@@ -567,12 +613,20 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
                 {isPlaying ? "||" : "▶"}
               </button>
 
-              {/* Progress Bar Mock */}
-              <div className="flex-1 h-3 bg-gray-200 rounded-full relative overflow-hidden cursor-pointer">
-                <div className="absolute top-0 left-0 h-full bg-[#E85D04] w-[40%] rounded-full transition-all duration-300"></div>
+              <div className="flex-1 h-1.5 md:h-2 bg-orange-200 rounded-full relative overflow-hidden cursor-pointer">
+                <div
+                  className="absolute top-0 left-0 h-full bg-[#E85D04] rounded-full transition-all duration-100"
+                  style={{ width: `${(recordedAudioDuration > 0) ? (playerCurrentTime / recordedAudioDuration) * 100 : 0}%` }}
+                ></div>
               </div>
 
-              <span className="text-[10px] md:text-xs text-gray-600 font-bold shrink-0 w-10 text-right">00:04</span>
+              <span className="text-[10px] md:text-xs text-gray-600 font-bold shrink-0 w-10 text-right">
+                {(() => {
+                  const minutes = Math.floor(playerCurrentTime / 60);
+                  const seconds = Math.floor(playerCurrentTime % 60);
+                  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                })()}
+              </span>
             </div>
 
             {/* Actions */}
@@ -662,6 +716,48 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
               </button>
               <button
                 onClick={handleConfirmDelete}
+                className="flex-1 bg-[#E85D04] text-white font-hand font-bold px-4 py-3 rounded-full hover:bg-orange-600 transition-colors border-2 border-white/20 shadow-lg"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Use Voice Confirmation Dialog */}
+      {showUseVoiceConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#FFF8E7] rounded-2xl p-6 shadow-2xl border-4 border-orange-300 max-w-sm mx-4 animate-in zoom-in-95 duration-200">
+            {/* Icon */}
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
+                <span className="text-4xl">⚠️</span>
+              </div>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-xl font-hand font-bold text-[#E85D04] text-center mb-3">
+              Tạo voice mới?
+            </h3>
+
+            {/* Message */}
+            <p className="text-gray-700 text-center mb-6 font-hand text-sm leading-relaxed">
+              Bạn đã có voice cũ.
+              <br />
+              Hành động này sẽ <span className="font-bold text-red-600">xóa voice cũ</span> và tạo voice mới từ recording này.
+            </p>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancelUseVoice}
+                className="flex-1 bg-gray-200 text-gray-700 font-hand font-bold px-4 py-3 rounded-full hover:bg-gray-300 transition-colors border-2 border-gray-300"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmUseVoice}
                 className="flex-1 bg-[#E85D04] text-white font-hand font-bold px-4 py-3 rounded-full hover:bg-orange-600 transition-colors border-2 border-white/20 shadow-lg"
               >
                 Xác nhận
