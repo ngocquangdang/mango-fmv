@@ -16,17 +16,17 @@ const BlindBagItem = ({ item, isActive = false }: { item: any; isActive?: boolea
 
       <div
         className="flex items-center justify-center relative w-[100px] h-[90px] lg:w-[255px] lg:h-[230px]"
-        style={{
-          backgroundImage: "url('/images/collection/blind-bag.png')",
-          backgroundSize: "contain",
-          backgroundPosition: "center center",
-          backgroundRepeat: "no-repeat",
-        }}
+      // style={{
+      //   backgroundImage: "url('/images/collection/blind-bag.png')",
+      //   backgroundSize: "contain",
+      //   backgroundPosition: "center center",
+      //   backgroundRepeat: "no-repeat",
+      // }}
       >
         <img
           src={item?.image}
           alt="bag"
-          className="object-contain w-[60px] h-[40px] lg:w-[152px] lg:h-[102px] drop-shadow-md"
+          className="object-contain w-full h-full drop-shadow-md"
         />
       </div>
 

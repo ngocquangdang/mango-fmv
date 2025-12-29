@@ -24,7 +24,7 @@ const DialogInfo = ({
 
   return (
     // Lớp phủ mờ (Overlay)
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60  p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60  p-4">
       <div
         className="relative w-full max-w-[370px] h-[294px] ml-[240px] bg-contain bg-center bg-no-repeat shadow-2xl"
         style={{ backgroundImage: `url(${BG_PAPER_IMG})` }}

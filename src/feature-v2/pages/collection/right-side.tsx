@@ -219,8 +219,8 @@ export const URCollectionFolder = ({ items, renderItem, onCardClick }: { items: 
 
 import { useCollection } from "./hooks/use-collection";
 
-const RightSide: React.FC<RightSideProps> = ({ renderItem, onCardClick, title, hideStats }) => {
-  const { data, isLoading, setSelectedCard, characters, selectedCharacterId } = useCollection();
+const RightSide: React.FC<RightSideProps> = ({ renderItem, onCardClick, title }) => {
+  const { data, isLoading, setSelectedCard } = useCollection();
 
   // If items are passed via props, use them (legacy/mock support)
   // Otherwise, use data from API
@@ -297,11 +297,11 @@ const RightSide: React.FC<RightSideProps> = ({ renderItem, onCardClick, title, h
   };
 
   // Render folders dynamically based on groups
-  const stats = data?.stats;
+  // const stats = data?.stats;
 
-  // Get current character name based on selectedCharacterId
-  const currentCharacter = characters.find(c => c.id === selectedCharacterId);
-  const currentCharacterName = currentCharacter?.name || "";
+  // // Get current character name based on selectedCharacterId
+  // const currentCharacter = characters.find(c => c.id === selectedCharacterId);
+  // const currentCharacterName = currentCharacter?.name || "";
 
   return (
     <div className="mx-[10px] h-full flex flex-col relative">
@@ -372,24 +372,6 @@ const RightSide: React.FC<RightSideProps> = ({ renderItem, onCardClick, title, h
         )}
       </div>
 
-      {/* Collection Stats - Bottom Right */}
-      {!hideStats && stats && (
-        <div className="absolute bottom-3 right-3 left-3">
-          <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded px-2 py-1 lg:px-3 lg:py-1 shadow-sm border border-blue-200">
-            <div className="flex items-center justify-center gap-1 flex-wrap">
-              <span className="text-[8px] lg:text-[10px] text-gray-700 font-hand whitespace-nowrap">
-                Bạn đã sưu tầm được
-              </span>
-              <span className="text-[9px] lg:text-xs font-bold text-blue-600 whitespace-nowrap">
-                {stats.collected}/{stats.total}
-              </span>
-              <span className="text-[8px] lg:text-[10px] text-gray-700 font-hand whitespace-nowrap">
-                thẻ {currentCharacterName}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

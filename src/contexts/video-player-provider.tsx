@@ -17,7 +17,6 @@ import RewardCollection, {
 } from "../feature-v2/components/reward-collection";
 import RelationshipPoint from "../feature-v2/components/relationship-point";
 import { VoiceService } from "../feature-v2/services/voice-service";
-import { getOrderedScenes } from "../feature-v2/utils/scene-ordering";
 
 export type VideoPlayerType =
   | "intro"
@@ -397,86 +396,76 @@ export const VideoPlayerProvider = ({
     api.setUseAiAudio?.(type);
   }, [api]);
 
-  React.useEffect(() => {
-    let isCancelled = false;
+  // React.useEffect(() => {
+  //   let isCancelled = false;
 
-    const fetchSceneAudio = async () => {
-      // Logic:
-      // 1. Start from data.startSceneId
-      // 2. Poll/Get result if scene has originalAudio + user audio
-      // 3. Traverse to next scenes (targetSceneId, branch options)
-      // 4. Update setAiAudioList
+  //   const fetchSceneAudio = async () => {
+  //     // Logic:
+  //     // 1. Start from data.startSceneId
+  //     // 2. Poll/Get result for start scene
+  //     // 3. Get immediate next scenes (no recursion)
+  //     // 4. Update setAiAudioList
 
-      if (!data?.startSceneId || !data.scenes || !audioRecordings || audioRecordings.length === 0) return;
+  //     if (!data?.startSceneId || !data.scenes || !audioRecordings || audioRecordings.length === 0) return;
 
-      const record = audioRecordings[0] as any;
-      const userAudioUrl = record?.cdnUrl;
-      if (!userAudioUrl) return;
+  //     const record = audioRecordings[0] as any;
+  //     const userAudioUrl = record?.cdnUrl;
+  //     if (!userAudioUrl) return;
 
-      const visited = new Set<string>();
-      const results: { sceneId: string; aiAudio: string }[] = [];
+  //     const results: { sceneId: string; aiAudio: string }[] = [];
+  //     const processedIds = new Set<string>();
 
-      // Recursive traversal function
-      const traverseAndFetch = async (sceneId: string, depth: number = 0) => {
-        // Stop if cancelled or depth exceeded
-        if (isCancelled || depth > 10 || visited.has(sceneId)) return;
-        visited.add(sceneId);
+  //     // Helper to process a single scene
+  //     const processSingleScene = async (sid: string) => {
+  //       if (isCancelled || processedIds.has(sid)) return;
+  //       processedIds.add(sid);
 
-        const scene = data.scenes[sceneId];
-        if (!scene) return;
+  //       const scene = data.scenes[sid];
+  //       if (!scene?.originalAudio) return;
 
-        // Fetch/Poll for current scene if valid candidates exist
-        if (scene.originalAudio) {
-          try {
-            // Check before async call
-            if (isCancelled) return;
-            const aiAudio = await VoiceService.pollVoiceProcessing(sceneId, userAudioUrl, scene.originalAudio);
+  //       try {
+  //         const aiAudio = await VoiceService.pollVoiceProcessing(sid, userAudioUrl, scene.originalAudio);
 
-            // Check after async call
-            if (isCancelled) return;
+  //         if (isCancelled) return;
 
-            if (aiAudio) {
-              results.push({ sceneId, aiAudio });
-              setAiAudioList([...results]);
-            }
-          } catch (e) {
-            console.warn(`Failed to fetch/poll AI voice for scene ${sceneId}`, e);
-          }
-        }
+  //         if (aiAudio) {
+  //           results.push({ sceneId: sid, aiAudio });
+  //           setAiAudioList([...results]);
+  //         }
+  //       } catch (e) {
+  //         console.warn(`Failed to fetch/poll AI voice for scene ${sid}`, e);
+  //       }
+  //     };
 
-        // Determine next scenes
-        const nextSceneIds: string[] = [];
+  //     // 1. Process start scene
+  //     await processSingleScene(data.startSceneId);
 
-        // 1. Direct target
-        if (scene.targetSceneId) {
-          nextSceneIds.push(scene.targetSceneId);
-        }
+  //     // 2. Process immediate next scenes only
+  //     const startScene = data.scenes[data.startSceneId];
+  //     if (startScene) {
+  //       const nextSceneIds: string[] = [];
+  //       if (startScene.targetSceneId) nextSceneIds.push(startScene.targetSceneId);
+  //       if (startScene.branch?.options) {
+  //         startScene.branch.options.forEach((opt: any) => {
+  //           if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
+  //         });
+  //       }
 
-        // 2. Branch options
-        if (scene.branch?.options) {
-          scene.branch.options.forEach((opt: any) => {
-            if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
-          });
-        }
+  //       for (const nid of nextSceneIds) {
+  //         if (isCancelled) break;
+  //         await processSingleScene(nid);
+  //       }
+  //     }
+  //   };
 
-        // Process next scenes sequentially
-        for (const nid of nextSceneIds) {
-          if (isCancelled) break;
-          await traverseAndFetch(nid, depth + 1);
-        }
-      };
+  //   if (voiceType === "ai") {
+  //     fetchSceneAudio();
+  //   }
 
-      await traverseAndFetch(data.startSceneId);
-    };
-
-    if (voiceType === "ai") {
-      fetchSceneAudio();
-    }
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType]);
+  //   return () => {
+  //     isCancelled = true;
+  //   };
+  // }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType]);
 
   const triggerDisplayReward = React.useCallback(
     (data: any) => {
@@ -563,6 +552,7 @@ export const VideoPlayerProvider = ({
         );
       }
       const scene = data.scenes[sceneId];
+
       if (!scene) {
         console.warn("Scene not found:", sceneId);
         setCurrentSceneId(sceneId);
@@ -570,14 +560,22 @@ export const VideoPlayerProvider = ({
         return;
       }
 
-      // Trigger voice polling for current and next 10 scenes
-      const pollingTargets = getOrderedScenes(data.scenes, sceneId).slice(0, 10);
+      // Trigger voice polling for immediate next scenes only
+      const nextSceneIds: string[] = [];
+      if (scene.targetSceneId) nextSceneIds.push(scene.targetSceneId);
+      if (scene.branch?.options) {
+        scene.branch.options.forEach((opt: any) => {
+          if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
+        });
+      }
 
       const userAudioUrl = audioRecordings?.[0]?.cdnUrl;
 
-      if (userAudioUrl) {
-        pollingTargets.forEach(targetId => {
+      if (userAudioUrl && nextSceneIds.length > 0) {
+        nextSceneIds.forEach(targetId => {
           const targetScene = data.scenes[targetId];
+          // Only fetch if not already in aiAudioList (optional optimization, but good practice)
+          // For now, just keep the existing polling logic but restricted to these IDs
           if (targetScene?.originalAudio) {
             VoiceService.pollVoiceProcessing(targetId, userAudioUrl, targetScene.originalAudio)
               .then(res => {
@@ -714,14 +712,18 @@ export const VideoPlayerProvider = ({
         {
           onSuccess: (response) => {
             const result = response.data;
-            openDialogInfo({
-              hotspotId: hotspotId,
-              title: result.moment?.title || "",
-              description: result.moment?.description || "",
-              mainImage: result.character?.imageUrl,
-              itemImage: result.moment?.rewards?.[0]?.imageUrl,
+            // Combined update to ensure atomicity
+            setDialogInfoState({
+              isOpen: true,
+              isLoading: false,
+              data: {
+                hotspotId: hotspotId,
+                title: result.moment?.title || "",
+                description: result.moment?.description || "",
+                mainImage: result.character?.imageUrl,
+                itemImage: result.moment?.rewards?.[0]?.imageUrl,
+              }
             });
-            setDialogInfoState((prev) => ({ ...prev, isLoading: false }));
 
             const items = {
               ...collectionItems,

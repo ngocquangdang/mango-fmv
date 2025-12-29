@@ -57,11 +57,11 @@ export default function RightSide({
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-2 min-w-[200px] lg:min-w-[240px] min-h-[220px] lg:min-h-[264px]">
+        <div className="grid grid-cols-3 gap-2 min-w-[200px] lg:min-w-[374px] min-h-[220px] lg:min-h-[412px]">
           {currentItems.map((reward) => (
             <div
               key={reward.rewardId}
-              className="w-[54px] h-[64px] lg:w-[64.8px] lg:h-[76.8px] cursor-pointer"
+              className="w-[54px] h-[64px] lg:w-[101px] lg:h-[120px] cursor-pointer"
               role="button"
               tabIndex={0}
               aria-label="Xem chi tiết phần thưởng"
@@ -74,7 +74,7 @@ export default function RightSide({
               }}
             >
               <FramedStoryline
-                className="w-[54px] h-[64px] lg:w-[64.8px] lg:h-[76.8px] -rotate-12"
+                className="w-[54px] h-[64px] lg:w-[101px] lg:h-[120px] -rotate-12"
                 bgImg="/images/note-gift-card.png"
                 info={{
                   avatar: reward.rewardImageUrl,
@@ -85,7 +85,7 @@ export default function RightSide({
           ))}
           {Array.from({ length: ITEMS_PER_PAGE - currentItems.length }).map(
             (_, index) => (
-              <div key={`empty-${index}`} className="w-[54px] h-[64px] lg:w-[64.8px] lg:h-[76.8px]" />
+              <div key={`empty-${index}`} className="w-[54px] h-[64px] lg:w-[101px] lg:h-[120px]" />
             )
           )}
         </div>

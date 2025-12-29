@@ -271,7 +271,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                 <img src="/images/home/charactor.png" alt="default" className="w-full h-full object-cover object-top" />
               </div>
               <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
-                Voice mặc định
+                Giọng mặc định
               </div>
               {/* Scribble border effect could be SVG or CSS */}
             </div>
@@ -285,7 +285,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                 <span className="font-hand font-bold text-orange-500 text-xl landscape:text-xs lg:text-3xl">AI</span>
               </div>
               <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
-                Voice của bạn
+                Giọng của bạn
               </div>
             </div>
 
@@ -355,7 +355,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           </div>
 
           <div className="text-white font-hand text-sm landscape:text-[9px] lg:text-base mb-6 landscape:mb-1 shadow-black/50 text-shadow-sm text-center px-4">
-            Nữ chính sẽ dùng voice <span className="text-orange-300">{voiceType === "original" ? "mặc định" : voiceType === "ai" ? "của bạn" : "tắt tiếng"}</span>
+            Nữ chính sẽ dùng giọng <span className="text-orange-300">{voiceType === "original" ? "mặc định" : voiceType === "ai" ? "của bạn" : "tắt tiếng"}</span>
           </div>
 
         </div>
