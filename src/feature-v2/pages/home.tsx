@@ -86,11 +86,11 @@ export default function Home() {
       label: "Xếp hạng",
       onClick: () => handleClick("ranking"),
     },
-    {
-      icon: `/images/home/collection.png?v=${IMAGE_VERSION}`,
-      label: "Bộ sưu tập",
-      onClick: () => handleClick("collection"),
-    },
+    // {
+    //   icon: `/images/home/collection.png?v=${IMAGE_VERSION}`,
+    //   label: "Bộ sưu tập",
+    //   onClick: () => handleClick("collection"),
+    // },
     ...(+(isPlaying || 0) > 0 ? [
       {
         icon: `/images/reload-icon.png?v=${IMAGE_VERSION}`,
@@ -98,17 +98,17 @@ export default function Home() {
         onClick: () => handleClick("playAgain"),
       },
     ] : []),
-    {
-      icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
-      label: "Chọn Voice",
-      onClick: () => {
-        if (userInfo?.vipinfo?.isvip === 3) {
-          setIsVoiceOverlayOpen(true);
-        } else {
-          setIsVipModalOpen(true);
-        }
-      },
-    },
+    // {
+    //   icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
+    //   label: "Chọn Voice",
+    //   onClick: () => {
+    //     if (userInfo?.vipinfo?.isvip === 3) {
+    //       setIsVoiceOverlayOpen(true);
+    //     } else {
+    //       setIsVipModalOpen(true);
+    //     }
+    //   },
+    // },
 
 
   ], [IMAGE_VERSION, handleClick, isPlaying]);
