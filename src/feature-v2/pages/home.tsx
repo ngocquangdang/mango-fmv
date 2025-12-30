@@ -7,6 +7,8 @@ import { useUserContext } from "../../features/user/context";
 import { useRestartChapter } from "../../features/user/hooks";
 import GameModal from "../components/ui/dialog";
 import SelectVoiceOverlay from "../components/select-voice-overlay";
+import BlockingUsageModal from "../components/ui/blocking-usage-modal";
+import { VoiceService } from "../services/voice-service";
 
 const IMAGE_VERSION = "1";
 
@@ -18,6 +20,8 @@ export default function Home() {
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const [isVoiceOverlayOpen, setIsVoiceOverlayOpen] = React.useState(false);
+  const [isUsageLimitExceeded, setIsUsageLimitExceeded] = React.useState(false);
+  const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
   /* Removed shakeState + effects in favor of CSS animations */
 
   // Determine if the game is in progress (has progress & multiple scenes)
@@ -105,8 +109,22 @@ export default function Home() {
     {
       icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
       label: "Chọn Voice",
-      onClick: () => {
-        setIsVoiceOverlayOpen(true);
+      onClick: async () => {
+        // Check daily usage limit before opening voice overlay
+        try {
+          const usageResponse = await VoiceService.getDailyUsage();
+          if (usageResponse.data && usageResponse.data.count >= dailyLimit) {
+            // Show blocking modal if limit exceeded
+            setIsUsageLimitExceeded(true);
+            return;
+          }
+          // Open overlay if within limit
+          setIsVoiceOverlayOpen(true);
+        } catch (error) {
+          console.error("Failed to check daily usage:", error);
+          // Still allow opening overlay if check fails
+          setIsVoiceOverlayOpen(true);
+        }
       },
     },
 
@@ -174,6 +192,11 @@ export default function Home() {
       <SelectVoiceOverlay
         isOpen={isVoiceOverlayOpen}
         onClose={() => setIsVoiceOverlayOpen(false)}
+      />
+
+      <BlockingUsageModal
+        isOpen={isUsageLimitExceeded}
+        onClose={() => setIsUsageLimitExceeded(false)}
       />
     </div>
   );

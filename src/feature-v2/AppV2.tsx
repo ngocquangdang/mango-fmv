@@ -20,8 +20,6 @@ import DialogInfo from "./components/ui/dialog-info";
 import CardCollection from "./pages/card-collection";
 import CollectionPage from "./pages/collection";
 import QrLoginPage from "./pages/qr-login";
-import { VoiceService } from "./services/voice-service";
-import BlockingUsageModal from "./components/ui/blocking-usage-modal";
 
 const useIsLandscapeMobile = () => {
   const [isLandscape, setIsLandscape] = React.useState(true);
@@ -54,27 +52,8 @@ function LayoutWrapper() {
   const isLandscapeMobile = useIsLandscapeMobile();
   const backgroundImage = "/images/new-bg.png";
 
-  // Read from environment variable, default to 100
-  const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
-
   const { loading: userLoading, updateSceneStatus } = useUserContext();
   const [orientationStatus, setOrientationStatus] = React.useState(!isLandscapeMobile);
-  const [isUsageLimitExceeded, setIsUsageLimitExceeded] = React.useState(false);
-
-  React.useEffect(() => {
-    const checkDailyUsage = async () => {
-      try {
-        const response = await VoiceService.getDailyUsage();
-        if (response.data && response.data.count > dailyLimit) {
-          setIsUsageLimitExceeded(true);
-        }
-      } catch (error) {
-        console.error("Failed to check daily usage:", error);
-      }
-    };
-
-    checkDailyUsage();
-  }, [dailyLimit]);
 
   const {
     type,
@@ -252,9 +231,6 @@ function LayoutWrapper() {
         isLoading={dialogInfoState.isLoading}
         data={dialogInfoState.data}
       />
-
-      {/* Daily Usage Blocking Modal */}
-      <BlockingUsageModal isOpen={isUsageLimitExceeded} limit={dailyLimit} />
     </div>
   );
 }

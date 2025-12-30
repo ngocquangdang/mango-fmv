@@ -3,10 +3,10 @@ import { createPortal } from 'react-dom';
 
 interface BlockingUsageModalProps {
     isOpen: boolean;
-    limit: number;
+    onClose: () => void;
 }
 
-const BlockingUsageModal: React.FC<BlockingUsageModalProps> = ({ isOpen, limit }) => {
+const BlockingUsageModal: React.FC<BlockingUsageModalProps> = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     // Use portal to ensure it stays on top of everything, similar to other modals
@@ -38,14 +38,18 @@ const BlockingUsageModal: React.FC<BlockingUsageModalProps> = ({ isOpen, limit }
                     </svg>
                 </div>
 
-                <h2 className="text-xl font-bold text-white mb-2">Đã đạt giới hạn sử dụng</h2>
+                <h2 className="text-xl font-bold text-white mb-2">Lượt tạo voice cá nhân hóa trong ngày đã hết</h2>
 
                 <p className="text-gray-300 mb-6">
-                    Bạn đã sử dụng hết số lượt tạo voice trong ngày ({limit}/{limit}). <br />
                     Vui lòng quay lại vào ngày mai để tiếp tục trải nghiệm nhé!
                 </p>
 
-                {/* No Buttons - Strictly Blocking */}
+                <button
+                    onClick={onClose}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                    Đã hiểu
+                </button>
             </div>
         </div>,
         mountNode
