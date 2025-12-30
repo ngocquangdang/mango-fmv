@@ -5,6 +5,7 @@ import CreateVoiceView from "./create-voice-view";
 import { useUserContext } from "../../features/user/context";
 import { VoiceService } from "../services/voice-service";
 import Banner from "./banner";
+import { gtmEvent } from "../../lib/analytics";
 
 interface SelectVoiceOverlayProps {
   isOpen: boolean;
@@ -196,6 +197,15 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
   }, [voiceType, isOpen]);
 
   const handleVoiceTypeChange = (type: "original" | "ai" | "mute") => {
+    const labels = {
+      original: "Giọng mặc định",
+      mute: "Tắt tiếng",
+      ai: "Giọng AI"
+    };
+    gtmEvent("button_click", {
+      button_id: type,
+      button_label: labels[type]
+    });
     setVoiceType(type);
   };
   if (!isOpen) return null;

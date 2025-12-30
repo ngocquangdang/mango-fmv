@@ -10,6 +10,8 @@ import SelectVoiceOverlay from "../components/select-voice-overlay";
 import BlockingUsageModal from "../components/ui/blocking-usage-modal";
 import { VoiceService } from "../services/voice-service";
 
+import { gtmEvent } from "../../lib/analytics";
+
 const IMAGE_VERSION = "1";
 
 export default function Home() {
@@ -49,6 +51,21 @@ export default function Home() {
   const handleClick = async (
     actionName: "story" | "journal" | "ranking" | "playAgain" | "collection" | "cardCollection"
   ) => {
+    // Map actionName to Vietnamese labels for tracking consistency with the request
+    const trackingLabels: Record<string, string> = {
+      story: "Cốt Truyện",
+      journal: "Nhật Ký",
+      ranking: "Ranking",
+      collection: "Bộ Sưu Tập",
+    };
+
+    if (trackingLabels[actionName]) {
+      gtmEvent("button_click", {
+        button_id: actionName,
+        button_label: trackingLabels[actionName]
+      });
+    }
+
     if (actionName === "playAgain") {
       setDialogName("quitPlayer");
       return;
@@ -76,6 +93,10 @@ export default function Home() {
     // const sceneId =
     //   chapter.progress?.currentScene?.sceneId || chapter.startSceneId;
     // onPlayPlayer(sceneId);
+    gtmEvent("button_click", {
+      button_id: "start",
+      button_label: isPlaying ? "Tiếp tục" : "Bắt Đầu"
+    });
     setType("story");
     setCollectionItems({});
   };
@@ -127,6 +148,10 @@ export default function Home() {
       icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
       label: "Chọn Voice",
       onClick: () => {
+        gtmEvent("button_click", {
+          button_id: "select_voice",
+          button_label: "Chọn Voice"
+        });
         // Use cached daily usage count instead of calling API
         if (dailyUsageCount >= dailyLimit) {
           // Show blocking modal if limit exceeded
