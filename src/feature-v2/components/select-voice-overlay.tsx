@@ -22,7 +22,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
   // State for recordings and processing
   const [recordings, setRecordings] = useState<any[]>([]);
-  // const [isLoadingRecordings, setIsLoadingRecordings] = useState(true);
+  const [isLoadingRecordings, setIsLoadingRecordings] = useState(true);
   const [isProcessingAi, setIsProcessingAi] = useState(false);
   const [aiProcessedAudioUrl, setAiProcessedAudioUrl] = useState<string | null>(null); // Store processed AI audio URL
   const hasProcessedRef = useRef(false); // Track if we've already processed AI voice
@@ -55,7 +55,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
   // Fetch recordings on mount
   useEffect(() => {
-    // setIsLoadingRecordings(true);
+    setIsLoadingRecordings(true);
     VoiceService.getAudioRecordings(50, 0)
       .then((res) => {
         if (res.data?.recordings) {
@@ -65,7 +65,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
       })
       .catch((err) => console.error("Failed to fetch recordings:", err))
       .finally(() => {
-        // setIsLoadingRecordings(false);
+        setIsLoadingRecordings(false);
       });
   }, []);
 
@@ -228,7 +228,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             setDuration(0);
             setIsPlaying(false);
             // Refresh recordings
-            // setIsLoadingRecordings(true);
+            setIsLoadingRecordings(true);
             VoiceService.getAudioRecordings(50, 0)
               .then((res) => {
                 if (res.data?.recordings) {
@@ -237,7 +237,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
               })
               .catch((err) => console.error("Failed to refresh recordings:", err))
               .finally(() => {
-                // setIsLoadingRecordings(false);
+                setIsLoadingRecordings(false);
               });
           }}
           />
@@ -274,7 +274,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             </div>
 
             {/* Option: AI */}
-            {/* <div
+            <div
               onClick={() => handleVoiceTypeChange("ai")}
               className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[64px] landscape:h-[84px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "ai" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
             >
@@ -284,7 +284,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
               <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
                 Giọng của bạn
               </div>
-            </div> */}
+            </div>
 
             {/* Option: Mute */}
             <div
@@ -301,7 +301,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           </div>
 
           <div className="w-full flex flex-col items-center justify-center min-h-[60px] landscape:min-h-[30px]">
-            {/* {voiceType === "ai" && (
+            {voiceType === "ai" && (
               <div className="flex flex-col items-center gap-2 landscape:gap-1 mb-4 landscape:mb-1 animate-in slide-in-from-top-2 fade-in">
                 {!isLoadingRecordings && recordings.length === 0 && (
                   <Button
@@ -319,7 +319,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                   </div>
                 )}
               </div>
-            )} */}
+            )}
 
             {/* Audio Player - Show for original, or for AI only if URL exists */}
             {((voiceType === "original") || (voiceType === "ai" && !!aiProcessedAudioUrl)) && (

@@ -367,28 +367,28 @@ export const VideoPlayerProvider = ({
   }, [api]);
 
   // Fetch all AI voices on mount moved below setAiAudioList declaration
-  // React.useEffect(() => {
-  //   const fetchAllAiVoices = async () => {
-  //     try {
-  //       const response = await VoiceService.getAllVoiceResults();
-  //       console.log(response);
-  //       if (response && Array.isArray(response.items)) {
-  //         const mappedList = response.items.map(item => ({
-  //           sceneId: item.scene_id,
-  //           aiAudio: item.audio_url
-  //         }));
-  //
-  //         if (mappedList.length > 0) {
-  //           setAiAudioList(mappedList);
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.warn("Failed to fetch all AI voices:", error);
-  //     }
-  //   };
-  //
-  //   fetchAllAiVoices();
-  // }, [setAiAudioList]);
+  React.useEffect(() => {
+    const fetchAllAiVoices = async () => {
+      try {
+        const response = await VoiceService.getAllVoiceResults();
+        console.log(response);
+        if (response && Array.isArray(response.items)) {
+          const mappedList = response.items.map(item => ({
+            sceneId: item.scene_id,
+            aiAudio: item.audio_url
+          }));
+
+          if (mappedList.length > 0) {
+            setAiAudioList(mappedList);
+          }
+        }
+      } catch (error) {
+        console.warn("Failed to fetch all AI voices:", error);
+      }
+    };
+
+    fetchAllAiVoices();
+  }, [setAiAudioList]);
 
   const setUseAiAudio = React.useCallback((type: "ai" | "original" | "mute") => {
     if (!api) return;
@@ -396,76 +396,76 @@ export const VideoPlayerProvider = ({
     api.setUseAiAudio?.(type);
   }, [api]);
 
-  // React.useEffect(() => {
-  //   let isCancelled = false;
+  React.useEffect(() => {
+    let isCancelled = false;
 
-  //   const fetchSceneAudio = async () => {
-  //     // Logic:
-  //     // 1. Start from data.startSceneId
-  //     // 2. Poll/Get result for start scene
-  //     // 3. Get immediate next scenes (no recursion)
-  //     // 4. Update setAiAudioList
+    const fetchSceneAudio = async () => {
+      // Logic:
+      // 1. Start from data.startSceneId
+      // 2. Poll/Get result for start scene
+      // 3. Get immediate next scenes (no recursion)
+      // 4. Update setAiAudioList
 
-  //     if (!data?.startSceneId || !data.scenes || !audioRecordings || audioRecordings.length === 0) return;
+      if (!data?.startSceneId || !data.scenes || !audioRecordings || audioRecordings.length === 0) return;
 
-  //     const record = audioRecordings[0] as any;
-  //     const userAudioUrl = record?.cdnUrl;
-  //     if (!userAudioUrl) return;
+      const record = audioRecordings[0] as any;
+      const userAudioUrl = record?.cdnUrl;
+      if (!userAudioUrl) return;
 
-  //     const results: { sceneId: string; aiAudio: string }[] = [];
-  //     const processedIds = new Set<string>();
+      const results: { sceneId: string; aiAudio: string }[] = [];
+      const processedIds = new Set<string>();
 
-  //     // Helper to process a single scene
-  //     const processSingleScene = async (sid: string) => {
-  //       if (isCancelled || processedIds.has(sid)) return;
-  //       processedIds.add(sid);
+      // Helper to process a single scene
+      const processSingleScene = async (sid: string) => {
+        if (isCancelled || processedIds.has(sid)) return;
+        processedIds.add(sid);
 
-  //       const scene = data.scenes[sid];
-  //       if (!scene?.originalAudio) return;
+        const scene = data.scenes[sid];
+        if (!scene?.originalAudio) return;
 
-  //       try {
-  //         const aiAudio = await VoiceService.pollVoiceProcessing(sid, userAudioUrl, scene.originalAudio);
+        try {
+          const aiAudio = await VoiceService.pollVoiceProcessing(sid, userAudioUrl, scene.originalAudio);
 
-  //         if (isCancelled) return;
+          if (isCancelled) return;
 
-  //         if (aiAudio) {
-  //           results.push({ sceneId: sid, aiAudio });
-  //           setAiAudioList([...results]);
-  //         }
-  //       } catch (e) {
-  //         console.warn(`Failed to fetch/poll AI voice for scene ${sid}`, e);
-  //       }
-  //     };
+          if (aiAudio) {
+            results.push({ sceneId: sid, aiAudio });
+            setAiAudioList([...results]);
+          }
+        } catch (e) {
+          console.warn(`Failed to fetch/poll AI voice for scene ${sid}`, e);
+        }
+      };
 
-  //     // 1. Process start scene
-  //     await processSingleScene(data.startSceneId);
+      // 1. Process start scene
+      await processSingleScene(data.startSceneId);
 
-  //     // 2. Process immediate next scenes only
-  //     const startScene = data.scenes[data.startSceneId];
-  //     if (startScene) {
-  //       const nextSceneIds: string[] = [];
-  //       if (startScene.targetSceneId) nextSceneIds.push(startScene.targetSceneId);
-  //       if (startScene.branch?.options) {
-  //         startScene.branch.options.forEach((opt: any) => {
-  //           if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
-  //         });
-  //       }
+      // 2. Process immediate next scenes only
+      const startScene = data.scenes[data.startSceneId];
+      if (startScene) {
+        const nextSceneIds: string[] = [];
+        if (startScene.targetSceneId) nextSceneIds.push(startScene.targetSceneId);
+        if (startScene.branch?.options) {
+          startScene.branch.options.forEach((opt: any) => {
+            if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
+          });
+        }
 
-  //       for (const nid of nextSceneIds) {
-  //         if (isCancelled) break;
-  //         await processSingleScene(nid);
-  //       }
-  //     }
-  //   };
+        for (const nid of nextSceneIds) {
+          if (isCancelled) break;
+          await processSingleScene(nid);
+        }
+      }
+    };
 
-  //   if (voiceType === "ai") {
-  //     fetchSceneAudio();
-  //   }
+    if (voiceType === "ai") {
+      fetchSceneAudio();
+    }
 
-  //   return () => {
-  //     isCancelled = true;
-  //   };
-  // }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType]);
+    return () => {
+      isCancelled = true;
+    };
+  }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType]);
 
   const triggerDisplayReward = React.useCallback(
     (data: any) => {
