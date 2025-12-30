@@ -7,8 +7,6 @@ import { useUserContext } from "../../features/user/context";
 import { useRestartChapter } from "../../features/user/hooks";
 import GameModal from "../components/ui/dialog";
 import SelectVoiceOverlay from "../components/select-voice-overlay";
-import BlockingUsageModal from "../components/ui/blocking-usage-modal";
-import { VoiceService } from "../services/voice-service";
 
 import { gtmEvent } from "../../lib/analytics";
 
@@ -21,29 +19,7 @@ export default function Home() {
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const [isVoiceOverlayOpen, setIsVoiceOverlayOpen] = React.useState(false);
-  const [isUsageLimitExceeded, setIsUsageLimitExceeded] = React.useState(false);
-  const [dailyUsageCount, setDailyUsageCount] = React.useState<number>(0);
-  const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
-  /* Removed shakeState + effects in favor of CSS animations */
 
-  // Fetch daily usage count once when component mounts
-  React.useEffect(() => {
-    const fetchDailyUsage = async () => {
-      try {
-        const usageResponse = await VoiceService.getDailyUsage();
-        if (usageResponse.data) {
-          setDailyUsageCount(usageResponse.data.count || 0);
-        }
-      } catch (error) {
-        console.error("Failed to fetch daily usage:", error);
-        setDailyUsageCount(0); // Default to 0 if fetch fails
-      }
-    };
-
-    fetchDailyUsage();
-  }, []); // Only run once on mount
-
-  // Determine if the game is in progress (has progress & multiple scenes)
   const isPlaying = useMemo(() => {
     return Object.values(chapter?.progress?.scenes || {}).length > 1 || chapter.progress?.currentScene?.watchingSecond;
   }, [chapter.progress?.scenes, chapter.progress?.currentScene?.watchingSecond]);
@@ -153,17 +129,13 @@ export default function Home() {
           button_label: "Chọn Voice"
         });
         // Use cached daily usage count instead of calling API
-        if (dailyUsageCount >= dailyLimit) {
-          // Show blocking modal if limit exceeded
-          setIsUsageLimitExceeded(true);
-          return;
-        }
+
         // Open overlay if within limit
         setIsVoiceOverlayOpen(true);
       },
     },
 
-  ], [IMAGE_VERSION, handleClick, isPlaying, dailyUsageCount, dailyLimit]);
+  ], [IMAGE_VERSION, handleClick, isPlaying]);
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -228,10 +200,7 @@ export default function Home() {
         onClose={() => setIsVoiceOverlayOpen(false)}
       />
 
-      <BlockingUsageModal
-        isOpen={isUsageLimitExceeded}
-        onClose={() => setIsUsageLimitExceeded(false)}
-      />
+
     </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Banner from "../../components/banner";
@@ -14,11 +13,13 @@ import { useCardCollection } from "./hooks/use-card-collection"; // Import hook
 import { useTicketPrice } from "./hooks/use-card-collection-query";
 import { getOrderStatus } from "../../../lib/api/ticket-api";
 import type { Card } from "./services/card-collection-service";
+import { useToast } from "../../../components/ui/toast-v2/use-toast";
 
 function CardCollectionContent() {
   const navigate = useNavigate();
   const { banners, userState, userInfo, openBlindBag } = useCardCollection();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { showToast } = useToast();
 
   const [isOpeningBulk, setIsOpeningBulk] = React.useState(false);
   const [isOpeningSingle, setIsOpeningSingle] = React.useState(false);
@@ -196,10 +197,13 @@ function CardCollectionContent() {
           setIsLoadingBulk(false);
         }
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error("Failed to open bags", e);
-      // Handle error (e.g. not enough tickets)
       setIsLoadingBulk(false);
+      const errorMessage = e?.response?.data?.error?.message || "Có lỗi xảy ra, vui lòng thử lại sau.";
+      showToast({
+        description: errorMessage,
+      });
     }
   };
 
@@ -227,9 +231,13 @@ function CardCollectionContent() {
           setIsLoadingSingle(false);
         }
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error("Failed to open bag", e);
       setIsLoadingSingle(false);
+      const errorMessage = e?.response?.data?.error?.message || "Có lỗi xảy ra, vui lòng thử lại sau.";
+      showToast({
+        description: errorMessage,
+      });
     }
   }
 
@@ -386,4 +394,3 @@ export default function CardCollection() {
     </div>
   )
 }
-
