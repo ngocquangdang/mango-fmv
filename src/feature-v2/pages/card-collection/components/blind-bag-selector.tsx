@@ -11,17 +11,8 @@ interface BlindBagSelectorProps {
 const BlindBagItem = ({ item, isActive = false }: { item: any; isActive?: boolean }) => {
   return (
     <div className={`relative transition-all duration-300 flex flex-col items-center ${isActive ? 'scale-[1.3] z-20' : 'scale-100 z-10 grayscale'}`}>
-      {/* Light effect can be kept or removed, keeping it simple for now */}
-      {/* {isActive && <div className="absolute inset-0 bg-white/50 blur-xl rounded-full"></div>} */}
-
       <div
-        className="flex items-center justify-center relative w-[100px] h-[90px] lg:w-[255px] lg:h-[230px]"
-      // style={{
-      //   backgroundImage: "url('/images/collection/blind-bag.png')",
-      //   backgroundSize: "contain",
-      //   backgroundPosition: "center center",
-      //   backgroundRepeat: "no-repeat",
-      // }}
+        className="flex items-center justify-center relative w-[100px] h-[90px] lg:w-[255px] lg:h-[230px] mb-2"
       >
         <img
           src={item?.image}
@@ -36,7 +27,7 @@ const BlindBagItem = ({ item, isActive = false }: { item: any; isActive?: boolea
         backgroundPosition: "center center",
         backgroundRepeat: "no-repeat",
       }}>
-        <div className="text-[10px] lg:text-2xl font-bold text-[#3B4C7A] text-center w-[80px] lg:w-[195px] line-clamp-1 pb-1 lg:pb-4">
+        <div className="text-[10px] lg:text-2xl font-bold text-[#3B4C7A] text-center w-[60px] lg:w-[155px] break-words pb-1 lg:pb-4 leading-3 lg:leading-7">
           {item?.name}
         </div>
       </div>

@@ -333,6 +333,18 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
     if (!audioUrl) return;
 
     try {
+      // Check daily usage limit before proceeding
+      const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
+      const usageResponse = await VoiceService.getDailyUsage();
+
+      if (usageResponse.data && usageResponse.data.count >= dailyLimit) {
+        // Show toast notification if limit exceeded
+        showToast({
+          description: "Lượt tạo voice cá nhân hóa trong ngày đã hết. Vui lòng quay lại vào ngày mai!",
+        });
+        return;
+      }
+
       setIsProcessing(true);
       setProcessingStage('uploading');
 
