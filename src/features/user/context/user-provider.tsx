@@ -277,7 +277,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     initQrSession(undefined, {
       onSuccess: (response: any) => {
         const sessionId = response.data.sessionId;
-        const generatedQrUrl = `https://gocuanhamynam.mangoplus.vn?sessionId=${sessionId}`;
+        const generatedQrUrl = `${import.meta.env.VITE_DOMAIN}?sessionId=${sessionId}`;
 
         setQrSessionId(sessionId);
         setQrUrl(generatedQrUrl);
