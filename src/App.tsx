@@ -19,7 +19,7 @@ import DialogConfirm from "./components/ui/dialog/dialog-confirm";
 // import { useToast } from "./components/ui/toast/use-toast";
 
 function App() {
-  const { loading, updateSceneStatus } = useUserContext();
+  const { loading } = useUserContext();
   const {
     type,
     quitPlayer,
@@ -27,7 +27,6 @@ function App() {
     setReviewScene,
     pause,
     onPlay,
-    currentStatus,
     isReviewScene,
   } = useVideoPlayerContext();
   const [dialogName, setDialogName] = React.useState<string | null>(null);

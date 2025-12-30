@@ -56,10 +56,34 @@ function LayoutWrapper() {
 
   // Read from environment variable, default to 100
   const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
-
-  const { loading: userLoading, updateSceneStatus } = useUserContext();
+  const { loading: userLoading } = useUserContext();
   const [orientationStatus, setOrientationStatus] = React.useState(!isLandscapeMobile);
   const [isUsageLimitExceeded, setIsUsageLimitExceeded] = React.useState(false);
+
+
+  const {
+    type,
+    setType,
+    quitPlayer,
+    setReviewScene,
+    pause,
+    onPlay,
+    isReviewScene,
+    isPlayerLoading,
+    isGiftSelectionOpen,
+    dialogInfoState,
+    closeDialogInfo,
+    isEndingScene,
+    setIsEndingScene,
+    isVipModalOpen,
+    setIsVipModalOpen,
+    setVersion
+  } = useVideoPlayerContext();
+
+  const navigate = useNavigate();
+  const [dialogName, setDialogName] = React.useState<string | null>(null);
+
+  const loading = userLoading || isPlayerLoading;
 
   React.useEffect(() => {
     const checkDailyUsage = async () => {
@@ -75,31 +99,6 @@ function LayoutWrapper() {
 
     checkDailyUsage();
   }, [dailyLimit]);
-
-  const {
-    type,
-    setType,
-    quitPlayer,
-    setReviewScene,
-    pause,
-    onPlay,
-    currentStatus,
-    isReviewScene,
-    isPlayerLoading,
-    isGiftSelectionOpen,
-    dialogInfoState,
-    closeDialogInfo,
-    clips,
-    isEndingScene,
-    setIsEndingScene,
-    isVipModalOpen,
-    setIsVipModalOpen,
-  } = useVideoPlayerContext();
-
-  const navigate = useNavigate();
-  const [dialogName, setDialogName] = React.useState<string | null>(null);
-
-  const loading = userLoading || isPlayerLoading;
 
   const handleBack = () => {
     if (type === "interactive") {
@@ -123,28 +122,13 @@ function LayoutWrapper() {
   };
 
   const onConfirm = () => {
-    const sceneId = currentStatus?.currentSceneId || "";
-    const scene = clips?.[sceneId];
-
     quitPlayer(); // This resets type to intro in context, we might need to change that
-    updateSceneStatus({
-      sceneId: currentStatus?.currentSceneId || "",
-      totalDuration: Math.floor(
-        scene?.duration ||
-        currentStatus?.totalDuration ||
-        currentStatus?.time ||
-        0
-      ),
-      watchingSecond: Math.floor(
-        currentStatus?.watchingSecond || currentStatus?.time || 0
-      ),
-      status: "INPROGRESS",
-    });
     setDialogName(null);
     setReviewScene(false);
     navigate("/"); // Go back to story (effectively home with story type if we really wanted, but user flow seems to be chapter page)
     // Actually, simply setType('story') should show the ChapterPage because of the conditional render in AppV2
     setType("story");
+    setVersion(Math.random());
   };
 
   React.useEffect(() => {

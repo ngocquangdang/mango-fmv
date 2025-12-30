@@ -83,13 +83,13 @@ const RewardCollection = ({
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking grid content
       >
         {/* Title Section */}
-        <div className="relative mb-6 landscape:mb-1 h-[90px] landscape:h-[50px] flex items-center justify-center">
+        <div className="relative mb-6 landscape:mb-1 min-h-[90px] landscape:min-h-[50px] flex items-center justify-center py-4">
           <img
             src="/images/bg-title.png"
             alt="bg-title"
             className="absolute inset-0 w-full h-full "
           />
-          <h2 className="relative z-10 text-xl text-white font-bold drop-shadow-sm px-4 py-8 landscape:py-4">
+          <h2 className="relative z-10 text-xl text-white font-bold drop-shadow-sm px-8 py-2 text-center w-full max-w-[400px] break-words leading-tight">
             {title || ""}
           </h2>
           {/* Stars */}
