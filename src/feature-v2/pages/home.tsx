@@ -21,8 +21,26 @@ export default function Home() {
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const [isVoiceOverlayOpen, setIsVoiceOverlayOpen] = React.useState(false);
   const [isUsageLimitExceeded, setIsUsageLimitExceeded] = React.useState(false);
+  const [dailyUsageCount, setDailyUsageCount] = React.useState<number>(0);
   const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
   /* Removed shakeState + effects in favor of CSS animations */
+
+  // Fetch daily usage count once when component mounts
+  React.useEffect(() => {
+    const fetchDailyUsage = async () => {
+      try {
+        const usageResponse = await VoiceService.getDailyUsage();
+        if (usageResponse.data) {
+          setDailyUsageCount(usageResponse.data.count || 0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch daily usage:", error);
+        setDailyUsageCount(0); // Default to 0 if fetch fails
+      }
+    };
+
+    fetchDailyUsage();
+  }, []); // Only run once on mount
 
   // Determine if the game is in progress (has progress & multiple scenes)
   const isPlaying = useMemo(() => {
@@ -109,27 +127,19 @@ export default function Home() {
     {
       icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
       label: "Chọn Voice",
-      onClick: async () => {
-        // Check daily usage limit before opening voice overlay
-        try {
-          const usageResponse = await VoiceService.getDailyUsage();
-          if (usageResponse.data && usageResponse.data.count >= dailyLimit) {
-            // Show blocking modal if limit exceeded
-            setIsUsageLimitExceeded(true);
-            return;
-          }
-          // Open overlay if within limit
-          setIsVoiceOverlayOpen(true);
-        } catch (error) {
-          console.error("Failed to check daily usage:", error);
-          // Still allow opening overlay if check fails
-          setIsVoiceOverlayOpen(true);
+      onClick: () => {
+        // Use cached daily usage count instead of calling API
+        if (dailyUsageCount >= dailyLimit) {
+          // Show blocking modal if limit exceeded
+          setIsUsageLimitExceeded(true);
+          return;
         }
+        // Open overlay if within limit
+        setIsVoiceOverlayOpen(true);
       },
     },
 
-
-  ], [IMAGE_VERSION, handleClick, isPlaying]);
+  ], [IMAGE_VERSION, handleClick, isPlaying, dailyUsageCount, dailyLimit]);
 
   return (
     <div className="relative w-full h-full overflow-hidden">
