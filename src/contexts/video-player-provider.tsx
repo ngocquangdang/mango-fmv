@@ -16,7 +16,7 @@ import RewardCollection, {
   type RewardItem,
 } from "../feature-v2/components/reward-collection";
 import RelationshipPoint from "../feature-v2/components/relationship-point";
-import { VoiceService } from "../feature-v2/services/voice-service";
+// import { VoiceService } from "../feature-v2/services/voice-service";
 
 export type VideoPlayerType =
   | "intro"
@@ -574,20 +574,21 @@ export const VideoPlayerProvider = ({
       if (isUserVip) return;
       if (userAudioUrl && nextSceneIds.length > 0) {
         nextSceneIds.forEach(targetId => {
-          const targetScene = data.scenes[targetId];
+          console.log("🚀 ~ handleStart ~ targetId:", targetId);
+          // const targetScene = data.scenes[targetId];
           // Only fetch if not already in aiAudioList (optional optimization, but good practice)
           // For now, just keep the existing polling logic but restricted to these IDs
-          if (targetScene?.originalAudio) {
-            VoiceService.pollVoiceProcessing(targetId, userAudioUrl, targetScene.originalAudio)
-              .then(res => {
-                if (res) {
-                  setAiAudioList([{ sceneId: targetId, aiAudio: res }]);
-                }
-              })
-              .catch(() => {
-                // Silent fail or low prio log
-              });
-          }
+          // if (targetScene?.originalAudio) {
+          //   VoiceService.pollVoiceProcessing(targetId, userAudioUrl, targetScene.originalAudio)
+          //     .then(res => {
+          //       if (res) {
+          //         setAiAudioList([{ sceneId: targetId, aiAudio: res }]);
+          //       }
+          //     })
+          //     .catch(() => {
+          //       // Silent fail or low prio log
+          //     });
+          // }
         });
       }
 
