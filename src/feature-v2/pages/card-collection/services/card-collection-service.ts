@@ -182,5 +182,11 @@ export const CardCollectionService = {
     }, {
       "X-Ticket": getLocalParam("ticket") || "",
     });
+  },
+
+  getTicketPrice: async (type: string): Promise<ApiResponse<{ price: number }>> => {
+    return apiClientVideoProgress.get<ApiResponse<{ price: number }>>(`/gacha/ticket-price?type=${type}`, {
+      "X-Ticket": getLocalParam("ticket") || "",
+    });
   }
 };

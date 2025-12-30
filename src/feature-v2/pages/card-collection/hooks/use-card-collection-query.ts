@@ -59,3 +59,11 @@ export const useUserInfo = () => {
         queryFn: CardCollectionService.getUserInfo,
     });
 };
+
+export const useTicketPrice = (type: string | undefined) => {
+    return useQuery({
+        queryKey: [...COLLECTION_KEYS.all, "ticket-price", type],
+        queryFn: () => CardCollectionService.getTicketPrice(type!),
+        enabled: !!type,
+    });
+};
