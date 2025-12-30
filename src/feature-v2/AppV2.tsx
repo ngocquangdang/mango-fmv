@@ -54,6 +54,9 @@ function LayoutWrapper() {
   const isLandscapeMobile = useIsLandscapeMobile();
   const backgroundImage = "/images/new-bg.png";
 
+  // Read from environment variable, default to 100
+  const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
+
   const { loading: userLoading, updateSceneStatus } = useUserContext();
   const [orientationStatus, setOrientationStatus] = React.useState(!isLandscapeMobile);
   const [isUsageLimitExceeded, setIsUsageLimitExceeded] = React.useState(false);
@@ -62,7 +65,7 @@ function LayoutWrapper() {
     const checkDailyUsage = async () => {
       try {
         const response = await VoiceService.getDailyUsage();
-        if (response.data && response.data.count > 10) {
+        if (response.data && response.data.count > dailyLimit) {
           setIsUsageLimitExceeded(true);
         }
       } catch (error) {
@@ -71,7 +74,7 @@ function LayoutWrapper() {
     };
 
     checkDailyUsage();
-  }, []);
+  }, [dailyLimit]);
 
   const {
     type,
@@ -251,7 +254,7 @@ function LayoutWrapper() {
       />
 
       {/* Daily Usage Blocking Modal */}
-      <BlockingUsageModal isOpen={isUsageLimitExceeded} />
+      <BlockingUsageModal isOpen={isUsageLimitExceeded} limit={dailyLimit} />
     </div>
   );
 }

@@ -3,9 +3,10 @@ import { createPortal } from 'react-dom';
 
 interface BlockingUsageModalProps {
     isOpen: boolean;
+    limit: number;
 }
 
-const BlockingUsageModal: React.FC<BlockingUsageModalProps> = ({ isOpen }) => {
+const BlockingUsageModal: React.FC<BlockingUsageModalProps> = ({ isOpen, limit }) => {
     if (!isOpen) return null;
 
     // Use portal to ensure it stays on top of everything, similar to other modals
@@ -40,7 +41,7 @@ const BlockingUsageModal: React.FC<BlockingUsageModalProps> = ({ isOpen }) => {
                 <h2 className="text-xl font-bold text-white mb-2">Đã đạt giới hạn sử dụng</h2>
 
                 <p className="text-gray-300 mb-6">
-                    Bạn đã sử dụng hết số lượt tạo voice trong ngày (10/10). <br />
+                    Bạn đã sử dụng hết số lượt tạo voice trong ngày ({limit}/{limit}). <br />
                     Vui lòng quay lại vào ngày mai để tiếp tục trải nghiệm nhé!
                 </p>
 
