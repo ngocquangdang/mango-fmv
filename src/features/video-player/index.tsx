@@ -17,7 +17,7 @@ export default function VideoPlayer() {
         ></div>
       </DetailDialogProvider>
       {isReviewScene && (
-        <div className="fixed bottom-8 left-0 right-0 w-[70%] mx-auto z-10">
+        <div className="fixed bottom-1 left-0 right-0 w-[70%] mx-auto z-[999]">
           <MediaPlayerControl />
         </div>
       )}

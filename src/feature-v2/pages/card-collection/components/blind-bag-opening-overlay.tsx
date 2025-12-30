@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Button from "../../../components/ui/button";
 import confetti from "canvas-confetti";
 import type { Card } from "../services/card-collection-service";
@@ -24,6 +24,8 @@ const BlindBagOpeningOverlay = ({
 
   const isAllRevealed = revealedIndices.length === cards.length;
 
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
     if (isOpen) {
       setRevealedIndices([]); // Reset on open
@@ -38,13 +40,20 @@ const BlindBagOpeningOverlay = ({
 
   useEffect(() => {
     let animationFrameId: number;
-    if (isAllRevealed && !isLoading) {
+    let myConfetti: any;
+
+    if (isAllRevealed && !isLoading && canvasRef.current) {
+      myConfetti = confetti.create(canvasRef.current, {
+        resize: true,
+        useWorker: true,
+      });
+
       // Launch confetti when all revealed
       const duration = 500;
       const end = Date.now() + duration;
 
       const frame = () => {
-        confetti({
+        myConfetti({
           particleCount: 5,
           angle: 60,
           spread: 55,
@@ -52,7 +61,7 @@ const BlindBagOpeningOverlay = ({
           zIndex: 100,
           colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
         });
-        confetti({
+        myConfetti({
           particleCount: 5,
           angle: 120,
           spread: 55,
@@ -70,7 +79,7 @@ const BlindBagOpeningOverlay = ({
     }
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
-      confetti.reset();
+      if (myConfetti) myConfetti.reset();
     };
   }, [isAllRevealed, isLoading]);
 
@@ -197,6 +206,10 @@ const BlindBagOpeningOverlay = ({
           </div>
         </div>
       )}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none z-[100]"
+      />
     </div>
   );
 };

@@ -378,7 +378,6 @@ export const VideoPlayerProvider = ({
     const fetchAllAiVoices = async () => {
       try {
         const response = await VoiceService.getAllVoiceResults();
-        console.log(response);
         if (response && Array.isArray(response.items)) {
           const mappedList = response.items.map(item => ({
             sceneId: item.scene_id,
@@ -531,7 +530,7 @@ export const VideoPlayerProvider = ({
       if (currentStatus && api && currentStatus?.currentSceneId === sceneId) {
         onSetCurrentSceneId(currentStatus?.currentSceneId);
         setTimeout(() => {
-          seekTo(isReviewScene ? 0 : currentStatus?.time);
+          seekTo(isReviewScene ? 0 : (currentStatus?.time > 0 ? currentStatus?.time - 1 : 0));
         }, 200);
         return;
       }
