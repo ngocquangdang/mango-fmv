@@ -55,14 +55,7 @@ function App() {
 
   const onConfirm = () => {
     quitPlayer();
-    updateSceneStatus(
-      {
-        sceneId: currentStatus?.currentSceneId || "",
-        totalDuration: Math.floor(currentStatus?.totalDuration || 0),
-        watchingSecond: Math.floor(currentStatus?.watchingSecond || 0),
-        status: "INPROGRESS",
-      }
-    );
+
     setDialogName(null);
     setReviewScene(false);
     setType("story");

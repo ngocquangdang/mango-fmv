@@ -529,7 +529,8 @@ export const VideoPlayerProvider = ({
         onSetCurrentSceneId(currentStatus?.currentSceneId);
         setTimeout(() => {
           seekTo(isReviewScene ? 0 : currentStatus?.time);
-        }, 50);
+        }, 200);
+        return;
       }
       if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
       play();
@@ -541,11 +542,13 @@ export const VideoPlayerProvider = ({
     (sceneId: string) => {
       console.log("🚀 ~ [START] [INPROGRESS]:", sceneId);
       if (!isReviewScene) {
+        // If resuming same scene, use saved time to maintain consistency
+        const startTime = (currentStatus?.currentSceneId === sceneId) ? (currentStatus?.time || 0) : 0;
         updateSceneStatus(
           {
             sceneId,
             totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
-            watchingSecond: 0,
+            watchingSecond: Math.floor(startTime),
             status: "INPROGRESS",
           },
           (responseData: any) => triggerDisplayReward(responseData)
@@ -600,15 +603,35 @@ export const VideoPlayerProvider = ({
   const handleStop = React.useCallback(
     (payload: Record<string, any>) => {
       console.log("🚀 ~ [STOP]", payload);
-      setCurrentStatus(payload);
+
       const currentClip = data.scenes[payload.currentSceneId];
+
+      // Helper to calculate adjusted watching second
+      const calculateWatchingSecond = () => {
+        const branch = currentClip?.branch;
+        const triggerTime = branch?.startTime !== undefined ? branch.startTime : (currentClip?.duration || 0);
+        // If we are indeed past or at trigger time (with 0.5s tolerance), save a bit earlier
+        if (branch?.options?.length && payload.time >= triggerTime - 0.5) {
+          // Return integer to avoid 400 error, back up 1 sec before trigger
+          return Math.max(0, Math.floor(triggerTime - 1));
+        }
+        return Math.floor(payload.time || 0);
+      };
+
+      const adjustedWatchingSecond = calculateWatchingSecond();
+
+      // Update local state with the adjusted time so 'Resume' works correctly immediately
+      setCurrentStatus({
+        ...payload,
+        time: adjustedWatchingSecond
+      });
 
       if (payload.actionName === PausedActionName.USER_PAUSED_VIDEO) {
         if (!isReviewScene) {
           updateSceneStatus({
             sceneId: payload.currentSceneId,
             totalDuration: Math.floor(currentClip?.duration || 0),
-            watchingSecond: Math.floor(payload.time || 0),
+            watchingSecond: adjustedWatchingSecond,
             status: "INPROGRESS",
           });
         }
@@ -621,7 +644,7 @@ export const VideoPlayerProvider = ({
             {
               sceneId: payload.currentSceneId,
               totalDuration: Math.floor(currentClip?.duration || 0),
-              watchingSecond: Math.floor(payload.time || 0),
+              watchingSecond: adjustedWatchingSecond,
               status: "INPROGRESS",
             },
             (responseData: any) => triggerDisplayReward(responseData)
@@ -817,7 +840,17 @@ export const VideoPlayerProvider = ({
           {
             sceneId,
             totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
-            watchingSecond: Math.floor(data.scenes[sceneId]?.duration || 0),
+            watchingSecond: (() => {
+              const scene = data.scenes[sceneId];
+              const branch = scene?.branch;
+              const triggerTime = branch?.startTime !== undefined ? branch.startTime : (scene?.duration || 0);
+
+              // If there are options, we assume we want to stop BEFORE the trigger for resume to work
+              if (branch?.options?.length) {
+                return Math.max(0, Math.floor(triggerTime - 0.1));
+              }
+              return Math.floor(scene?.duration || 0);
+            })(),
             status: "COMPLETED",
             points: data.scenes[sceneId]?.points || 0,
           },
@@ -901,6 +934,8 @@ export const VideoPlayerProvider = ({
     });
     setCurrentSceneId(data.progress?.currentScene?.sceneId || null);
     if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
+    setPauseType(null);
+
     setPauseType(null);
   }, [data.id, data.progress?.currentScene, pauseType]);
 
