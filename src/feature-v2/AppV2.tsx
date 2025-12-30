@@ -51,9 +51,9 @@ const useIsLandscapeMobile = () => {
 function LayoutWrapper() {
   const isLandscapeMobile = useIsLandscapeMobile();
   const backgroundImage = "/images/new-bg.png";
-
-  const { loading: userLoading, updateSceneStatus } = useUserContext();
+  const { loading: userLoading } = useUserContext();
   const [orientationStatus, setOrientationStatus] = React.useState(!isLandscapeMobile);
+
 
   const {
     type,
@@ -62,17 +62,16 @@ function LayoutWrapper() {
     setReviewScene,
     pause,
     onPlay,
-    currentStatus,
     isReviewScene,
     isPlayerLoading,
     isGiftSelectionOpen,
     dialogInfoState,
     closeDialogInfo,
-    clips,
     isEndingScene,
     setIsEndingScene,
     isVipModalOpen,
     setIsVipModalOpen,
+    setVersion
   } = useVideoPlayerContext();
 
   const navigate = useNavigate();
@@ -102,28 +101,13 @@ function LayoutWrapper() {
   };
 
   const onConfirm = () => {
-    const sceneId = currentStatus?.currentSceneId || "";
-    const scene = clips?.[sceneId];
-
     quitPlayer(); // This resets type to intro in context, we might need to change that
-    updateSceneStatus({
-      sceneId: currentStatus?.currentSceneId || "",
-      totalDuration: Math.floor(
-        scene?.duration ||
-        currentStatus?.totalDuration ||
-        currentStatus?.time ||
-        0
-      ),
-      watchingSecond: Math.floor(
-        currentStatus?.watchingSecond || currentStatus?.time || 0
-      ),
-      status: "INPROGRESS",
-    });
     setDialogName(null);
     setReviewScene(false);
     navigate("/"); // Go back to story (effectively home with story type if we really wanted, but user flow seems to be chapter page)
     // Actually, simply setType('story') should show the ChapterPage because of the conditional render in AppV2
     setType("story");
+    setVersion(Math.random());
   };
 
   React.useEffect(() => {

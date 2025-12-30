@@ -206,11 +206,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }, 100);
       },
       onError: () => {
-        logInfo(
-          "UserProvider - confirmQrLogin failed",
-          {},
-          "UserProvider"
-        );
+
       },
     });
     setLoading(true);
@@ -229,25 +225,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const hasLocalTicket = !!getLocalParam("ticket");
     // If we are in dev or mobile-like env and NO ticket, redirect to login page
     if ((import.meta.env.DEV || !isMobileLike) && !hasLocalTicket) {
-      logInfo(
-        "UserProvider - Mobile/Dev detected without ticket, redirecting to QR Login",
-        {},
-        "UserProvider"
-      );
       navigate("/login-qr");
     }
   }, [mgApi, isPreview, navigate]);
 
   const handleQrSuccess = React.useCallback((ticket: string) => {
-    logInfo(
-      "UserProvider - QR login successful",
-      { ticket },
-      "UserProvider"
-    );
-    // Defer UI updates to avoid race conditions
     setTimeout(() => {
-      // logInfo inside timeout to capture the context of execution if needed, or keep outside.
-      // Keeping logging outside for immediate feedback is fine, but state updates must be deferred.
       saveLocalParams({ ticket });
       setIsQrLoginVisible(false);
       showToast({ description: "Đăng nhập QR thành công!" });
@@ -310,6 +293,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         },
         {
           onSuccess: (data: any) => {
+            console.log("UserProvider - updateSceneStatus success", data);
             refetchProgress();
             refetchCollectedRewards();
             if (callback) callback(data.data);

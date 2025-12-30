@@ -86,6 +86,7 @@ export interface VideoPlayerContextType {
   // currentSceneAudioUrl: string | null;
   setAiAudioList: (audioList: { sceneId: string; aiAudio: string }[]) => void;
   setUseAiAudio: (type: "ai" | "original" | "mute") => void;
+  setVersion: (version: number) => void;
 }
 
 
@@ -106,7 +107,6 @@ export const VideoPlayerProvider = ({
 }) => {
   const { api, ready } = useVideoPlayer();
   const { chapter: data, updateSceneStatus, userInfo, audioRecordings } = useUserContext();
-  console.log({ audioRecordings });
   const { mutate: submitHotspot } = useSubmitHotspot();
   const { showToast } = useToast();
 
@@ -308,6 +308,13 @@ export const VideoPlayerProvider = ({
     [api, setIsReviewScene]
   );
 
+  const setVersion = React.useCallback(
+    (version: number) => {
+      if (!api) return;
+      api.setVersion?.(version);
+    },
+    [api]
+  );
   const onSetCurrentSceneId = React.useCallback(
     (sceneId: string) => {
       if (!api) return;
@@ -467,42 +474,38 @@ export const VideoPlayerProvider = ({
     };
   }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType]);
 
-  const triggerDisplayReward = React.useCallback(
-    (data: any) => {
+  const triggerDisplayReward = (data: any) => {
+    if (data?.relationships?.length > 0) {
+      showRelationshipPoint(data.relationships);
+    }
 
-      if (data?.relationships?.length > 0) {
-        showRelationshipPoint(data.relationships);
+    const handleShowMoments = (index: number) => {
+      // Stop recursion if no more moments
+      if (!data.moments || index >= data.moments.length) {
+        showRewardCollection([]);
+        closeGiftSelection();
+        play();
+        return;
       }
 
-      const handleShowMoments = (index: number) => {
-        // Stop recursion if no more moments
-        if (!data.moments || index >= data.moments.length) {
-          showRewardCollection([]);
-          closeGiftSelection();
-          play();
-          return;
-        }
+      pause();
+      // Show current moment and schedule next one on close
+      showRewardCollection(
+        data.moments[index].rewards,
+        () => {
+          setTimeout(() => {
+            handleShowMoments(index + 1);
+          }, 200);
+        },
+        data.moments[index].title,
+        data.moments[index].description
+      );
+    };
 
-        pause();
-        // Show current moment and schedule next one on close
-        showRewardCollection(
-          data.moments[index].rewards,
-          () => {
-            setTimeout(() => {
-              handleShowMoments(index + 1);
-            }, 200);
-          },
-          data.moments[index].title,
-          data.moments[index].description
-        );
-      };
-
-      if (data.moments && data.moments.length > 0) {
-        handleShowMoments(0);
-      }
-    },
-    [showRelationshipPoint, showRewardCollection, closeGiftSelection, pause, play]
-  );
+    if (data.moments && data.moments.length > 0) {
+      handleShowMoments(0);
+    }
+  }
 
   const handleCollectionItems = React.useCallback(
     (hotspot: any, currentSceneId: string) => {
@@ -529,7 +532,8 @@ export const VideoPlayerProvider = ({
         onSetCurrentSceneId(currentStatus?.currentSceneId);
         setTimeout(() => {
           seekTo(isReviewScene ? 0 : currentStatus?.time);
-        }, 50);
+        }, 200);
+        return;
       }
       if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
       play();
@@ -540,17 +544,19 @@ export const VideoPlayerProvider = ({
   const handleStart = React.useCallback(
     (sceneId: string) => {
       console.log("🚀 ~ [START] [INPROGRESS]:", sceneId);
-      if (!isReviewScene) {
-        updateSceneStatus(
-          {
-            sceneId,
-            totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
-            watchingSecond: 0,
-            status: "INPROGRESS",
-          },
-          (responseData: any) => triggerDisplayReward(responseData)
-        );
-      }
+      // if (!isReviewScene) {
+      //   // If resuming same scene, use saved time to maintain consistency
+      //   const startTime = (currentStatus?.currentSceneId === sceneId) ? (currentStatus?.time || 0) : 0;
+      //   updateSceneStatus(
+      //     {
+      //       sceneId,
+      //       totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
+      //       watchingSecond: Math.floor(startTime),
+      //       status: "INPROGRESS",
+      //     },
+      //     (responseData: any) => triggerDisplayReward(responseData)
+      //   );
+      // }
       const scene = data.scenes[sceneId];
 
       if (!scene) {
@@ -594,23 +600,43 @@ export const VideoPlayerProvider = ({
       setCurrentSceneId(sceneId);
       setPauseType(null);
     },
-    [updateSceneStatus, data.scenes, isReviewScene, triggerDisplayReward, audioRecordings, setAiAudioList]
+    [updateSceneStatus, data.scenes, isReviewScene, audioRecordings, setAiAudioList]
   );
 
   const handleStop = React.useCallback(
     (payload: Record<string, any>) => {
       console.log("🚀 ~ [STOP]", payload);
-      setCurrentStatus(payload);
+
       const currentClip = data.scenes[payload.currentSceneId];
+
+      // Helper to calculate adjusted watching second
+      const calculateWatchingSecond = () => {
+        const branch = currentClip?.branch;
+        const triggerTime = branch?.startTime !== undefined ? branch.startTime : (currentClip?.duration || 0);
+        // If we are indeed past or at trigger time (with 0.5s tolerance), save a bit earlier
+        if (branch?.options?.length && payload.time >= triggerTime - 0.5) {
+          // Return integer to avoid 400 error, back up 1 sec before trigger
+          return Math.max(0, Math.floor(triggerTime - 1));
+        }
+        return Math.floor(payload.time || 0);
+      };
+
+      const adjustedWatchingSecond = calculateWatchingSecond();
+
+      // Update local state with the adjusted time so 'Resume' works correctly immediately
+      setCurrentStatus({
+        ...payload,
+        time: adjustedWatchingSecond
+      });
 
       if (payload.actionName === PausedActionName.USER_PAUSED_VIDEO) {
         if (!isReviewScene) {
           updateSceneStatus({
             sceneId: payload.currentSceneId,
             totalDuration: Math.floor(currentClip?.duration || 0),
-            watchingSecond: Math.floor(payload.time || 0),
+            watchingSecond: adjustedWatchingSecond,
             status: "INPROGRESS",
-          });
+          }, (responseData: any) => triggerDisplayReward(responseData));
         }
         return;
       }
@@ -621,7 +647,7 @@ export const VideoPlayerProvider = ({
             {
               sceneId: payload.currentSceneId,
               totalDuration: Math.floor(currentClip?.duration || 0),
-              watchingSecond: Math.floor(payload.time || 0),
+              watchingSecond: adjustedWatchingSecond,
               status: "INPROGRESS",
             },
             (responseData: any) => triggerDisplayReward(responseData)
@@ -673,8 +699,7 @@ export const VideoPlayerProvider = ({
       updateSceneStatus,
       handleCollectionItems,
       collectionItems,
-      isReviewScene,
-      triggerDisplayReward,
+      isReviewScene
     ]
   );
 
@@ -773,7 +798,6 @@ export const VideoPlayerProvider = ({
         saveLocalParams({ previousSceneId: sceneId });
       } else {
         const isUserVip = [3].includes(userInfo?.isVip);
-        console.log("🚀 ~ handleChoiceSelected ~ isUserVip:", isUserVip, userInfo);
         removeLocalParam("previousSceneId");
         if (!isReviewScene) {
           updateSceneStatus({
@@ -782,7 +806,7 @@ export const VideoPlayerProvider = ({
             watchingSecond: Math.floor(data.scenes[sceneId]?.duration || 0),
             status: "COMPLETED",
             points: data.scenes[sceneId]?.points || 0,
-          });
+          }, (responseData: any) => triggerDisplayReward(responseData));
           const nextScene = data.scenes[nextSceneId];
           if (nextScene.isVip && !isUserVip) {
             return setIsVipModalOpen(true);
@@ -793,7 +817,7 @@ export const VideoPlayerProvider = ({
             watchingSecond: 0,
             status: "INPROGRESS",
             points: 0,
-          });
+          }, (responseData: any) => triggerDisplayReward(responseData));
         }
       }
       const nextScene = data.scenes[nextSceneId];
@@ -823,6 +847,10 @@ export const VideoPlayerProvider = ({
           },
           (params: any) => triggerDisplayReward(params)
         );
+        // const scene = data.scenes[sceneId];
+        // const isUserVip = [3].includes(userInfo?.isVip);
+
+
       }
 
       const scene = data.scenes[sceneId];
@@ -852,11 +880,21 @@ export const VideoPlayerProvider = ({
         const nextSceneId = (scene as any).targetSceneId;
         if (nextSceneId) {
           const nextScene = data.scenes[nextSceneId];
-          const isUserVip = userInfo?.isVip;
+          const isUserVip = userInfo?.isVip === 3;
           if (nextScene?.isVip && !isUserVip) {
             return setIsVipModalOpen(true);
           }
           onSetCurrentSceneId(nextSceneId);
+          updateSceneStatus(
+            {
+              sceneId: nextSceneId,
+              totalDuration: Math.floor(data.scenes[nextSceneId]?.duration || 0),
+              watchingSecond: 0,
+              status: "INPROGRESS",
+              points: 0,
+            },
+            (params: any) => triggerDisplayReward(params)
+          );
         }
       }
     },
@@ -864,7 +902,6 @@ export const VideoPlayerProvider = ({
       updateSceneStatus,
       data.scenes,
       isReviewScene,
-      triggerDisplayReward,
       pause,
       setIsEndingScene,
       onSetCurrentSceneId,
@@ -902,6 +939,8 @@ export const VideoPlayerProvider = ({
     setCurrentSceneId(data.progress?.currentScene?.sceneId || null);
     if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
     setPauseType(null);
+
+    setPauseType(null);
   }, [data.id, data.progress?.currentScene, pauseType]);
 
   const onInit = React.useCallback(() => {
@@ -910,7 +949,7 @@ export const VideoPlayerProvider = ({
       console.warn("Init player skipped: Missing api or data.id", { api: !!api, dataId: currentData?.id });
       return;
     }
-    console.log("Init player", { dataId: currentData.id });
+    console.log("Init player");
     const params = new URLSearchParams(window.location.search);
 
     // function ChoiceButtonWrapper({
@@ -1087,6 +1126,7 @@ export const VideoPlayerProvider = ({
     // currentSceneAudioUrl,
     setAiAudioList,
     setUseAiAudio,
+    setVersion
   };
   return (
     <VideoPlayerContext.Provider value={value}>

@@ -16,7 +16,6 @@ export default function Home() {
   const { setType, setCollectionItems, } = useVideoPlayerContext();
   const navigate = useNavigate();
   const { chapter, refetchProgress, refetchCollectedRewards, } = useUserContext();
-  console.log({ chapter })
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const [isVoiceOverlayOpen, setIsVoiceOverlayOpen] = React.useState(false);
