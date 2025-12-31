@@ -6,6 +6,7 @@ import { UserProvider } from "../features/user/context/user-provider";
 import { VideoPlayerProvider } from "../contexts/video-player-provider";
 import { useVideoPlayerContext } from "../contexts";
 import { useUserContext } from "../features/user/context";
+import { useAutoUpdate } from "../hooks/useAutoUpdate";
 
 import { BrowserRouter, Routes, Route, Outlet, useNavigate } from "react-router-dom";
 import VideoPlayer from "../features/video-player";
@@ -52,6 +53,7 @@ function LayoutWrapper() {
   // const isLandscapeMobile = useIsLandscapeMobile();
   const backgroundImage = "/images/new-bg.png";
   const { loading: userLoading } = useUserContext();
+  const { isUpdateAvailable, reloadApp } = useAutoUpdate();
   // const [orientationStatus, setOrientationStatus] = React.useState(!isLandscapeMobile);
 
 
@@ -109,6 +111,14 @@ function LayoutWrapper() {
     setType("story");
     setVersion(Math.random());
   };
+
+
+
+  React.useEffect(() => {
+    if (isUpdateAvailable && type === "interactive") {
+      pause();
+    }
+  }, [isUpdateAvailable, type, pause]);
 
   // React.useEffect(() => {
   //   if (type === "interactive") {
@@ -206,6 +216,16 @@ function LayoutWrapper() {
         }}
         title="Đăng ký thành viên SVIP"
         message="Để trải nghiệm toàn bộ nội dung và cơ hội nhận quà độc quyền từ chương trình SVIP"
+      />
+
+      {/* Update Available Dialog */}
+      <GameModal
+        isOpen={isUpdateAvailable}
+        onClose={() => { }} // Helper to keep it open or optional close? Plan didn't specify strict force. User said "hiển thị modal". I'll make it non-closable effectively by empty onClose, or user can click out? GameModal usually handles click out.
+        // Assuming strict update is better.
+        onConfirm={reloadApp}
+        title="Cập nhật ngày"
+        message="Đã có phiên bản mới."
       />
 
       {/* Dialog Info */}
