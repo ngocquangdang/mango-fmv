@@ -31,13 +31,13 @@ export default function Home() {
     const trackingLabels: Record<string, string> = {
       story: "Cốt Truyện",
       journal: "Nhật Ký",
-      ranking: "Ranking",
+      ranking: "Xếp hạng",
       collection: "Bộ Sưu Tập",
     };
 
     if (trackingLabels[actionName]) {
       gtmEvent("button_click", {
-        button_id: actionName,
+        button_id: actionName === "journal" ? "diary" : actionName,
         button_label: trackingLabels[actionName]
       });
     }
