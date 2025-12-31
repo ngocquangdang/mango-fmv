@@ -226,7 +226,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
       ai: "Giọng AI"
     };
     gtmEvent("button_click", {
-      button_id: type,
+      button_id: type === "original" ? "default" : type,
       button_label: labels[type]
     });
     setVoiceType(type);
