@@ -459,7 +459,7 @@ export const VideoPlayerProvider = ({
           }
         }
       };
-      // 1. Process start scene
+      // 1. Process current scene
       const currentScene = data.progress?.currentScene?.sceneId;
       if (currentScene) {
         await processSingleScene(currentScene);

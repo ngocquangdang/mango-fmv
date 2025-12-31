@@ -21,7 +21,7 @@ import CardCollection from "./pages/card-collection";
 import CollectionPage from "./pages/collection";
 import QrLoginPage from "./pages/qr-login";
 
-const useIsLandscapeMobile = () => {
+export const useIsLandscapeMobile = () => {
   const [isLandscape, setIsLandscape] = React.useState(true);
 
   React.useEffect(() => {
@@ -49,10 +49,10 @@ const useIsLandscapeMobile = () => {
 
 // Layout Component to keep persistent VideoPlayer and Modals
 function LayoutWrapper() {
-  const isLandscapeMobile = useIsLandscapeMobile();
+  // const isLandscapeMobile = useIsLandscapeMobile();
   const backgroundImage = "/images/new-bg.png";
   const { loading: userLoading } = useUserContext();
-  const [orientationStatus, setOrientationStatus] = React.useState(!isLandscapeMobile);
+  // const [orientationStatus, setOrientationStatus] = React.useState(!isLandscapeMobile);
 
 
   const {
@@ -110,18 +110,18 @@ function LayoutWrapper() {
     setVersion(Math.random());
   };
 
-  React.useEffect(() => {
-    if (type === "interactive") {
-      if (orientationStatus) {
-        pause();
-      }
-    }
-  }, [orientationStatus, type, pause]);
+  // React.useEffect(() => {
+  //   if (type === "interactive") {
+  //     if (orientationStatus) {
+  //       pause();
+  //     }
+  //   }
+  // }, [orientationStatus, type, pause]);
 
   // Sync orientation check
-  React.useEffect(() => {
-    setOrientationStatus(!isLandscapeMobile);
-  }, [isLandscapeMobile]);
+  // React.useEffect(() => {
+  //   setOrientationStatus(!isLandscapeMobile);
+  // }, [isLandscapeMobile]);
 
   return (
     <div
