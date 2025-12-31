@@ -187,7 +187,7 @@ const ChapterFlowV2 = () => {
       if (scene.originalAudio) {
         console.log("Checking voice result for:", scene.originalAudio);
         // const { audioRecordings } = clickContextRef.current;
-        // const firstRecordingUrl = audioRecordings?.[0]?.cdnUrl || "https://cdn-audio-dev.mangoplus.vn/interactive-video-audio-recordings/audio-recordings/dcedeab9523a5e089bf0d2eafd5c3497/1766875005417-e2e-test-recording.m4a";
+        // const firstRecordingUrl = audioRecordings?.[0]?.cdnUrl;
 
         // VoiceService.getProcessingResult(nodeId, firstRecordingUrl, scene.originalAudio)
         //   .then(res => console.log("Voice Result:", res))
