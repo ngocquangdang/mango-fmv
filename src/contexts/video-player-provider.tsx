@@ -443,35 +443,47 @@ export const VideoPlayerProvider = ({
         }
       };
 
+      const processNextScene = async (startScene: any) => {
+        if (startScene) {
+          const nextSceneIds: string[] = [];
+          if (startScene.targetSceneId) nextSceneIds.push(startScene.targetSceneId);
+          if (startScene.branch?.options) {
+            startScene.branch.options.forEach((opt: any) => {
+              if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
+            });
+          }
+
+          for (const nid of nextSceneIds) {
+            if (isCancelled) break;
+            await processSingleScene(nid);
+          }
+        }
+      };
+      // 1. Process start scene
+      const currentScene = data.progress?.currentScene?.sceneId;
+      if (currentScene) {
+        await processSingleScene(currentScene);
+        const nextSceneIds = data.scenes[currentScene];
+        // 2. Process immediate next scenes only
+        processNextScene(nextSceneIds);
+      }
       // 1. Process start scene
       await processSingleScene(data.startSceneId);
 
       // 2. Process immediate next scenes only
       const startScene = data.scenes[data.startSceneId];
-      if (startScene) {
-        const nextSceneIds: string[] = [];
-        if (startScene.targetSceneId) nextSceneIds.push(startScene.targetSceneId);
-        if (startScene.branch?.options) {
-          startScene.branch.options.forEach((opt: any) => {
-            if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
-          });
-        }
+      processNextScene(startScene);
 
-        for (const nid of nextSceneIds) {
-          if (isCancelled) break;
-          await processSingleScene(nid);
-        }
-      }
     };
 
-    if (voiceType === "ai") {
+    if (voiceType === "ai" && userInfo?.isVip === 3) {
       fetchSceneAudio();
     }
 
     return () => {
       isCancelled = true;
     };
-  }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType]);
+  }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType, userInfo?.isVip, data.progress?.currentScene?.sceneId]);
 
   const triggerDisplayReward = (data: any) => {
     if (data?.relationships?.length > 0) {
