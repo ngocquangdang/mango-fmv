@@ -151,6 +151,21 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
     }
   }, [userInfo]); // Only run once on mount
 
+  // Check microphone permission when overlay opens
+  useEffect(() => {
+    if (isOpen) {
+      navigator?.mediaDevices?.getUserMedia({ audio: true })
+        .then(function (stream) {
+          console.log("Microphone access granted");
+        })
+        .catch(function (err) {
+          console.log("Lỗi: " + err.name);
+          // Nếu err.name là 'NotAllowedError', nghĩa là WebView hoặc Hệ điều hành đã chặn.
+          // Nếu là 'NotFoundError', nghĩa là không tìm thấy thiết bị phần cứng.
+        });
+    }
+  }, [isOpen]);
+
   // Determine which audio to play based on voice type
   const currentAudioUrl = voiceType === 'ai' ? aiProcessedAudioUrl : firstSceneAudioUrl;
   const isAudioAvailable = voiceType === 'ai' ? !!aiProcessedAudioUrl : !!firstSceneAudioUrl;
