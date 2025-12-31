@@ -156,7 +156,7 @@ function LayoutWrapper() {
       )}
 
       {/* Orientation Dialog */}
-      <GameModal
+      {/* <GameModal
         isOpen={orientationStatus}
         onConfirm={() => {
           if (type === "interactive") {
@@ -165,7 +165,7 @@ function LayoutWrapper() {
           setOrientationStatus(false);
         }}
         message="Vui lòng xoay ngang màn hình để tiếp tục trải nghiệm. Player ưu tiên hiển thị ngang trên điện thoại."
-      />
+      /> */}
 
       {/* Confirmation Dialog */}
       <GameModal
