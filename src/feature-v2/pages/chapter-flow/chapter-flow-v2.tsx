@@ -7,7 +7,7 @@ import { useFlowChart } from "./context";
 import { getLayoutedElements } from "../../../features/pixel-flow/layout";
 import { useVideoPlayerContext } from "../../../contexts";
 import { useToast } from "../../../components/ui/toast-v2/use-toast";
-import { VoiceService } from "../../services/voice-service";
+// import { VoiceService } from "../../services/voice-service";
 import { useUserContext } from "../../../features/user/context";
 
 const ChapterFlowV2 = () => {
@@ -186,12 +186,12 @@ const ChapterFlowV2 = () => {
       console.log("Checking voice result for:", scene.originalAudio);
       if (scene.originalAudio) {
         console.log("Checking voice result for:", scene.originalAudio);
-        const { audioRecordings } = clickContextRef.current;
-        const firstRecordingUrl = audioRecordings?.[0]?.cdnUrl || "https://cdn-audio-dev.mangoplus.vn/interactive-video-audio-recordings/audio-recordings/dcedeab9523a5e089bf0d2eafd5c3497/1766875005417-e2e-test-recording.m4a";
+        // const { audioRecordings } = clickContextRef.current;
+        // const firstRecordingUrl = audioRecordings?.[0]?.cdnUrl || "https://cdn-audio-dev.mangoplus.vn/interactive-video-audio-recordings/audio-recordings/dcedeab9523a5e089bf0d2eafd5c3497/1766875005417-e2e-test-recording.m4a";
 
-        VoiceService.getProcessingResult(nodeId, firstRecordingUrl, scene.originalAudio)
-          .then(res => console.log("Voice Result:", res))
-          .catch(err => console.error("Voice Check Error:", err));
+        // VoiceService.getProcessingResult(nodeId, firstRecordingUrl, scene.originalAudio)
+        //   .then(res => console.log("Voice Result:", res))
+        //   .catch(err => console.error("Voice Check Error:", err));
       }
 
       setReviewScene(false);
