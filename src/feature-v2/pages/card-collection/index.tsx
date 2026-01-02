@@ -306,7 +306,7 @@ function CardCollectionContent() {
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
         }}></div>
-        <div className='absolute top-6 right-1 w-8 h-8 lg:top-10 lg:right-5 lg:w-10 lg:h-10  font-bold text-lg lg:text-2xl text-[#FF4820]'>+</div>
+        {/* <div className='absolute top-6 right-1 w-8 h-8 lg:top-10 lg:right-5 lg:w-10 lg:h-10  font-bold text-lg lg:text-2xl text-[#FF4820]'>+</div> */}
       </div>
 
       {/* Header Banner */}

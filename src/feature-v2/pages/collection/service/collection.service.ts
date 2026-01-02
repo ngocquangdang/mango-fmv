@@ -107,6 +107,7 @@ export interface HistoryTransaction {
   activity: string;
   amount: number; // Unified field, originally mangoAmount or amount
   mangoAmount?: number; // Keep optional if API returns varying names
+  type?: string;
 }
 
 export interface UserLeaderboardItem {

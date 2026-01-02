@@ -110,7 +110,8 @@ export function HistoryRight() {
     return spendingData.data.map((item) => ({
       date: new Date(item.createdAt).toLocaleDateString('vi-VN'),
       action: item.activity,
-      amount: item.amount
+      amount: item.amount,
+      type: item.type
     }));
   }, [spendingData]);
 
@@ -162,9 +163,16 @@ export function HistoryRight() {
             <div className="w-full text-center py-4">Loading...</div>
           ) : (
             spendHistory.map((item, idx) => (
-              <div key={idx} className="flex text-[#112953] font-bold text-[10px] lg:text-sm py-1 border-b border-gray-200">
+              <div key={idx} className="flex items-center text-[#112953] font-bold text-[10px] lg:text-sm py-1 border-b border-gray-200">
                 <div className="w-1/3 text-center">{item.date}</div>
-                <div className="w-1/3 text-center opacity-80">{item.action}</div>
+                <div className={`w-1/3 text-center flex flex-col items-start justify-center ${item.type === 'DRAW' ? '' : 'opacity-80'}`}>
+                  {item.type === 'DRAW' ? (
+                    <>
+                      <span className="text-[10px] lg:text-xs text-[#112953] font-hand font-bold">túi mù</span>
+                      <span className="text-[#007AFF]">{item.action}</span>
+                    </>
+                  ) : item.action}
+                </div>
                 <div className="w-1/3 text-center">{item.amount}</div>
               </div>
             ))
