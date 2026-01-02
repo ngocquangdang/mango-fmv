@@ -10,7 +10,7 @@ import Button from "../../components/ui/button";
 import GameModal from "../../components/ui/dialog";
 import { CardCollectionProvider } from "./context"; // Import provider
 import { useCardCollection } from "./hooks/use-card-collection"; // Import hook
-import { useTicketPrice } from "./hooks/use-card-collection-query";
+// import { useTicketPrice } from "./hooks/use-card-collection-query";
 import { useVideoPlayerContext } from "../../../contexts";
 import { getOrderStatus } from "../../../lib/api/ticket-api";
 import type { Card } from "./services/card-collection-service";
@@ -182,8 +182,8 @@ function CardCollectionContent() {
   };
 
   const activeBanner = banners[selectedBannerIndex];
-  const { data: ticketPriceData } = useTicketPrice(activeBanner?.type);
-  const ticketPrice = ticketPriceData?.data?.price ?? 10;
+  // const { data: ticketPriceData } = useTicketPrice(activeBanner?.type);
+  // const ticketPrice = ticketPriceData?.data?.price ?? 10;
 
   const handleBulkOpen = async () => {
     if ((userInfo as any)?.isVip !== 3) {
