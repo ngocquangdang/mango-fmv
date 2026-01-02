@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import NotebookLayout from "../../../components/notebook";
-// import { useCollectionContext } from "../context/collection-context";
+import { useCollectionContext } from "../context/collection-context";
 import Banner from "../../../components/banner";
 import type { CollectionItem } from "../right-side";
 import { useToast } from "../../../../components/ui/toast-v2/use-toast";
@@ -13,7 +13,11 @@ import MergeCardRight from "./right";
 export default function MergeCardPage() {
   // const { setType } = useVideoPlayerContext();
   const navigate = useNavigate();
-  // const { fetchCollection } = useCollectionContext();
+  const { fetchCollection } = useCollectionContext();
+
+  useEffect(() => {
+    fetchCollection();
+  }, []);
   // const { id: characterId } = useParams(); // Get subpage param which might contain ID?
   // The routing in collection/index.tsx uses wildcard: /collection/*, so params["*"] helps us
   const { showToast } = useToast();

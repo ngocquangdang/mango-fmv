@@ -26,7 +26,7 @@ function CardCollectionContent() {
   const [isOpeningBulk, setIsOpeningBulk] = React.useState(false);
   const [isOpeningSingle, setIsOpeningSingle] = React.useState(false);
   const [isLoadingBulk, setIsLoadingBulk] = React.useState(false);
-  const [isLoadingSingle, setIsLoadingSingle] = React.useState(false);
+  // const [isLoadingSingle, setIsLoadingSingle] = React.useState(false);
   const [isBuyingTickets, setIsBuyingTickets] = React.useState(false);
   const [selectedBannerIndex, setSelectedBannerIndex] = React.useState(0);
   const [openedCards, setOpenedCards] = React.useState<Card[]>([]);
@@ -235,35 +235,35 @@ function CardCollectionContent() {
     }
   };
 
-  const handleSingleOpen = async () => {
-    if ((userInfo as any)?.isVip !== 3) {
-      setIsVipModalOpen(true);
-      return;
-    }
-    if (!activeBanner) return;
-    setIsLoadingSingle(true);
-    setIsShowingBonus(false);
-    try {
-      await openBlindBag({ bannerId: activeBanner.id, quantity: 1 }, {
-        onSuccess: (data) => {
-          console.log("Single open success", data);
-          setOpenedCards(data.data.results);
-          setBonusCards(data.data.bonusRewards || []);
-          setIsOpeningSingle(true);
-        },
-        onSettled: () => {
-          setIsLoadingSingle(false);
-        }
-      });
-    } catch (e: any) {
-      console.error("Failed to open bag", e);
-      setIsLoadingSingle(false);
-      const errorMessage = e?.response?.data?.error?.message || "Có lỗi xảy ra, vui lòng thử lại sau.";
-      showToast({
-        description: errorMessage,
-      });
-    }
-  }
+  // const handleSingleOpen = async () => {
+  //   if ((userInfo as any)?.isVip !== 3) {
+  //     setIsVipModalOpen(true);
+  //     return;
+  //   }
+  //   if (!activeBanner) return;
+  //   setIsLoadingSingle(true);
+  //   setIsShowingBonus(false);
+  //   try {
+  //     await openBlindBag({ bannerId: activeBanner.id, quantity: 1 }, {
+  //       onSuccess: (data) => {
+  //         console.log("Single open success", data);
+  //         setOpenedCards(data.data.results);
+  //         setBonusCards(data.data.bonusRewards || []);
+  //         setIsOpeningSingle(true);
+  //       },
+  //       onSettled: () => {
+  //         setIsLoadingSingle(false);
+  //       }
+  //     });
+  //   } catch (e: any) {
+  //     console.error("Failed to open bag", e);
+  //     setIsLoadingSingle(false);
+  //     const errorMessage = e?.response?.data?.error?.message || "Có lỗi xảy ra, vui lòng thử lại sau.";
+  //     showToast({
+  //       description: errorMessage,
+  //     });
+  //   }
+  // }
 
   const handleCloseSingle = () => {
     if (bonusCards.length > 0) {
@@ -348,7 +348,7 @@ function CardCollectionContent() {
         {/* Action Buttons */}
         <div className="flex gap-4 lg:gap-10 z-20 items-center justify-center relative bottom-10 lg:bottom-24">
           {/* Single Open */}
-          <div className="flex flex-col items-center gap-2 relative">
+          {/* <div className="flex flex-col items-center gap-2 relative">
             <Button
               label={isLoadingSingle ? "Đang xé..." : "Xé túi mù"}
               size="small"
@@ -363,7 +363,7 @@ function CardCollectionContent() {
               <span className=" text-[10px] absolute left-1 top-5 -rotate-20">tốn {ticketPrice}</span>
               <img src="/images/collection/ticket-x.png" alt="ticket" className="w-14 h-12 lg:w-24 lg:h-[70px] lg:-left-12 lg:-top-2" />
             </div>
-          </div>
+          </div> */}
 
           {/* Bulk Open */}
           <div className="flex flex-col items-center gap-2 relative">
@@ -374,7 +374,7 @@ function CardCollectionContent() {
               className="text-white! text-xs pl-8 pr-2"
               containerClassName="bg-contain! w-fit text-white! text-xs pl-10 pr-2"
               onClick={handleBulkOpen}
-              disabled={isLoadingSingle || isLoadingBulk}
+              disabled={isLoadingBulk}
               customBgImage="/images/collection/button-primary.png"
             />
             <div className='absolute -left-2 -top-2 z-10'>

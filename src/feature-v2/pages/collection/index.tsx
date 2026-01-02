@@ -36,21 +36,21 @@ export function CollectionPageContent() {
       id: "card-collection",
       slug: "card-collection"
     },
-    {
-      name: "Bảng xếp hạng",
-      id: "leaderboard",
-      slug: "leaderboard"
-    },
+    // {
+    //   name: "Bảng xếp hạng",
+    //   id: "leaderboard",
+    //   slug: "leaderboard"
+    // },
     {
       name: "Thẻ giới hạn",
       id: "limited",
       slug: "limited"
     },
-    {
-      name: "Lịch sử Giao dịch",
-      id: "history",
-      slug: "history"
-    }
+    // {
+    //   name: "Lịch sử Giao dịch",
+    //   id: "history",
+    //   slug: "history"
+    // }
   ];
 
   const handleSelectSubPage = (id: string) => {

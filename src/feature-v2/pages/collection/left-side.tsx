@@ -24,13 +24,6 @@ const LeftSide: React.FC = () => {
                 </div>
               )}
             </div>
-
-            {/* Card Name */}
-            <div className="mt-2 text-center">
-              <h2 className="font-hand text-sm lg:text-xl font-bold text-gray-800">
-                {selectedCard.name}
-              </h2>
-            </div>
           </div>
         </div>
       ) : (

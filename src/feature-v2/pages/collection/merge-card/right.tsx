@@ -12,9 +12,6 @@ interface MergeCardRightProps {
 export default function MergeCardRight({ slots, onRemoveSlot, onMerge }: MergeCardRightProps) {
   return (
     <div className="w-full h-full flex flex-col items-center relative pt-2 lg:pt-4 overflow-hidden">
-
-
-
       <div className="flex-1 flex flex-col w-full relative z-10 items-center justify-start mt-8 lg:mt-10">
 
         {/* Mystery Card Area - Scaled down significantly */}
