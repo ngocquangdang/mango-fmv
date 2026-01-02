@@ -8,19 +8,18 @@ import { useRestartChapter } from "../../features/user/hooks";
 import GameModal from "../components/ui/dialog";
 import SelectVoiceOverlay from "../components/select-voice-overlay";
 
+import { gtmEvent } from "../../lib/analytics";
+
 const IMAGE_VERSION = "1";
 
 export default function Home() {
   const { setType, setCollectionItems, } = useVideoPlayerContext();
   const navigate = useNavigate();
   const { chapter, refetchProgress, refetchCollectedRewards, } = useUserContext();
-  console.log({ chapter })
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const [isVoiceOverlayOpen, setIsVoiceOverlayOpen] = React.useState(false);
-  /* Removed shakeState + effects in favor of CSS animations */
 
-  // Determine if the game is in progress (has progress & multiple scenes)
   const isPlaying = useMemo(() => {
     return Object.values(chapter?.progress?.scenes || {}).length > 1 || chapter.progress?.currentScene?.watchingSecond;
   }, [chapter.progress?.scenes, chapter.progress?.currentScene?.watchingSecond]);
@@ -28,6 +27,21 @@ export default function Home() {
   const handleClick = async (
     actionName: "story" | "journal" | "ranking" | "playAgain" | "collection" | "cardCollection"
   ) => {
+    // Map actionName to Vietnamese labels for tracking consistency with the request
+    const trackingLabels: Record<string, string> = {
+      story: "Cốt Truyện",
+      journal: "Nhật Ký",
+      ranking: "Xếp hạng",
+      collection: "Bộ Sưu Tập",
+    };
+
+    if (trackingLabels[actionName]) {
+      gtmEvent("button_click", {
+        button_id: actionName === "journal" ? "diary" : actionName,
+        button_label: trackingLabels[actionName]
+      });
+    }
+
     if (actionName === "playAgain") {
       setDialogName("quitPlayer");
       return;
@@ -55,6 +69,10 @@ export default function Home() {
     // const sceneId =
     //   chapter.progress?.currentScene?.sceneId || chapter.startSceneId;
     // onPlayPlayer(sceneId);
+    gtmEvent("button_click", {
+      button_id: "start",
+      button_label: isPlaying ? "Tiếp tục" : "Bắt Đầu"
+    });
     setType("story");
     setCollectionItems({});
   };
@@ -90,11 +108,11 @@ export default function Home() {
       label: "Xếp hạng",
       onClick: () => handleClick("ranking"),
     },
-    // {
-    //   icon: `/images/home/collection.png?v=${IMAGE_VERSION}`,
-    //   label: "Bộ sưu tập",
-    //   onClick: () => handleClick("collection"),
-    // },
+    {
+      icon: `/images/home/collection.png?v=${IMAGE_VERSION}`,
+      label: "Bộ sưu tập",
+      onClick: () => handleClick("collection"),
+    },
     ...(+(isPlaying || 0) > 0 ? [
       {
         icon: `/images/reload-icon.png?v=${IMAGE_VERSION}`,
@@ -106,14 +124,16 @@ export default function Home() {
       icon: `/images/ask-icon.png?v=${IMAGE_VERSION}`,
       label: "Chọn Voice",
       onClick: () => {
-        // if (userInfo?.isVip === 3) {
+        gtmEvent("button_click", {
+          button_id: "select_voice",
+          button_label: "Chọn Voice"
+        });
+        // Use cached daily usage count instead of calling API
+
+        // Open overlay if within limit
         setIsVoiceOverlayOpen(true);
-        // } else {
-        //   setIsVipModalOpen(true);
-        // }
       },
     },
-
 
   ], [IMAGE_VERSION, handleClick, isPlaying]);
 
@@ -179,6 +199,8 @@ export default function Home() {
         isOpen={isVoiceOverlayOpen}
         onClose={() => setIsVoiceOverlayOpen(false)}
       />
+
+
     </div>
   );
 }

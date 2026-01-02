@@ -183,7 +183,7 @@ const TicketPurchaseOverlay = ({
                 />
 
                 {/* Price */}
-                <div className="mt-1">
+                <div className="mt-1 text-center">
                   <span className="text-base font-bold text-[#112953]" style={{ fontFamily: 'var(--font-handwriting, inherit)' }}>
                     {(pkg.price).toLocaleString("vi-VN")} {pkg.currency?.toLowerCase() || 'vnđ'}
                   </span>

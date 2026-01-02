@@ -23,6 +23,7 @@ declare global {
       setReviewScene?: (status: boolean) => void;
       setAiAudioList?: (audioList: {sceneId: string, aiAudio: string}[]) => void;
       setUseAiAudio?: (type: "ai" | "original" | "mute") => void;
+      setVersion?: (version: number) => void;
     };
   }
 }

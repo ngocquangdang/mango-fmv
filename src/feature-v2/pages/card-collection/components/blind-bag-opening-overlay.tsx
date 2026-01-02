@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Button from "../../../components/ui/button";
 import confetti from "canvas-confetti";
 import type { Card } from "../services/card-collection-service";
@@ -9,6 +9,8 @@ interface BlindBagOpeningOverlayProps {
   onSkip?: () => void;
   cards?: Card[];
   blindBagImage?: string;
+  onViewCollection?: () => void;
+  isBonus?: boolean;
 }
 
 const BlindBagOpeningOverlay = ({
@@ -16,6 +18,8 @@ const BlindBagOpeningOverlay = ({
   onSkip,
   cards = [],
   blindBagImage = "",
+  onViewCollection,
+  isBonus = false,
 }: BlindBagOpeningOverlayProps) => {
   const navigate = useNavigate();
   const [revealedIndices, setRevealedIndices] = useState<number[]>([]);
@@ -23,6 +27,8 @@ const BlindBagOpeningOverlay = ({
   const [zoomedItemIndex, setZoomedItemIndex] = useState<number | null>(null);
 
   const isAllRevealed = revealedIndices.length === cards.length;
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -38,13 +44,20 @@ const BlindBagOpeningOverlay = ({
 
   useEffect(() => {
     let animationFrameId: number;
-    if (isAllRevealed && !isLoading) {
+    let myConfetti: any;
+
+    if (isAllRevealed && !isLoading && canvasRef.current) {
+      myConfetti = confetti.create(canvasRef.current, {
+        resize: true,
+        useWorker: true,
+      });
+
       // Launch confetti when all revealed
       const duration = 500;
       const end = Date.now() + duration;
 
       const frame = () => {
-        confetti({
+        myConfetti({
           particleCount: 5,
           angle: 60,
           spread: 55,
@@ -52,7 +65,7 @@ const BlindBagOpeningOverlay = ({
           zIndex: 100,
           colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
         });
-        confetti({
+        myConfetti({
           particleCount: 5,
           angle: 120,
           spread: 55,
@@ -70,7 +83,7 @@ const BlindBagOpeningOverlay = ({
     }
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
-      confetti.reset();
+      if (myConfetti) myConfetti.reset();
     };
   }, [isAllRevealed, isLoading]);
 
@@ -97,7 +110,13 @@ const BlindBagOpeningOverlay = ({
     }
   };
 
-  const handleViewCollection = () => navigate('/collection')
+  const handleViewCollection = () => {
+    if (onViewCollection) {
+      onViewCollection();
+    } else {
+      navigate('/collection');
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
@@ -106,10 +125,17 @@ const BlindBagOpeningOverlay = ({
         /* Loading View */
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-white font-bold text-xl animate-pulse">Đang mở túi...</p>
+          <p className="text-white font-bold text-xl animate-pulse">{isBonus ? "Đang mở phần thưởng..." : "Đang mở túi..."}</p>
         </div>
       ) : (
         <>
+          {/* Bonus Banner */}
+          {isBonus && (
+            <div className="mb-8 scale-75 lg:scale-100">
+              <p className="text-white font-bold text-xl">Chúc mừng bạn nhận được thẻ giới hạn</p>
+            </div>
+          )}
+
           {/* 2 Rows of 5 items */}
           <div className="grid grid-cols-5 gap-4 lg:gap-8 mb-8">
             {cards.map((item: any, index) => {
@@ -178,25 +204,23 @@ const BlindBagOpeningOverlay = ({
           onClick={() => setZoomedItemIndex(null)}
         >
           <div className="relative transform transition-all animate-in zoom-in-95 duration-200 p-4">
-            <div className="w-[300px] h-[450px] lg:w-[400px] lg:h-[600px] bg-slate-800 rounded-xl overflow-hidden border-4 border-white/20 shadow-2xl relative">
+            <div className="w-[220px] h-[330px] lg:w-[280px] lg:h-[420px] bg-slate-800 rounded-xl overflow-hidden border-4 border-white/20 shadow-2xl relative">
               {(() => {
                 const item: any = cards[zoomedItemIndex];
                 const cardImage = item?.imageUrl || item?.image || "/images/home/charactor.png";
                 const cardName = item?.name || `ITEM ${zoomedItemIndex + 1}`;
                 return (
-                  <>
-                    <img src={cardImage} alt={cardName} className="w-full h-full object-cover" />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6 pt-20">
-                      <h3 className="text-white text-2xl lg:text-3xl font-bold uppercase text-center tracking-wider">{cardName}</h3>
-                      <p className="text-white/80 text-center mt-2 text-sm">Chạm ra ngoài để đóng</p>
-                    </div>
-                  </>
+                  <img src={cardImage} alt={cardName} className="w-full h-full object-inherit" />
                 );
               })()}
             </div>
           </div>
         </div>
       )}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none z-[100]"
+      />
     </div>
   );
 };

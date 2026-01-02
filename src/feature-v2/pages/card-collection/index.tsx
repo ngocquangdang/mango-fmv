@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Banner from "../../components/banner";
@@ -11,21 +10,28 @@ import Button from "../../components/ui/button";
 import GameModal from "../../components/ui/dialog";
 import { CardCollectionProvider } from "./context"; // Import provider
 import { useCardCollection } from "./hooks/use-card-collection"; // Import hook
+// import { useTicketPrice } from "./hooks/use-card-collection-query";
+import { useVideoPlayerContext } from "../../../contexts";
 import { getOrderStatus } from "../../../lib/api/ticket-api";
-
-import type { Card } from "./services/card-collection-service"; // Import Card type
+import type { Card } from "./services/card-collection-service";
+import { useToast } from "../../../components/ui/toast-v2/use-toast";
 
 function CardCollectionContent() {
   const navigate = useNavigate();
-  const { banners, userState, userInfo, openBlindBag, isOpening } = useCardCollection();
+  const { banners, userState, userInfo, openBlindBag } = useCardCollection();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { showToast } = useToast();
+  const { setIsVipModalOpen } = useVideoPlayerContext();
 
   const [isOpeningBulk, setIsOpeningBulk] = React.useState(false);
   const [isOpeningSingle, setIsOpeningSingle] = React.useState(false);
+  const [isLoadingBulk, setIsLoadingBulk] = React.useState(false);
+  // const [isLoadingSingle, setIsLoadingSingle] = React.useState(false);
   const [isBuyingTickets, setIsBuyingTickets] = React.useState(false);
   const [selectedBannerIndex, setSelectedBannerIndex] = React.useState(0);
   const [openedCards, setOpenedCards] = React.useState<Card[]>([]);
   const [bonusCards, setBonusCards] = React.useState<Card[]>([]);
+  const [isShowingBonus, setIsShowingBonus] = React.useState(false);
   const [paymentStatus, setPaymentStatus] = React.useState<'verifying' | 'success' | 'failed' | null>(null);
   const [paymentModalData, setPaymentModalData] = React.useState<{
     isOpen: boolean;
@@ -176,53 +182,101 @@ function CardCollectionContent() {
   };
 
   const activeBanner = banners[selectedBannerIndex];
+  // const { data: ticketPriceData } = useTicketPrice(activeBanner?.type);
+  // const ticketPrice = ticketPriceData?.data?.price ?? 10;
 
   const handleBulkOpen = async () => {
+    if ((userInfo as any)?.isVip !== 3) {
+      setIsVipModalOpen(true);
+      return;
+    }
     if (!activeBanner) return;
+    setIsLoadingBulk(true);
+    setIsShowingBonus(false);
     try {
-      openBlindBag({ bannerId: activeBanner.id, quantity: 10 }, {
+      await openBlindBag({ bannerId: activeBanner.id, quantity: 10 }, {
         onSuccess: (data) => {
           console.log("Bulk open success", data);
           setIsOpeningBulk(true);
           setOpenedCards(data.data.results);
           setBonusCards(data.data.bonusRewards || []);
         },
+        onSettled: () => {
+          setIsLoadingBulk(false);
+        }
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error("Failed to open bags", e);
-      // Handle error (e.g. not enough tickets)
+      setIsLoadingBulk(false);
+      const errorMessage = e?.response?.data?.error?.message || "Có lỗi xảy ra, vui lòng thử lại sau.";
+      showToast({
+        description: errorMessage,
+      });
     }
   };
 
   const handleCloseBulk = () => {
     setIsOpeningBulk(false);
     if (bonusCards.length > 0) {
-      setOpenedCards(bonusCards);
-      setIsOpeningSingle(true);
-      setBonusCards([]);
+      setTimeout(() => {
+        setOpenedCards(bonusCards);
+        setIsOpeningBulk(true);
+        setIsShowingBonus(true);
+        setBonusCards([]);
+      }, 300);
     }
   };
 
-  const handleSingleOpen = async () => {
-    if (!activeBanner) return;
-    try {
-      openBlindBag({ bannerId: activeBanner.id, quantity: 1 }, {
-        onSuccess: (data) => {
-          console.log("Single open success", data);
-          setOpenedCards(data.data.results);
-          setBonusCards(data.data.bonusRewards || []);
-          setIsOpeningSingle(true);
-        },
-      });
-    } catch (e) {
-      console.error("Failed to open bag", e);
+  const handleViewCollectionFromOverlay = () => {
+    if (bonusCards.length > 0) {
+      handleCloseBulk();
+    } else {
+      navigate('/collection');
     }
-  }
+  };
+
+  // const handleSingleOpen = async () => {
+  //   if ((userInfo as any)?.isVip !== 3) {
+  //     setIsVipModalOpen(true);
+  //     return;
+  //   }
+  //   if (!activeBanner) return;
+  //   setIsLoadingSingle(true);
+  //   setIsShowingBonus(false);
+  //   try {
+  //     await openBlindBag({ bannerId: activeBanner.id, quantity: 1 }, {
+  //       onSuccess: (data) => {
+  //         console.log("Single open success", data);
+  //         setOpenedCards(data.data.results);
+  //         setBonusCards(data.data.bonusRewards || []);
+  //         setIsOpeningSingle(true);
+  //       },
+  //       onSettled: () => {
+  //         setIsLoadingSingle(false);
+  //       }
+  //     });
+  //   } catch (e: any) {
+  //     console.error("Failed to open bag", e);
+  //     setIsLoadingSingle(false);
+  //     const errorMessage = e?.response?.data?.error?.message || "Có lỗi xảy ra, vui lòng thử lại sau.";
+  //     showToast({
+  //       description: errorMessage,
+  //     });
+  //   }
+  // }
 
   const handleCloseSingle = () => {
-    setIsOpeningSingle(false);
-    setOpenedCards([]);
-    setBonusCards([]);
+    if (bonusCards.length > 0) {
+      setOpenedCards(bonusCards);
+      setIsOpeningBulk(true); // Switch to Bulk Overlay (Grid View)
+      setIsShowingBonus(true);
+      setIsOpeningSingle(false);
+      setBonusCards([]); // Clear so we don't loop
+    } else {
+      setIsOpeningSingle(false);
+      setOpenedCards([]);
+      setBonusCards([]);
+    }
   }
 
   // Use real ticket count from API (userInfo has the actual balance from database)
@@ -248,7 +302,7 @@ function CardCollectionContent() {
 
       {/* Currency Top Right */}
 
-      <div className="absolute top-0 right-0 flex items-center gap-2 p-4" onClick={() => setIsBuyingTickets(true)}>
+      {/* <div className="absolute top-0 right-0 flex items-center gap-2 p-4" onClick={() => { }}>
         <div
           className="w-20 h-10 lg:w-[164px] lg:h-[82px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-xl lg:pb-1"
           style={{ backgroundImage: `url(/images/score-banner.png)` }}
@@ -256,14 +310,14 @@ function CardCollectionContent() {
           {tickets}
 
         </div>
-        <div className='absolute top-4 left-0 w-8 h-8 lg:w-13 lg:h-13 lg:top-5 lg:left-3' style={{
+        <div className='absolute top-4 left-1 w-8 h-8 lg:w-13 lg:h-13 lg:top-5 lg:left-3' style={{
           backgroundImage: "url('/images/collection/coin-icon.png')",
           backgroundSize: "contain",
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
         }}></div>
-        <div className='absolute top-6 right-1 w-8 h-8 lg:top-10 lg:right-5 lg:w-10 lg:h-10  font-bold text-lg lg:text-2xl text-[#FF4820]'>+</div>
-      </div>
+        {/* <div className='absolute top-6 right-1 w-8 h-8 lg:top-10 lg:right-5 lg:w-10 lg:h-10  font-bold text-lg lg:text-2xl text-[#FF4820]'>+</div> * /}
+      </div> */}
 
       {/* Header Banner */}
       <div className="flex flex-col items-center gap-2">
@@ -275,7 +329,7 @@ function CardCollectionContent() {
         <CollectionProgress current={collectedCount} max={40} />
       </div>
 
-      <div className='relative z-10 top-0 w-[386px] h-[234px] lg:w-[820px] lg:h-[496px]' style={{
+      <div className='relative z-10 top-0 w-[464px] h-[234px] lg:w-[820px] lg:h-[496px]' style={{
         backgroundImage: "url('/images/collection/bg-inside.png')",
         backgroundSize: "contain",
         backgroundPosition: "center center",
@@ -283,7 +337,7 @@ function CardCollectionContent() {
       }}>
 
         {/* Blind Bag Area */}
-        <div className="flex-1 w-full h-full flex items-center justify-center relative z-10 lg:mt-8 -top-8">
+        <div className="flex-1 w-full h-full flex items-center justify-center relative z-10 lg:mt-8 -top-4">
           <BlindBagSelector
             banners={banners}
             selectedIndex={selectedBannerIndex}
@@ -292,41 +346,47 @@ function CardCollectionContent() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-8 lg:gap-14 z-20 items-center justify-center relative bottom-10 lg:bottom-24">
+        <div className="flex gap-4 lg:gap-10 z-20 items-center justify-center relative bottom-10 lg:bottom-24">
           {/* Single Open */}
-          <div className="flex flex-col items-center gap-2 relative">
+          {/* <div className="flex flex-col items-center gap-2 relative">
             <Button
-              label={isOpening ? "ĐANG XÉ..." : "XÉ TÚI MÙ"}
+              label={isLoadingSingle ? "Đang xé..." : "Xé túi mù"}
               size="small"
               lgSize="large"
-              className="text-[#F76933]! "
+              className="text-[#F76933]! text-xs pl-8 pr-2"
+              containerClassName="text-[#F76933]! text-xs pl-10 pr-2"
               onClick={handleSingleOpen}
-              disabled={isOpening}
+              disabled={isLoadingSingle || isLoadingBulk}
               customBgImage="/images/collection/button-white.png"
             />
-            <img src="/images/collection/ticket-1.png" alt="ticket" className="absolute -left-2 top-0 w-10 h-7 lg:w-24 lg:h-[70px] lg:-left-12 lg:-top-2" />
-
-          </div>
+            <div className='absolute -left-2 -top-2 z-10'>
+              <span className=" text-[10px] absolute left-1 top-5 -rotate-20">tốn {ticketPrice}</span>
+              <img src="/images/collection/ticket-x.png" alt="ticket" className="w-14 h-12 lg:w-24 lg:h-[70px] lg:-left-12 lg:-top-2" />
+            </div>
+          </div> */}
 
           {/* Bulk Open */}
           <div className="flex flex-col items-center gap-2 relative">
             <Button
-              label={isOpening ? "ĐANG XÉ..." : "XÉ TÚI MÙ X10"}
+              label={isLoadingBulk ? "Đang xé..." : "Xé túi mù x10"}
               size="small"
               lgSize="large"
-              className="text-white"
-              containerClassName="bg-contain! w-fit"
+              className="text-white! text-xs pl-8 pr-2"
+              containerClassName="bg-contain! w-fit text-white! text-xs pl-3 pr-2"
               onClick={handleBulkOpen}
-              disabled={isOpening}
+              disabled={isLoadingBulk}
               customBgImage="/images/collection/button-primary.png"
             />
-            <img src="/images/collection/ticket-10.png" alt="ticket" className="absolute -left-5 top-0 w-10 h-7 lg:w-24 lg:h-[70px] lg:-left-12 lg:-top-2" />
+            {/* <div className='absolute -left-2 -top-2 z-10'>
+              <span className=" text-[10px] absolute left-1 top-5 -rotate-20">tốn {ticketPrice * 10}</span>
+              <img src="/images/collection/ticket-x.png" alt="ticket" className="w-14 h-12 lg:w-24 lg:h-[70px] lg:-left-12 lg:-top-2" />
+            </div> */}
 
           </div>
         </div>
       </div>
 
-      <BlindBagOpeningOverlay isOpen={isOpeningBulk} onSkip={handleCloseBulk} cards={openedCards} blindBagImage={activeBanner?.imageUrl} />
+      <BlindBagOpeningOverlay isOpen={isOpeningBulk} onSkip={handleCloseBulk} cards={openedCards} blindBagImage={activeBanner?.imageUrl} onViewCollection={handleViewCollectionFromOverlay} isBonus={isShowingBonus} />
       <SingleBlindBagOverlay isOpen={isOpeningSingle} onConfirm={() => handleCloseSingle()} card={openedCards[0]} />
       <TicketPurchaseOverlay
         isOpen={isBuyingTickets}
@@ -366,4 +426,3 @@ export default function CardCollection() {
     </div>
   )
 }
-

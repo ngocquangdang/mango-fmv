@@ -16,6 +16,7 @@ export interface Card {
   tier?: "R" | "R+" | "SR" | "SSR"; // API response
   isOwned?: boolean;
   isNew?: boolean; // API response
+  quantity?: number;
 }
 
 export interface CollectionStats {
@@ -180,6 +181,12 @@ export const CardCollectionService = {
     return apiClientVideoProgress.post<ApiResponse<{ resultCard: Card }>>("/gacha/merge", {
       cardIds
     }, {
+      "X-Ticket": getLocalParam("ticket") || "",
+    });
+  },
+
+  getTicketPrice: async (type: string): Promise<ApiResponse<{ price: number }>> => {
+    return apiClientVideoProgress.get<ApiResponse<{ price: number }>>(`/gacha/ticket-price?type=${type}`, {
       "X-Ticket": getLocalParam("ticket") || "",
     });
   }

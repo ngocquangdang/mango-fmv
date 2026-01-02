@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import Button from "../../../components/ui/button";
 import type { Card } from "../services/card-collection-service";
@@ -18,16 +18,25 @@ const SingleBlindBagOverlay = ({
   const cardImage = card?.imageUrl || card?.image || "";
   const cardName = card?.name || "";
 
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
     let animationFrameId: number;
-    if (isOpen) {
+    let myConfetti: any;
+
+    if (isOpen && canvasRef.current) {
+      myConfetti = confetti.create(canvasRef.current, {
+        resize: true,
+        useWorker: true,
+      });
+
       // Launch confetti
       const duration = 500;
       const end = Date.now() + duration;
 
       const frame = () => {
         // launch a few confetti from the left edge
-        confetti({
+        myConfetti({
           particleCount: 7,
           angle: 60,
           spread: 55,
@@ -36,7 +45,7 @@ const SingleBlindBagOverlay = ({
           colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'] // Colorful
         });
         // and launch a few from the right edge
-        confetti({
+        myConfetti({
           particleCount: 7,
           angle: 120,
           spread: 55,
@@ -54,7 +63,7 @@ const SingleBlindBagOverlay = ({
     }
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
-      confetti.reset();
+      if (myConfetti) myConfetti.reset();
     };
   }, [isOpen]);
 
@@ -68,7 +77,6 @@ const SingleBlindBagOverlay = ({
         <div className="relative mb-4 transform hover:scale-105 transition-transform duration-300">
           {/* Glow behind card */}
           <img src={cardImage} alt={cardName} className="w-[200px] h-[288px] lg:w-[250px] lg:h-[360px] object-contain" />
-
         </div>
 
         {/* Continue Button */}
@@ -80,6 +88,10 @@ const SingleBlindBagOverlay = ({
           onClick={onConfirm}
         />
       </div>
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none z-[100]"
+      />
     </div>
   );
 };

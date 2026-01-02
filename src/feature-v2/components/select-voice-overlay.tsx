@@ -5,6 +5,8 @@ import CreateVoiceView from "./create-voice-view";
 import { useUserContext } from "../../features/user/context";
 import { VoiceService } from "../services/voice-service";
 import Banner from "./banner";
+import { gtmEvent } from "../../lib/analytics";
+import BlockingUsageModal from './ui/blocking-usage-modal';
 
 interface SelectVoiceOverlayProps {
   isOpen: boolean;
@@ -26,6 +28,10 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
   const [isProcessingAi, setIsProcessingAi] = useState(false);
   const [aiProcessedAudioUrl, setAiProcessedAudioUrl] = useState<string | null>(null); // Store processed AI audio URL
   const hasProcessedRef = useRef(false); // Track if we've already processed AI voice
+
+  const [isUsageLimitExceeded, setIsUsageLimitExceeded] = React.useState(false);
+  // const [dailyUsageCount, setDailyUsageCount] = React.useState<number>(0);
+  // const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
 
   // Get first scene audio URL from context or chapter data
   const sceneId = currentSceneId || chapter?.startSceneId;
@@ -54,20 +60,20 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
   }, [chapter, clips, currentSceneId, firstSceneAudioUrl, targetScene, voiceType]);
 
   // Fetch recordings on mount
-  useEffect(() => {
-    // setIsLoadingRecordings(true);
-    VoiceService.getAudioRecordings(50, 0)
-      .then((res) => {
-        if (res.data?.recordings) {
-          setRecordings(res.data.recordings);
-          console.log('📼 Fetched recordings:', res.data.recordings);
-        }
-      })
-      .catch((err) => console.error("Failed to fetch recordings:", err))
-      .finally(() => {
-        // setIsLoadingRecordings(false);
-      });
-  }, []);
+  // useEffect(() => {
+  //   setIsLoadingRecordings(true);
+  //   VoiceService.getAudioRecordings(50, 0)
+  //     .then((res) => {
+  //       if (res.data?.recordings) {
+  //         setRecordings(res.data.recordings);
+  //         console.log('📼 Fetched recordings:', res.data.recordings);
+  //       }
+  //     })
+  //     .catch((err) => console.error("Failed to fetch recordings:", err))
+  //     .finally(() => {
+  //       setIsLoadingRecordings(false);
+  //     });
+  // }, []);
 
   // Auto-process AI voice when AI option is selected and recordings are available
   useEffect(() => {
@@ -126,6 +132,24 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
     processAiVoice();
   }, [voiceType, recordings, currentSceneId, chapter, clips, isProcessingAi]);
+
+  // React.useEffect(() => {
+  //   const fetchDailyUsage = async () => {
+  //     try {
+  //       const usageResponse = await VoiceService.getDailyUsage();
+  //       if (usageResponse.data) {
+  //         setDailyUsageCount(usageResponse.data.count || 0);
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to fetch daily usage:", error);
+  //       setDailyUsageCount(0); // Default to 0 if fetch fails
+  //     }
+  //   };
+
+  //   if (userInfo?.isVip === 3) {
+  //     fetchDailyUsage();
+  //   }
+  // }, [userInfo]); // Only run once on mount
 
   // Determine which audio to play based on voice type
   const currentAudioUrl = voiceType === 'ai' ? aiProcessedAudioUrl : firstSceneAudioUrl;
@@ -196,6 +220,15 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
   }, [voiceType, isOpen]);
 
   const handleVoiceTypeChange = (type: "original" | "ai" | "mute") => {
+    const labels = {
+      original: "Giọng mặc định",
+      mute: "Tắt tiếng",
+      ai: "Giọng AI"
+    };
+    gtmEvent("button_click", {
+      button_id: type === "original" ? "default" : type,
+      button_label: labels[type]
+    });
     setVoiceType(type);
   };
   if (!isOpen) return null;
@@ -274,17 +307,26 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             </div>
 
             {/* Option: AI */}
-            {/* <div
-              onClick={() => handleVoiceTypeChange("ai")}
-              className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[64px] landscape:h-[84px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "ai" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
-            >
-              <div className="w-12 h-12 landscape:w-8 landscape:h-8 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
-                <span className="font-hand font-bold text-orange-500 text-xl landscape:text-xs lg:text-3xl">AI</span>
-              </div>
-              <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
-                Giọng của bạn
-              </div>
-            </div> */}
+            {/* {
+              userInfo?.isVip === 3 ? (
+                <div
+                  onClick={() => {
+                    if (dailyUsageCount >= dailyLimit) {
+                      // Show blocking modal if limit exceeded
+                      setIsUsageLimitExceeded(true);
+                      return;
+                    }
+                    handleVoiceTypeChange("ai")
+                  }}
+                  className={`cursor-pointer group relative w-[100px] h-[130px] landscape:w-[64px] landscape:h-[84px] lg:w-[150px] lg:h-[200px] bg-[#FFF8E7] border-2 ${voiceType === "ai" ? "border-[#E85D04] ring-2 ring-[#E85D04]/50" : "border-[#E5E0D5]"} rounded-lg shadow-md flex flex-col items-center justify-center p-2 transition-all hover:-translate-y-1`}
+                >
+                  <div className="w-12 h-12 landscape:w-8 landscape:h-8 lg:w-20 lg:h-20 rounded-full border-2 border-orange-400 mb-2 bg-white flex items-center justify-center">
+                    <span className="font-hand font-bold text-orange-500 text-xl landscape:text-xs lg:text-3xl">AI</span>
+                  </div>
+                  <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
+                    Giọng của bạn
+                  </div>
+                </div>) : <></>} */}
 
             {/* Option: Mute */}
             <div
@@ -373,6 +415,10 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           />
         </div>
       )}
+      <BlockingUsageModal
+        isOpen={isUsageLimitExceeded}
+        onClose={() => setIsUsageLimitExceeded(false)}
+      />
     </div>
   );
 };

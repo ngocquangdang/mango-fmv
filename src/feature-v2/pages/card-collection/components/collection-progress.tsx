@@ -30,10 +30,10 @@ const CollectionProgress = ({
         </span>
 
         {/* End Icon */}
-        <div className="absolute -right-4 -top-4 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center">
+        {/* <div className="absolute -right-4 -top-4 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center">
           <img src="/images/collection/ho-dong-quan-sr.png" alt="Card Reward" className="w-full h-full object-contain rotate-12 drop-shadow-lg" />
-          {/* Fallback if card-frame is empty or invalid, user can swap */}
-        </div>
+          {/* Fallback if card-frame is empty or invalid, user can swap * /}
+        </div> */}
       </div>
 
       <p className="text-[10px] lg:text-xl text-blue-900 font-semibold text-center mt-2 max-w-full lg:max-w-[120%] lg:-ml-[10%]">

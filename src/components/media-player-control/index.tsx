@@ -47,11 +47,11 @@ export default function MediaPlayerControl() {
     <div className="flex items-center justify-center gap-10">
       <SupperSeekPre
         onClick={handleSupperSeekPreClick}
-        className="w-[40px] h-[40px] lg:w-[64px] lg:h-[64px]"
+        className="w-[32px] h-[32px] lg:w-[64px] lg:h-[64px]"
       />
       <SeekPre
         onClick={handleSeekPreClick}
-        className="w-[40px] h-[40px] lg:w-[64px] lg:h-[64px]"
+        className="w-[32px] h-[32px] lg:w-[64px] lg:h-[64px]"
       />
       {isPlaying ? (
         <Pause
@@ -66,11 +66,11 @@ export default function MediaPlayerControl() {
       )}
       <SeekTo
         onClick={handleSeekToClick}
-        className="w-[40px] h-[40px] lg:w-[64px] lg:h-[64px]"
+        className="w-[32px] h-[32px] lg:w-[64px] lg:h-[64px]"
       />
       <SupperSeekTo
         onClick={handleSupperSeekToClick}
-        className="w-[40px] h-[40px] lg:w-[64px] lg:h-[64px]"
+        className="w-[32px] h-[32px] lg:w-[64px] lg:h-[64px]"
       />
     </div>
   );

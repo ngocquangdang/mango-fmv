@@ -150,5 +150,12 @@ export const VoiceService = {
         return apiClientVideoProgress.delete<ApiResponse<any>>(`/audio-recordings/${recordingId}`, {
             "X-Ticket": getLocalParam("ticket") || "",
         });
+    },
+
+    // API 6: Get Daily Usage
+    getDailyUsage: async (): Promise<ApiResponse<{ count: number; date: string; timezone: string }>> => {
+        return apiClientVideoProgress.get<ApiResponse<{ count: number; date: string; timezone: string }>>("/voice/usage/daily", {
+            "X-Ticket": getLocalParam("ticket") || "",
+        });
     }
 };

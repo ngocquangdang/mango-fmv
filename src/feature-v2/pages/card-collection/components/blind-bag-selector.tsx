@@ -1,5 +1,6 @@
 
 
+
 import type { Banner } from "../services/card-collection-service";
 
 interface BlindBagSelectorProps {
@@ -8,20 +9,14 @@ interface BlindBagSelectorProps {
   onSelect?: (index: number) => void;
 }
 
-const BlindBagItem = ({ item, isActive = false }: { item: any; isActive?: boolean }) => {
+const BlindBagItem = ({ item, isActive = false, onClick }: { item: any; isActive?: boolean, onClick?: () => void }) => {
   return (
-    <div className={`relative transition-all duration-300 flex flex-col items-center ${isActive ? 'scale-[1.3] z-20' : 'scale-100 z-10 grayscale'}`}>
-      {/* Light effect can be kept or removed, keeping it simple for now */}
-      {/* {isActive && <div className="absolute inset-0 bg-white/50 blur-xl rounded-full"></div>} */}
-
+    <div
+      onClick={onClick}
+      className={`relative transition-all duration-300 flex flex-col items-center ${isActive ? 'scale-[1.3] z-20' : 'scale-100 z-10 grayscale'} ${onClick ? 'cursor-pointer' : ''}`}
+    >
       <div
-        className="flex items-center justify-center relative w-[100px] h-[90px] lg:w-[255px] lg:h-[230px]"
-      // style={{
-      //   backgroundImage: "url('/images/collection/blind-bag.png')",
-      //   backgroundSize: "contain",
-      //   backgroundPosition: "center center",
-      //   backgroundRepeat: "no-repeat",
-      // }}
+        className="flex items-center justify-center relative w-[100px] h-[90px] lg:w-[255px] lg:h-[230px] mb-2"
       >
         <img
           src={item?.image}
@@ -36,7 +31,7 @@ const BlindBagItem = ({ item, isActive = false }: { item: any; isActive?: boolea
         backgroundPosition: "center center",
         backgroundRepeat: "no-repeat",
       }}>
-        <div className="text-[10px] lg:text-2xl font-bold text-[#3B4C7A] text-center w-[80px] lg:w-[195px] line-clamp-1 pb-1 lg:pb-4">
+        <div className="text-[10px] lg:text-2xl font-bold text-[#3B4C7A] text-center w-[60px] lg:w-[155px] break-words pb-1 lg:pb-4 leading-3 lg:leading-7">
           {item?.name}
         </div>
       </div>
@@ -65,6 +60,32 @@ const BlindBagSelector = ({ banners = [], selectedIndex = 0, onSelect }: BlindBa
     }
   };
 
+  // Logic for < 3 items
+  if (items.length === 0) return null;
+
+  if (items.length === 1) {
+    return (
+      <div className="relative flex items-center -top-3 lg:-top-16 justify-center w-full px-8 py-4">
+        <BlindBagItem item={items[0]} isActive={true} />
+      </div>
+    )
+  }
+
+  if (items.length === 2) {
+    return (
+      <div className="relative flex items-center -top-3 lg:-top-16 justify-center w-full px-8 py-4 gap-8 lg:gap-24">
+        {items.map((item, index) => (
+          <BlindBagItem
+            key={item.id}
+            item={item}
+            isActive={index === selectedIndex}
+            onClick={() => onSelect && onSelect(index)}
+          />
+        ))}
+      </div>
+    )
+  }
+
   // Simple view: Left (prev), Center (current), Right (next)
   const leftIndex = (selectedIndex - 1 + items.length) % items.length;
   const rightIndex = (selectedIndex + 1) % items.length;
@@ -85,9 +106,18 @@ const BlindBagSelector = ({ banners = [], selectedIndex = 0, onSelect }: BlindBa
 
       {/* Carousel Items */}
       <div className="flex items-center justify-center gap-1 w-full">
-        <BlindBagItem item={items[leftIndex]} isActive={false} />
+        {/* We can make these clickable too if we want, but arrows are primary for carousel */}
+        <BlindBagItem
+          item={items[leftIndex]}
+          isActive={false}
+          onClick={() => onSelect && onSelect(leftIndex)}
+        />
         <BlindBagItem item={items[selectedIndex]} isActive={true} />
-        <BlindBagItem item={items[rightIndex]} isActive={false} />
+        <BlindBagItem
+          item={items[rightIndex]}
+          isActive={false}
+          onClick={() => onSelect && onSelect(rightIndex)}
+        />
       </div>
 
       {/* Right Arrow */}

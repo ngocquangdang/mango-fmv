@@ -333,6 +333,18 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
     if (!audioUrl) return;
 
     try {
+      // Check daily usage limit before proceeding
+      const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
+      const usageResponse = await VoiceService.getDailyUsage();
+
+      if (usageResponse.data && usageResponse.data.count >= dailyLimit) {
+        // Show toast notification if limit exceeded
+        showToast({
+          description: "Lượt tạo voice cá nhân hóa trong ngày đã hết. Vui lòng quay lại vào ngày mai!",
+        });
+        return;
+      }
+
       setIsProcessing(true);
       setProcessingStage('uploading');
 
@@ -487,8 +499,10 @@ const CreateVoiceView = ({ onBack }: CreateVoiceViewProps) => {
 
       {/* Title */}
       {/* Title */}
-      <div className="w-full h-[60px] lg:h-[74px] shrink-0 relative mb-4 landscape:mb-1 mt-8 landscape:mt-0 flex justify-center">
-        <Banner text="TẠO GIỌNG CỦA RIÊNG BẠN" className="!w-auto !px-8 whitespace-nowrap !text-sm lg:!text-xl" />
+      <div className="w-full h-[60px] lg:h-[74px] shrink-0 relative mb-4 landscape:mb-1 mt-8 landscape:mt-0">
+        <Banner text="TẠO GIỌNG CỦA RIÊNG BẠN"
+          className="!text-lg lg:!text-[28.8px] whitespace-nowrap min-w-[200px]"
+        />
       </div>
       <div className="flex w-full max-w-[680px] landscape:max-w-full landscape:w-full landscape:px-8 gap-2 md:gap-4 items-stretch justify-center">
 

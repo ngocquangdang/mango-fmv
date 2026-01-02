@@ -16,7 +16,7 @@ import RewardCollection, {
   type RewardItem,
 } from "../feature-v2/components/reward-collection";
 import RelationshipPoint from "../feature-v2/components/relationship-point";
-// import { VoiceService } from "../feature-v2/services/voice-service";
+import { VoiceService } from "../feature-v2/services/voice-service";
 
 export type VideoPlayerType =
   | "intro"
@@ -86,6 +86,7 @@ export interface VideoPlayerContextType {
   // currentSceneAudioUrl: string | null;
   setAiAudioList: (audioList: { sceneId: string; aiAudio: string }[]) => void;
   setUseAiAudio: (type: "ai" | "original" | "mute") => void;
+  setVersion: (version: number) => void;
 }
 
 
@@ -106,7 +107,6 @@ export const VideoPlayerProvider = ({
 }) => {
   const { api, ready } = useVideoPlayer();
   const { chapter: data, updateSceneStatus, userInfo, audioRecordings } = useUserContext();
-  console.log({ audioRecordings });
   const { mutate: submitHotspot } = useSubmitHotspot();
   const { showToast } = useToast();
 
@@ -308,6 +308,13 @@ export const VideoPlayerProvider = ({
     [api, setIsReviewScene]
   );
 
+  const setVersion = React.useCallback(
+    (version: number) => {
+      if (!api) return;
+      api.setVersion?.(version);
+    },
+    [api]
+  );
   const onSetCurrentSceneId = React.useCallback(
     (sceneId: string) => {
       if (!api) return;
@@ -367,28 +374,27 @@ export const VideoPlayerProvider = ({
   }, [api]);
 
   // Fetch all AI voices on mount moved below setAiAudioList declaration
-  // React.useEffect(() => {
-  //   const fetchAllAiVoices = async () => {
-  //     try {
-  //       const response = await VoiceService.getAllVoiceResults();
-  //       console.log(response);
-  //       if (response && Array.isArray(response.items)) {
-  //         const mappedList = response.items.map(item => ({
-  //           sceneId: item.scene_id,
-  //           aiAudio: item.audio_url
-  //         }));
-  //
-  //         if (mappedList.length > 0) {
-  //           setAiAudioList(mappedList);
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.warn("Failed to fetch all AI voices:", error);
-  //     }
-  //   };
-  //
-  //   fetchAllAiVoices();
-  // }, [setAiAudioList]);
+  React.useEffect(() => {
+    const fetchAllAiVoices = async () => {
+      try {
+        const response = await VoiceService.getAllVoiceResults();
+        if (response && Array.isArray(response.items)) {
+          const mappedList = response.items.map(item => ({
+            sceneId: item.scene_id,
+            aiAudio: item.audio_url
+          }));
+
+          if (mappedList.length > 0) {
+            setAiAudioList(mappedList);
+          }
+        }
+      } catch (error) {
+        console.warn("Failed to fetch all AI voices:", error);
+      }
+    };
+
+    fetchAllAiVoices();
+  }, [setAiAudioList]);
 
   const setUseAiAudio = React.useCallback((type: "ai" | "original" | "mute") => {
     if (!api) return;
@@ -396,113 +402,121 @@ export const VideoPlayerProvider = ({
     api.setUseAiAudio?.(type);
   }, [api]);
 
-  // React.useEffect(() => {
-  //   let isCancelled = false;
+  React.useEffect(() => {
+    let isCancelled = false;
 
-  //   const fetchSceneAudio = async () => {
-  //     // Logic:
-  //     // 1. Start from data.startSceneId
-  //     // 2. Poll/Get result for start scene
-  //     // 3. Get immediate next scenes (no recursion)
-  //     // 4. Update setAiAudioList
+    const fetchSceneAudio = async () => {
+      // Logic:
+      // 1. Start from data.startSceneId
+      // 2. Poll/Get result for start scene
+      // 3. Get immediate next scenes (no recursion)
+      // 4. Update setAiAudioList
 
-  //     if (!data?.startSceneId || !data.scenes || !audioRecordings || audioRecordings.length === 0) return;
+      if (!data?.startSceneId || !data.scenes || !audioRecordings || audioRecordings.length === 0) return;
 
-  //     const record = audioRecordings[0] as any;
-  //     const userAudioUrl = record?.cdnUrl;
-  //     if (!userAudioUrl) return;
+      const record = audioRecordings[0] as any;
+      const userAudioUrl = record?.cdnUrl;
+      if (!userAudioUrl) return;
 
-  //     const results: { sceneId: string; aiAudio: string }[] = [];
-  //     const processedIds = new Set<string>();
+      const results: { sceneId: string; aiAudio: string }[] = [];
+      const processedIds = new Set<string>();
 
-  //     // Helper to process a single scene
-  //     const processSingleScene = async (sid: string) => {
-  //       if (isCancelled || processedIds.has(sid)) return;
-  //       processedIds.add(sid);
+      // Helper to process a single scene
+      const processSingleScene = async (sid: string) => {
+        if (isCancelled || processedIds.has(sid)) return;
+        processedIds.add(sid);
 
-  //       const scene = data.scenes[sid];
-  //       if (!scene?.originalAudio) return;
+        const scene = data.scenes[sid];
+        if (!scene?.originalAudio) return;
 
-  //       try {
-  //         const aiAudio = await VoiceService.pollVoiceProcessing(sid, userAudioUrl, scene.originalAudio);
+        try {
+          const aiAudio = await VoiceService.pollVoiceProcessing(sid, userAudioUrl, scene.originalAudio);
 
-  //         if (isCancelled) return;
+          if (isCancelled) return;
 
-  //         if (aiAudio) {
-  //           results.push({ sceneId: sid, aiAudio });
-  //           setAiAudioList([...results]);
-  //         }
-  //       } catch (e) {
-  //         console.warn(`Failed to fetch/poll AI voice for scene ${sid}`, e);
-  //       }
-  //     };
-
-  //     // 1. Process start scene
-  //     await processSingleScene(data.startSceneId);
-
-  //     // 2. Process immediate next scenes only
-  //     const startScene = data.scenes[data.startSceneId];
-  //     if (startScene) {
-  //       const nextSceneIds: string[] = [];
-  //       if (startScene.targetSceneId) nextSceneIds.push(startScene.targetSceneId);
-  //       if (startScene.branch?.options) {
-  //         startScene.branch.options.forEach((opt: any) => {
-  //           if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
-  //         });
-  //       }
-
-  //       for (const nid of nextSceneIds) {
-  //         if (isCancelled) break;
-  //         await processSingleScene(nid);
-  //       }
-  //     }
-  //   };
-
-  //   if (voiceType === "ai") {
-  //     fetchSceneAudio();
-  //   }
-
-  //   return () => {
-  //     isCancelled = true;
-  //   };
-  // }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType]);
-
-  const triggerDisplayReward = React.useCallback(
-    (data: any) => {
-
-      if (data?.relationships?.length > 0) {
-        showRelationshipPoint(data.relationships);
-      }
-
-      const handleShowMoments = (index: number) => {
-        // Stop recursion if no more moments
-        if (!data.moments || index >= data.moments.length) {
-          showRewardCollection([]);
-          closeGiftSelection();
-          play();
-          return;
+          if (aiAudio) {
+            results.push({ sceneId: sid, aiAudio });
+            setAiAudioList([...results]);
+          }
+        } catch (e) {
+          console.warn(`Failed to fetch/poll AI voice for scene ${sid}`, e);
         }
-
-        pause();
-        // Show current moment and schedule next one on close
-        showRewardCollection(
-          data.moments[index].rewards,
-          () => {
-            setTimeout(() => {
-              handleShowMoments(index + 1);
-            }, 200);
-          },
-          data.moments[index].title,
-          data.moments[index].description
-        );
       };
 
-      if (data.moments && data.moments.length > 0) {
-        handleShowMoments(0);
+      const processNextScene = async (startScene: any) => {
+        if (startScene) {
+          const nextSceneIds: string[] = [];
+          if (startScene.targetSceneId) nextSceneIds.push(startScene.targetSceneId);
+          if (startScene.branch?.options) {
+            startScene.branch.options.forEach((opt: any) => {
+              if (opt.targetSceneId) nextSceneIds.push(opt.targetSceneId);
+            });
+          }
+
+          for (const nid of nextSceneIds) {
+            if (isCancelled) break;
+            await processSingleScene(nid);
+          }
+        }
+      };
+      // 1. Process current scene
+      const currentScene = data.progress?.currentScene?.sceneId;
+      if (currentScene) {
+        await processSingleScene(currentScene);
+        const nextSceneIds = data.scenes[currentScene];
+        // 2. Process immediate next scenes only
+        processNextScene(nextSceneIds);
       }
-    },
-    [showRelationshipPoint, showRewardCollection, closeGiftSelection, pause, play]
-  );
+      // 1. Process start scene
+      await processSingleScene(data.startSceneId);
+
+      // 2. Process immediate next scenes only
+      const startScene = data.scenes[data.startSceneId];
+      processNextScene(startScene);
+
+    };
+
+    if (voiceType === "ai" && userInfo?.isVip === 3) {
+      fetchSceneAudio();
+    }
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [data?.scenes, data?.startSceneId, audioRecordings, setAiAudioList, voiceType, userInfo?.isVip, data.progress?.currentScene?.sceneId]);
+
+  const triggerDisplayReward = (data: any) => {
+    if (data?.relationships?.length > 0) {
+      showRelationshipPoint(data.relationships);
+    }
+
+    const handleShowMoments = (index: number) => {
+      // Stop recursion if no more moments
+      if (!data.moments || index >= data.moments.length) {
+        showRewardCollection([]);
+        closeGiftSelection();
+        play();
+        return;
+      }
+
+      pause();
+      // Show current moment and schedule next one on close
+      showRewardCollection(
+        data.moments[index].rewards,
+        () => {
+          setTimeout(() => {
+            handleShowMoments(index + 1);
+          }, 200);
+        },
+        data.moments[index].title,
+        data.moments[index].description
+      );
+    };
+
+    if (data.moments && data.moments.length > 0) {
+      handleShowMoments(0);
+    }
+  }
 
   const handleCollectionItems = React.useCallback(
     (hotspot: any, currentSceneId: string) => {
@@ -528,8 +542,9 @@ export const VideoPlayerProvider = ({
       if (currentStatus && api && currentStatus?.currentSceneId === sceneId) {
         onSetCurrentSceneId(currentStatus?.currentSceneId);
         setTimeout(() => {
-          seekTo(isReviewScene ? 0 : currentStatus?.time);
-        }, 50);
+          seekTo(isReviewScene ? 0 : (currentStatus?.time > 0 ? currentStatus?.time - 1 : 0));
+        }, 200);
+        return;
       }
       if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
       play();
@@ -540,17 +555,19 @@ export const VideoPlayerProvider = ({
   const handleStart = React.useCallback(
     (sceneId: string) => {
       console.log("🚀 ~ [START] [INPROGRESS]:", sceneId);
-      if (!isReviewScene) {
-        updateSceneStatus(
-          {
-            sceneId,
-            totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
-            watchingSecond: 0,
-            status: "INPROGRESS",
-          },
-          (responseData: any) => triggerDisplayReward(responseData)
-        );
-      }
+      // if (!isReviewScene) {
+      //   // If resuming same scene, use saved time to maintain consistency
+      //   const startTime = (currentStatus?.currentSceneId === sceneId) ? (currentStatus?.time || 0) : 0;
+      //   updateSceneStatus(
+      //     {
+      //       sceneId,
+      //       totalDuration: Math.floor(data.scenes[sceneId]?.duration || 0),
+      //       watchingSecond: Math.floor(startTime),
+      //       status: "INPROGRESS",
+      //     },
+      //     (responseData: any) => triggerDisplayReward(responseData)
+      //   );
+      // }
       const scene = data.scenes[sceneId];
 
       if (!scene) {
@@ -575,43 +592,63 @@ export const VideoPlayerProvider = ({
       if (userAudioUrl && nextSceneIds.length > 0) {
         nextSceneIds.forEach(targetId => {
           console.log("🚀 ~ handleStart ~ targetId:", targetId);
-          // const targetScene = data.scenes[targetId];
+          const targetScene = data.scenes[targetId];
           // Only fetch if not already in aiAudioList (optional optimization, but good practice)
           // For now, just keep the existing polling logic but restricted to these IDs
-          // if (targetScene?.originalAudio) {
-          //   VoiceService.pollVoiceProcessing(targetId, userAudioUrl, targetScene.originalAudio)
-          //     .then(res => {
-          //       if (res) {
-          //         setAiAudioList([{ sceneId: targetId, aiAudio: res }]);
-          //       }
-          //     })
-          //     .catch(() => {
-          //       // Silent fail or low prio log
-          //     });
-          // }
+          if (targetScene?.originalAudio) {
+            VoiceService.pollVoiceProcessing(targetId, userAudioUrl, targetScene.originalAudio)
+              .then(res => {
+                if (res) {
+                  setAiAudioList([{ sceneId: targetId, aiAudio: res }]);
+                }
+              })
+              .catch(() => {
+                // Silent fail or low prio log
+              });
+          }
         });
       }
 
       setCurrentSceneId(sceneId);
       setPauseType(null);
     },
-    [updateSceneStatus, data.scenes, isReviewScene, triggerDisplayReward, audioRecordings, setAiAudioList]
+    [updateSceneStatus, data.scenes, isReviewScene, audioRecordings, setAiAudioList, userInfo?.isVip]
   );
 
   const handleStop = React.useCallback(
     (payload: Record<string, any>) => {
       console.log("🚀 ~ [STOP]", payload);
-      setCurrentStatus(payload);
+
       const currentClip = data.scenes[payload.currentSceneId];
+
+      // Helper to calculate adjusted watching second
+      const calculateWatchingSecond = () => {
+        const branch = currentClip?.branch;
+        const triggerTime = branch?.startTime !== undefined ? branch.startTime : (currentClip?.duration || 0);
+        // If we are indeed past or at trigger time (with 0.5s tolerance), save a bit earlier
+        if (branch?.options?.length && payload.time >= triggerTime - 0.5) {
+          // Return integer to avoid 400 error, back up 1 sec before trigger
+          return Math.max(0, Math.floor(triggerTime - 1));
+        }
+        return Math.floor(payload.time || 0);
+      };
+
+      const adjustedWatchingSecond = calculateWatchingSecond();
+
+      // Update local state with the adjusted time so 'Resume' works correctly immediately
+      setCurrentStatus({
+        ...payload,
+        time: adjustedWatchingSecond
+      });
 
       if (payload.actionName === PausedActionName.USER_PAUSED_VIDEO) {
         if (!isReviewScene) {
           updateSceneStatus({
             sceneId: payload.currentSceneId,
             totalDuration: Math.floor(currentClip?.duration || 0),
-            watchingSecond: Math.floor(payload.time || 0),
+            watchingSecond: adjustedWatchingSecond,
             status: "INPROGRESS",
-          });
+          }, (responseData: any) => triggerDisplayReward(responseData));
         }
         return;
       }
@@ -622,7 +659,7 @@ export const VideoPlayerProvider = ({
             {
               sceneId: payload.currentSceneId,
               totalDuration: Math.floor(currentClip?.duration || 0),
-              watchingSecond: Math.floor(payload.time || 0),
+              watchingSecond: adjustedWatchingSecond,
               status: "INPROGRESS",
             },
             (responseData: any) => triggerDisplayReward(responseData)
@@ -674,8 +711,7 @@ export const VideoPlayerProvider = ({
       updateSceneStatus,
       handleCollectionItems,
       collectionItems,
-      isReviewScene,
-      triggerDisplayReward,
+      isReviewScene
     ]
   );
 
@@ -774,7 +810,6 @@ export const VideoPlayerProvider = ({
         saveLocalParams({ previousSceneId: sceneId });
       } else {
         const isUserVip = [3].includes(userInfo?.isVip);
-        console.log("🚀 ~ handleChoiceSelected ~ isUserVip:", isUserVip, userInfo);
         removeLocalParam("previousSceneId");
         if (!isReviewScene) {
           updateSceneStatus({
@@ -783,7 +818,7 @@ export const VideoPlayerProvider = ({
             watchingSecond: Math.floor(data.scenes[sceneId]?.duration || 0),
             status: "COMPLETED",
             points: data.scenes[sceneId]?.points || 0,
-          });
+          }, (responseData: any) => triggerDisplayReward(responseData));
           const nextScene = data.scenes[nextSceneId];
           if (nextScene.isVip && !isUserVip) {
             return setIsVipModalOpen(true);
@@ -794,7 +829,7 @@ export const VideoPlayerProvider = ({
             watchingSecond: 0,
             status: "INPROGRESS",
             points: 0,
-          });
+          }, (responseData: any) => triggerDisplayReward(responseData));
         }
       }
       const nextScene = data.scenes[nextSceneId];
@@ -824,6 +859,10 @@ export const VideoPlayerProvider = ({
           },
           (params: any) => triggerDisplayReward(params)
         );
+        // const scene = data.scenes[sceneId];
+        // const isUserVip = [3].includes(userInfo?.isVip);
+
+
       }
 
       const scene = data.scenes[sceneId];
@@ -853,11 +892,21 @@ export const VideoPlayerProvider = ({
         const nextSceneId = (scene as any).targetSceneId;
         if (nextSceneId) {
           const nextScene = data.scenes[nextSceneId];
-          const isUserVip = userInfo?.isVip;
+          const isUserVip = userInfo?.isVip === 3;
           if (nextScene?.isVip && !isUserVip) {
             return setIsVipModalOpen(true);
           }
           onSetCurrentSceneId(nextSceneId);
+          updateSceneStatus(
+            {
+              sceneId: nextSceneId,
+              totalDuration: Math.floor(data.scenes[nextSceneId]?.duration || 0),
+              watchingSecond: 0,
+              status: "INPROGRESS",
+              points: 0,
+            },
+            (params: any) => triggerDisplayReward(params)
+          );
         }
       }
     },
@@ -865,7 +914,6 @@ export const VideoPlayerProvider = ({
       updateSceneStatus,
       data.scenes,
       isReviewScene,
-      triggerDisplayReward,
       pause,
       setIsEndingScene,
       onSetCurrentSceneId,
@@ -903,6 +951,8 @@ export const VideoPlayerProvider = ({
     setCurrentSceneId(data.progress?.currentScene?.sceneId || null);
     if (pauseType === PausedActionName.DECISION_POINT_REACHED) return;
     setPauseType(null);
+
+    setPauseType(null);
   }, [data.id, data.progress?.currentScene, pauseType]);
 
   const onInit = React.useCallback(() => {
@@ -911,7 +961,7 @@ export const VideoPlayerProvider = ({
       console.warn("Init player skipped: Missing api or data.id", { api: !!api, dataId: currentData?.id });
       return;
     }
-    console.log("Init player", { dataId: currentData.id });
+    console.log("Init player");
     const params = new URLSearchParams(window.location.search);
 
     // function ChoiceButtonWrapper({
@@ -1088,6 +1138,7 @@ export const VideoPlayerProvider = ({
     // currentSceneAudioUrl,
     setAiAudioList,
     setUseAiAudio,
+    setVersion
   };
   return (
     <VideoPlayerContext.Provider value={value}>
