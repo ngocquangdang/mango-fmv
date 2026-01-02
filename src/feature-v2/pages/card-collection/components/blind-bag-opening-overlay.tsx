@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import Button from "../../../components/ui/button";
-import Banner from "../../../components/banner";
 import confetti from "canvas-confetti";
 import type { Card } from "../services/card-collection-service";
 import { useNavigate } from 'react-router-dom';
