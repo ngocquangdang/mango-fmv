@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Button from "../../../components/ui/button";
+import Banner from "../../../components/banner";
 import confetti from "canvas-confetti";
 import type { Card } from "../services/card-collection-service";
 import { useNavigate } from 'react-router-dom';
@@ -129,6 +130,13 @@ const BlindBagOpeningOverlay = ({
         </div>
       ) : (
         <>
+          {/* Bonus Banner */}
+          {isBonus && (
+            <div className="mb-8 scale-75 lg:scale-100">
+              <p className="text-white font-bold text-xl">Chúc mừng bạn nhận được thẻ giới hạn</p>
+            </div>
+          )}
+
           {/* 2 Rows of 5 items */}
           <div className="grid grid-cols-5 gap-4 lg:gap-8 mb-8">
             {cards.map((item: any, index) => {
