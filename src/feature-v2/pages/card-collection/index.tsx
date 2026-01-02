@@ -302,7 +302,7 @@ function CardCollectionContent() {
 
       {/* Currency Top Right */}
 
-      <div className="absolute top-0 right-0 flex items-center gap-2 p-4" onClick={() => { }}>
+      {/* <div className="absolute top-0 right-0 flex items-center gap-2 p-4" onClick={() => { }}>
         <div
           className="w-20 h-10 lg:w-[164px] lg:h-[82px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-xl lg:pb-1"
           style={{ backgroundImage: `url(/images/score-banner.png)` }}
@@ -316,8 +316,8 @@ function CardCollectionContent() {
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
         }}></div>
-        {/* <div className='absolute top-6 right-1 w-8 h-8 lg:top-10 lg:right-5 lg:w-10 lg:h-10  font-bold text-lg lg:text-2xl text-[#FF4820]'>+</div> */}
-      </div>
+        {/* <div className='absolute top-6 right-1 w-8 h-8 lg:top-10 lg:right-5 lg:w-10 lg:h-10  font-bold text-lg lg:text-2xl text-[#FF4820]'>+</div> * /}
+      </div> */}
 
       {/* Header Banner */}
       <div className="flex flex-col items-center gap-2">
@@ -372,15 +372,15 @@ function CardCollectionContent() {
               size="small"
               lgSize="large"
               className="text-white! text-xs pl-8 pr-2"
-              containerClassName="bg-contain! w-fit text-white! text-xs pl-10 pr-2"
+              containerClassName="bg-contain! w-fit text-white! text-xs pl-3 pr-2"
               onClick={handleBulkOpen}
               disabled={isLoadingBulk}
               customBgImage="/images/collection/button-primary.png"
             />
-            <div className='absolute -left-2 -top-2 z-10'>
+            {/* <div className='absolute -left-2 -top-2 z-10'>
               <span className=" text-[10px] absolute left-1 top-5 -rotate-20">tốn {ticketPrice * 10}</span>
               <img src="/images/collection/ticket-x.png" alt="ticket" className="w-14 h-12 lg:w-24 lg:h-[70px] lg:-left-12 lg:-top-2" />
-            </div>
+            </div> */}
 
           </div>
         </div>
