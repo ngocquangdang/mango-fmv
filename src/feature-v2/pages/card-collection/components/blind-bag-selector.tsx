@@ -1,5 +1,6 @@
 
 
+
 import type { Banner } from "../services/card-collection-service";
 
 interface BlindBagSelectorProps {
@@ -8,9 +9,12 @@ interface BlindBagSelectorProps {
   onSelect?: (index: number) => void;
 }
 
-const BlindBagItem = ({ item, isActive = false }: { item: any; isActive?: boolean }) => {
+const BlindBagItem = ({ item, isActive = false, onClick }: { item: any; isActive?: boolean, onClick?: () => void }) => {
   return (
-    <div className={`relative transition-all duration-300 flex flex-col items-center ${isActive ? 'scale-[1.3] z-20' : 'scale-100 z-10 grayscale'}`}>
+    <div
+      onClick={onClick}
+      className={`relative transition-all duration-300 flex flex-col items-center ${isActive ? 'scale-[1.3] z-20' : 'scale-100 z-10 grayscale'} ${onClick ? 'cursor-pointer' : ''}`}
+    >
       <div
         className="flex items-center justify-center relative w-[100px] h-[90px] lg:w-[255px] lg:h-[230px] mb-2"
       >
@@ -56,6 +60,32 @@ const BlindBagSelector = ({ banners = [], selectedIndex = 0, onSelect }: BlindBa
     }
   };
 
+  // Logic for < 3 items
+  if (items.length === 0) return null;
+
+  if (items.length === 1) {
+    return (
+      <div className="relative flex items-center -top-3 lg:-top-16 justify-center w-full px-8 py-4">
+        <BlindBagItem item={items[0]} isActive={true} />
+      </div>
+    )
+  }
+
+  if (items.length === 2) {
+    return (
+      <div className="relative flex items-center -top-3 lg:-top-16 justify-center w-full px-8 py-4 gap-8 lg:gap-24">
+        {items.map((item, index) => (
+          <BlindBagItem
+            key={item.id}
+            item={item}
+            isActive={index === selectedIndex}
+            onClick={() => onSelect && onSelect(index)}
+          />
+        ))}
+      </div>
+    )
+  }
+
   // Simple view: Left (prev), Center (current), Right (next)
   const leftIndex = (selectedIndex - 1 + items.length) % items.length;
   const rightIndex = (selectedIndex + 1) % items.length;
@@ -76,9 +106,18 @@ const BlindBagSelector = ({ banners = [], selectedIndex = 0, onSelect }: BlindBa
 
       {/* Carousel Items */}
       <div className="flex items-center justify-center gap-1 w-full">
-        <BlindBagItem item={items[leftIndex]} isActive={false} />
+        {/* We can make these clickable too if we want, but arrows are primary for carousel */}
+        <BlindBagItem
+          item={items[leftIndex]}
+          isActive={false}
+          onClick={() => onSelect && onSelect(leftIndex)}
+        />
         <BlindBagItem item={items[selectedIndex]} isActive={true} />
-        <BlindBagItem item={items[rightIndex]} isActive={false} />
+        <BlindBagItem
+          item={items[rightIndex]}
+          isActive={false}
+          onClick={() => onSelect && onSelect(rightIndex)}
+        />
       </div>
 
       {/* Right Arrow */}

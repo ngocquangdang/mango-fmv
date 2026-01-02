@@ -15,7 +15,7 @@ interface SelectVoiceOverlayProps {
 
 const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
   const { voiceType, setVoiceType, clips, currentSceneId, setUseAiAudio } = useVideoPlayerContext();
-  const { chapter, userInfo } = useUserContext();
+  const { chapter } = useUserContext();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCreatingVoice, setIsCreatingVoice] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -24,14 +24,14 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
 
   // State for recordings and processing
   const [recordings, setRecordings] = useState<any[]>([]);
-  const [isLoadingRecordings, setIsLoadingRecordings] = useState(true);
+  // const [isLoadingRecordings, setIsLoadingRecordings] = useState(true);
   const [isProcessingAi, setIsProcessingAi] = useState(false);
   const [aiProcessedAudioUrl, setAiProcessedAudioUrl] = useState<string | null>(null); // Store processed AI audio URL
   const hasProcessedRef = useRef(false); // Track if we've already processed AI voice
 
   const [isUsageLimitExceeded, setIsUsageLimitExceeded] = React.useState(false);
-  const [dailyUsageCount, setDailyUsageCount] = React.useState<number>(0);
-  const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
+  // const [dailyUsageCount, setDailyUsageCount] = React.useState<number>(0);
+  // const dailyLimit = parseInt(import.meta.env.VITE_DAILY_VOICE_LIMIT || "100", 10);
 
   // Get first scene audio URL from context or chapter data
   const sceneId = currentSceneId || chapter?.startSceneId;
@@ -60,20 +60,20 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
   }, [chapter, clips, currentSceneId, firstSceneAudioUrl, targetScene, voiceType]);
 
   // Fetch recordings on mount
-  useEffect(() => {
-    setIsLoadingRecordings(true);
-    VoiceService.getAudioRecordings(50, 0)
-      .then((res) => {
-        if (res.data?.recordings) {
-          setRecordings(res.data.recordings);
-          console.log('📼 Fetched recordings:', res.data.recordings);
-        }
-      })
-      .catch((err) => console.error("Failed to fetch recordings:", err))
-      .finally(() => {
-        setIsLoadingRecordings(false);
-      });
-  }, []);
+  // useEffect(() => {
+  //   setIsLoadingRecordings(true);
+  //   VoiceService.getAudioRecordings(50, 0)
+  //     .then((res) => {
+  //       if (res.data?.recordings) {
+  //         setRecordings(res.data.recordings);
+  //         console.log('📼 Fetched recordings:', res.data.recordings);
+  //       }
+  //     })
+  //     .catch((err) => console.error("Failed to fetch recordings:", err))
+  //     .finally(() => {
+  //       setIsLoadingRecordings(false);
+  //     });
+  // }, []);
 
   // Auto-process AI voice when AI option is selected and recordings are available
   useEffect(() => {
@@ -133,23 +133,23 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
     processAiVoice();
   }, [voiceType, recordings, currentSceneId, chapter, clips, isProcessingAi]);
 
-  React.useEffect(() => {
-    const fetchDailyUsage = async () => {
-      try {
-        const usageResponse = await VoiceService.getDailyUsage();
-        if (usageResponse.data) {
-          setDailyUsageCount(usageResponse.data.count || 0);
-        }
-      } catch (error) {
-        console.error("Failed to fetch daily usage:", error);
-        setDailyUsageCount(0); // Default to 0 if fetch fails
-      }
-    };
+  // React.useEffect(() => {
+  //   const fetchDailyUsage = async () => {
+  //     try {
+  //       const usageResponse = await VoiceService.getDailyUsage();
+  //       if (usageResponse.data) {
+  //         setDailyUsageCount(usageResponse.data.count || 0);
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to fetch daily usage:", error);
+  //       setDailyUsageCount(0); // Default to 0 if fetch fails
+  //     }
+  //   };
 
-    if (userInfo?.isVip === 3) {
-      fetchDailyUsage();
-    }
-  }, [userInfo]); // Only run once on mount
+  //   if (userInfo?.isVip === 3) {
+  //     fetchDailyUsage();
+  //   }
+  // }, [userInfo]); // Only run once on mount
 
   // Determine which audio to play based on voice type
   const currentAudioUrl = voiceType === 'ai' ? aiProcessedAudioUrl : firstSceneAudioUrl;
@@ -261,7 +261,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             setDuration(0);
             setIsPlaying(false);
             // Refresh recordings
-            setIsLoadingRecordings(true);
+            // setIsLoadingRecordings(true);
             VoiceService.getAudioRecordings(50, 0)
               .then((res) => {
                 if (res.data?.recordings) {
@@ -270,7 +270,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
               })
               .catch((err) => console.error("Failed to refresh recordings:", err))
               .finally(() => {
-                setIsLoadingRecordings(false);
+                // setIsLoadingRecordings(false);
               });
           }}
           />
@@ -307,7 +307,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
             </div>
 
             {/* Option: AI */}
-            {
+            {/* {
               userInfo?.isVip === 3 ? (
                 <div
                   onClick={() => {
@@ -326,7 +326,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                   <div className="text-center font-hand font-bold text-[#1A4027] text-xs landscape:text-[8px] lg:text-base leading-tight">
                     Giọng của bạn
                   </div>
-                </div>) : <></>}
+                </div>) : <></>} */}
 
             {/* Option: Mute */}
             <div
@@ -343,7 +343,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
           </div>
 
           <div className="w-full flex flex-col items-center justify-center min-h-[60px] landscape:min-h-[30px]">
-            {voiceType === "ai" && (
+            {/* {voiceType === "ai" && (
               <div className="flex flex-col items-center gap-2 landscape:gap-1 mb-4 landscape:mb-1 animate-in slide-in-from-top-2 fade-in">
                 {!isLoadingRecordings && recordings.length === 0 && (
                   <Button
@@ -361,7 +361,7 @@ const SelectVoiceOverlay = ({ isOpen, onClose }: SelectVoiceOverlayProps) => {
                   </div>
                 )}
               </div>
-            )}
+            )} */}
 
             {/* Audio Player - Show for original, or for AI only if URL exists */}
             {((voiceType === "original") || (voiceType === "ai" && !!aiProcessedAudioUrl)) && (
