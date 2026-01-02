@@ -203,6 +203,22 @@ function CardCollectionContent() {
         },
         onSettled: () => {
           setIsLoadingBulk(false);
+        },
+        onError: (error: any) => {
+          console.error("Failed to open bags", { ...error }?.code);
+          let errorMessage = error?.response?.data?.error?.message || "Có lỗi xảy ra, vui lòng thử lại sau.";
+          if ({ ...error }?.code === "ErrorCode00012") {
+            errorMessage = <>
+              <p>Hết lượt xé rùi</p>
+              <p>Quay lại vào ngày mai để có thêm nhé!</p>
+            </>
+          }
+          setPaymentModalData({
+            isOpen: true,
+            title: "",
+            message: errorMessage,
+            onConfirm: () => setPaymentModalData({ ...paymentModalData, isOpen: false }), // We can't safely depend on prev state inside callback if strictly following React, but here it's fine or use prev => ...
+          });
         }
       });
     } catch (e: any) {
