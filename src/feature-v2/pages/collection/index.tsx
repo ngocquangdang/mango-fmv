@@ -11,15 +11,11 @@ import CollectionLeaderboard from "./components/leaderboard";
 import CollectionLimited from "./components/limited-card";
 import { HistoryLeft, HistoryRight } from "./components/history";
 import Button from '../../components/ui/button';
-import { useUserContext } from "../../../features/user/context";
-import { useVideoPlayerContext } from "../../../contexts";
 
 
 export function CollectionPageContent() {
   const navigate = useNavigate();
   const { characters, fetchCollection } = useCollectionContext();
-  const { userInfo } = useUserContext();
-  const { setIsVipModalOpen } = useVideoPlayerContext();
 
   const [selectedTab, setSelectedTab] = useState<string>("");
 
@@ -141,13 +137,7 @@ export function CollectionPageContent() {
               lgSize="large"
               className="text-[#F76933]! text-xs pl-8 pr-2"
               containerClassName="text-[#F76933]! text-xs pointer-events-auto"
-              onClick={() => {
-                if (userInfo?.isVip !== 3) {
-                  setIsVipModalOpen(true);
-                  return;
-                }
-                navigate("/card-collection");
-              }}
+              onClick={() => navigate("/card-collection")}
               customBgImage="/images/collection/button-white.png"
             />
           </div>

@@ -11,6 +11,7 @@ import GameModal from "../../components/ui/dialog";
 import { CardCollectionProvider } from "./context"; // Import provider
 import { useCardCollection } from "./hooks/use-card-collection"; // Import hook
 import { useTicketPrice } from "./hooks/use-card-collection-query";
+import { useVideoPlayerContext } from "../../../contexts";
 import { getOrderStatus } from "../../../lib/api/ticket-api";
 import type { Card } from "./services/card-collection-service";
 import { useToast } from "../../../components/ui/toast-v2/use-toast";
@@ -20,6 +21,7 @@ function CardCollectionContent() {
   const { banners, userState, userInfo, openBlindBag } = useCardCollection();
   const [searchParams, setSearchParams] = useSearchParams();
   const { showToast } = useToast();
+  const { setIsVipModalOpen } = useVideoPlayerContext();
 
   const [isOpeningBulk, setIsOpeningBulk] = React.useState(false);
   const [isOpeningSingle, setIsOpeningSingle] = React.useState(false);
@@ -184,6 +186,10 @@ function CardCollectionContent() {
   const ticketPrice = ticketPriceData?.data?.price ?? 10;
 
   const handleBulkOpen = async () => {
+    if ((userInfo as any)?.isVip !== 3) {
+      setIsVipModalOpen(true);
+      return;
+    }
     if (!activeBanner) return;
     setIsLoadingBulk(true);
     setIsShowingBonus(false);
@@ -230,6 +236,10 @@ function CardCollectionContent() {
   };
 
   const handleSingleOpen = async () => {
+    if ((userInfo as any)?.isVip !== 3) {
+      setIsVipModalOpen(true);
+      return;
+    }
     if (!activeBanner) return;
     setIsLoadingSingle(true);
     setIsShowingBonus(false);
