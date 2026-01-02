@@ -14,13 +14,13 @@ import { useCardCollection } from "./hooks/use-card-collection"; // Import hook
 import { useVideoPlayerContext } from "../../../contexts";
 import { getOrderStatus } from "../../../lib/api/ticket-api";
 import type { Card } from "./services/card-collection-service";
-import { useToast } from "../../../components/ui/toast-v2/use-toast";
+// import { useToast } from "../../../components/ui/toast-v2/use-toast";
 
 function CardCollectionContent() {
   const navigate = useNavigate();
   const { banners, userState, userInfo, openBlindBag } = useCardCollection();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { showToast } = useToast();
+  // const { showToast } = useToast();
   const { setIsVipModalOpen } = useVideoPlayerContext();
 
   const [isOpeningBulk, setIsOpeningBulk] = React.useState(false);
@@ -224,10 +224,10 @@ function CardCollectionContent() {
     } catch (e: any) {
       console.error("Failed to open bags", e);
       setIsLoadingBulk(false);
-      const errorMessage = e?.response?.data?.error?.message || "Có lỗi xảy ra, vui lòng thử lại sau.";
-      showToast({
-        description: errorMessage,
-      });
+      // const errorMessage = e?.response?.data?.error?.message || "Có lỗi xảy ra, vui lòng thử lại sau.";
+      // showToast({
+      //   description: errorMessage,
+      // });
     }
   };
 
