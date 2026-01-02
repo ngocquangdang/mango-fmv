@@ -292,7 +292,7 @@ function CardCollectionContent() {
 
       {/* Currency Top Right */}
 
-      <div className="absolute top-0 right-0 flex items-center gap-2 p-4" onClick={() => setIsBuyingTickets(true)}>
+      <div className="absolute top-0 right-0 flex items-center gap-2 p-4" onClick={() => { }}>
         <div
           className="w-20 h-10 lg:w-[164px] lg:h-[82px] bg-cover bg-center bg-no-repeat flex items-center justify-center text-xs lg:text-xl lg:pb-1"
           style={{ backgroundImage: `url(/images/score-banner.png)` }}

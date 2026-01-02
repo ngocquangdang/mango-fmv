@@ -116,6 +116,7 @@ export function CollectionPageContent() {
       <NotebookLayout
         subPages={subPages}
         onSelectSubPage={handleSelectSubPage}
+        selectedSubPage={currentSubPageId}
         // Only pass categories if we are in collection mode
         categories={showCategories ? categories : undefined}
         selectedTab={selectedTab}

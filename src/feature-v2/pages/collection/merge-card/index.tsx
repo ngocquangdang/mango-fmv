@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NotebookLayout from "../../../components/notebook";
-import { useCollectionContext } from "../context/collection-context";
+// import { useCollectionContext } from "../context/collection-context";
 import Banner from "../../../components/banner";
 import type { CollectionItem } from "../right-side";
 import { useToast } from "../../../../components/ui/toast-v2/use-toast";
@@ -13,12 +13,12 @@ import MergeCardRight from "./right";
 export default function MergeCardPage() {
   // const { setType } = useVideoPlayerContext();
   const navigate = useNavigate();
-  const { fetchCollection } = useCollectionContext();
+  // const { fetchCollection } = useCollectionContext();
   // const { id: characterId } = useParams(); // Get subpage param which might contain ID?
   // The routing in collection/index.tsx uses wildcard: /collection/*, so params["*"] helps us
   const { showToast } = useToast();
 
-  const [selectedTab, setSelectedTab] = useState<string>("");
+  // const [selectedTab, setSelectedTab] = useState<string>("");
   const [slots, setSlots] = useState<(CollectionItem | null)[]>([null, null, null]);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [resultCard, setResultCard] = useState<Card | null>(null);
@@ -90,9 +90,9 @@ export default function MergeCardPage() {
         setSlots([null, null, null]);
 
         // Refresh collection to reflect consumed cards and new card
-        if (selectedTab) {
-          fetchCollection(selectedTab);
-        }
+        // if (selectedTab) {
+        //   fetchCollection(selectedTab);
+        // }
       }
     } catch (error: any) {
       console.error("Merge failed:", error);
@@ -118,27 +118,27 @@ export default function MergeCardPage() {
     setSlots([null, null, null]); // Always keep 3 slots
   }
 
-  const handleTabChange = (id: string) => {
-    setSelectedTab(id);
-    // fetchCollection(id);
-    // We might want to keep the URL consistent: /collection/merge-card/{id}
-    // navigate(`/collection/merge-card/${id}`); 
-  };
+  // const handleTabChange = (id: string) => {
+  //   setSelectedTab(id);
+  //   // fetchCollection(id);
+  //   // We might want to keep the URL consistent: /collection/merge-card/{id}
+  //   // navigate(`/collection/merge-card/${id}`); 
+  // };
 
-  const subPages = [{
-    slug: "card-collection",
-    name: "Thu thập thẻ",
-    id: "card-collection",
-  }, {
-    slug: "merge-card",
-    name: "Ghép thẻ",
-    id: "merge-card",
-  }];
+  // const subPages = [{
+  //   slug: "card-collection",
+  //   name: "Thu thập thẻ",
+  //   id: "card-collection",
+  // }, {
+  //   slug: "merge-card",
+  //   name: "Ghép thẻ",
+  //   id: "merge-card",
+  // }];
 
-  const handleSelectSubPage = (id: string) => {
-    if (id === "card-collection") navigate(`/collection/${id}`);
-    else navigate(`/collection/${id}`);
-  }
+  // const handleSelectSubPage = (id: string) => {
+  //   if (id === "card-collection") navigate(`/collection/${id}`);
+  //   else navigate(`/collection/${id}`);
+  // }
 
   return (
     <div className="w-full h-full flex items-center justify-center relative">

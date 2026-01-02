@@ -9,7 +9,14 @@ export default function CollectionLimited() {
 
   return (
     <div className="w-full h-full flex flex-col items-center p-4 lg:p-8 relative">
-      <div className="w-full h-full overflow-y-auto mt-2 px-4 lg:px-12 scrollbar-hide">
+      <div className="w-full h-full overflow-y-auto mt-2 px-8 py-5 lg:px-12 scrollbar-hide"
+        style={{
+          backgroundImage: 'url(/images/collection/limit-card-bg.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>

@@ -31,7 +31,7 @@ export function HistoryLeft() {
           <img src="/images/avatar-border.png" alt="border" className="absolute w-full h-full object-contain" />
           {/* Avatar */}
           <img
-            src={userInfo?.avatar}
+            src={userInfo?.imageUrl}
             alt="avatar"
             className="w-6 h-6 lg:w-8 lg:h-8 rounded-full object-cover relative z-10"
           />
