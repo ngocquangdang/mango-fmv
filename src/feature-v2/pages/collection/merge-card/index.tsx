@@ -13,7 +13,7 @@ import MergeCardRight from "./right";
 export default function MergeCardPage() {
   // const { setType } = useVideoPlayerContext();
   const navigate = useNavigate();
-  const { fetchCollection } = useCollectionContext();
+  const { fetchCollection, selectedCharacterId } = useCollectionContext();
 
   useEffect(() => {
     fetchCollection();
@@ -94,9 +94,7 @@ export default function MergeCardPage() {
         setSlots([null, null, null]);
 
         // Refresh collection to reflect consumed cards and new card
-        // if (selectedTab) {
-        //   fetchCollection(selectedTab);
-        // }
+        fetchCollection(selectedCharacterId ?? undefined);
       }
     } catch (error: any) {
       console.error("Merge failed:", error);
