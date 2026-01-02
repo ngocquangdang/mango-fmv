@@ -43,11 +43,11 @@ export function HistoryLeft() {
 
       {/* Header */}
       <div className="relative mb-4 text-center flex-shrink-0 mt-2 lg:mt-4">
-        <img src="/images/cloud-icon.png" className="absolute left-6 lg:left-12 top-0 w-6 opacity-80" alt="" />
+        {/* <img src="/images/cloud-icon.png" className="absolute left-6 lg:left-12 top-0 w-6 opacity-80" alt="" /> */}
         <div className="inline-block bg-[#FF7E47] text-white px-2 lg:px-4 py-0.5 rounded-sm transform -rotate-1 shadow-sm">
           <span className="font-bold text-xs lg:text-base uppercase">LỊCH SỬ TẶNG XOÀI</span>
         </div>
-        <img src="/images/cloud-icon.png" className="absolute right-6 lg:right-12 top-2 w-6 opacity-60" alt="" />
+        {/* <img src="/images/cloud-icon.png" className="absolute right-6 lg:right-12 top-2 w-6 opacity-60" alt="" /> */}
       </div>
 
       {/* Table Header */}

@@ -42,7 +42,7 @@ const NotebookLayout = ({
           return (
             <div
               key={subPage.id}
-              className={`relative ${isSelected ? "z-2" : "z-0"}`}
+              className={`relative ${isSelected ? "z-10" : "z-0"}`}
               onClick={() => onSelectSubPage?.(subPage.id)}
             >
               <img
