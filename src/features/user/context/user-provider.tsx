@@ -174,6 +174,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     isVideosLoading
   ]);
 
+  const prevMgUserInfoRef = React.useRef<string>("");
+
   const handleGetToken = React.useCallback((mgUserInfo: string) => {
     logInfo(
       "UserProvider - handleGetToken called",
@@ -182,6 +184,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       },
       "UserProvider"
     );
+
+    if (mgUserInfo === prevMgUserInfoRef.current) {
+      return;
+    }
+    prevMgUserInfoRef.current = mgUserInfo;
+
     const mgUserInfoObject = JSON.parse(mgUserInfo || "{}");
     setUserInfo(mgUserInfoObject);
     saveLocalParams({

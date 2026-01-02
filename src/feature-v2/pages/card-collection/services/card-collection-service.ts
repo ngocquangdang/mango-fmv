@@ -16,6 +16,7 @@ export interface Card {
   tier?: "R" | "R+" | "SR" | "SSR"; // API response
   isOwned?: boolean;
   isNew?: boolean; // API response
+  quantity?: number;
 }
 
 export interface CollectionStats {

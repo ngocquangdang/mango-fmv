@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import NotebookLayout from "../../../components/notebook";
 import { useCollectionContext } from "../context/collection-context";
 import Banner from "../../../components/banner";
@@ -13,10 +13,9 @@ import MergeCardRight from "./right";
 export default function MergeCardPage() {
   // const { setType } = useVideoPlayerContext();
   const navigate = useNavigate();
-  const { characters, fetchCollection } = useCollectionContext();
+  const { fetchCollection } = useCollectionContext();
   // const { id: characterId } = useParams(); // Get subpage param which might contain ID?
   // The routing in collection/index.tsx uses wildcard: /collection/*, so params["*"] helps us
-  const { "*": subPageParam } = useParams();
   const { showToast } = useToast();
 
   const [selectedTab, setSelectedTab] = useState<string>("");
@@ -119,37 +118,11 @@ export default function MergeCardPage() {
     setSlots([null, null, null]); // Always keep 3 slots
   }
 
-  // Parse character ID from URL or fallback
-  // We need to parse parent logic properly.
-
-  // Actually, in NotebookLayout, the left side and right side are just contents. 
-  // We want to maintain the "Character Tabs" on the right (which are Categories).
-
-  useEffect(() => {
-    if (characters.length > 0) {
-      // Extract character ID from subPageParam "merge-card/{id}"
-      if (subPageParam && subPageParam.startsWith("merge-card/")) {
-        const id = subPageParam.split("/")[1];
-        if (id && id !== selectedTab) {
-          setSelectedTab(id);
-          fetchCollection(id);
-        }
-      } else if (!selectedTab) {
-        // Default to first char
-        const firstId = characters[0].id;
-        setSelectedTab(firstId);
-        fetchCollection(firstId);
-        // Update URL to match
-        navigate(`/collection/merge-card/${firstId}`, { replace: true });
-      }
-    }
-  }, [characters, subPageParam, fetchCollection, navigate, selectedTab]);
-
   const handleTabChange = (id: string) => {
     setSelectedTab(id);
-    fetchCollection(id);
+    // fetchCollection(id);
     // We might want to keep the URL consistent: /collection/merge-card/{id}
-    navigate(`/collection/merge-card/${id}`);
+    // navigate(`/collection/merge-card/${id}`); 
   };
 
   const subPages = [{
@@ -164,7 +137,7 @@ export default function MergeCardPage() {
 
   const handleSelectSubPage = (id: string) => {
     if (id === "card-collection") navigate(`/collection/${id}`);
-    else navigate(`/collection/${id}/${selectedTab || characters[0]?.id}`);
+    else navigate(`/collection/${id}`);
   }
 
   return (
@@ -178,11 +151,11 @@ export default function MergeCardPage() {
       <Banner text="Ghép thẻ" className="absolute! top-4 left-4" />
 
       <NotebookLayout
-        subPages={subPages}
-        onSelectSubPage={handleSelectSubPage}
+        // subPages={subPages}
+        // onSelectSubPage={handleSelectSubPage}
         // categories={categories}
         // selectedTab={selectedTab}
-        setSelectedTab={handleTabChange}
+        // setSelectedTab={handleTabChange}
         leftContent={
           <MergeCardLeft
             onToggle={handleToggleItem}

@@ -9,20 +9,24 @@ interface NotebookLayoutProps {
   leftContent: React.ReactNode;
   rightContent: React.ReactNode;
   categories?: Category[];
+  centerContent?: React.ReactNode;
   selectedTab?: string;
   setSelectedTab?: (tab: string) => void;
   subPages?: { id: string; name: string, slug: string }[];
   onSelectSubPage?: (subPageId: string) => void;
+  extraContent?: React.ReactNode;
 }
 
 const NotebookLayout = ({
   leftContent,
   rightContent,
+  centerContent,
   categories = [],
   selectedTab,
   setSelectedTab,
   subPages = [],
   onSelectSubPage,
+  extraContent,
 }: NotebookLayoutProps) => {
   const BINDING_IMG = "/images/binding.png";
   const MARKER_UNSELECTED_IMG = "/images/tab-unselected.png";
@@ -57,8 +61,16 @@ const NotebookLayout = ({
       </div>
       <div className="notebook-cover w-[536px] h-[340px] lg:w-[1100px] lg:h-[700px] z-2">
         <div className="notebook-spread">
-          <div className="notebook-page page-left">{leftContent}</div>
-          <div className="notebook-page page-right">{rightContent}</div>
+          {centerContent ? (
+            <div className="notebook-page page-center w-full h-full absolute top-0 left-0 z-[11]">
+              {centerContent}
+            </div>
+          ) : (
+            <>
+              <div className="notebook-page page-left">{leftContent}</div>
+              <div className="notebook-page page-right">{rightContent}</div>
+            </>
+          )}
           <div className="notebook-binding-container">
             <img src={BINDING_IMG} alt="binding-top" className="binding-ring" />
             <img
@@ -68,6 +80,7 @@ const NotebookLayout = ({
             />
           </div>
         </div>
+        {extraContent}
       </div>
       <div className="absolute -right-26 lg:-right-[220px] top-4 flex flex-col gap-4">
         {categories.map((category) => {
@@ -101,7 +114,7 @@ const NotebookLayout = ({
           );
         })}
       </div>
-    </div>
+    </div >
   );
 };
 

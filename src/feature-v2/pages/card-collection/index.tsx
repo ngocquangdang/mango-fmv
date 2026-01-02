@@ -29,6 +29,7 @@ function CardCollectionContent() {
   const [selectedBannerIndex, setSelectedBannerIndex] = React.useState(0);
   const [openedCards, setOpenedCards] = React.useState<Card[]>([]);
   const [bonusCards, setBonusCards] = React.useState<Card[]>([]);
+  const [isShowingBonus, setIsShowingBonus] = React.useState(false);
   const [paymentStatus, setPaymentStatus] = React.useState<'verifying' | 'success' | 'failed' | null>(null);
   const [paymentModalData, setPaymentModalData] = React.useState<{
     isOpen: boolean;
@@ -185,6 +186,7 @@ function CardCollectionContent() {
   const handleBulkOpen = async () => {
     if (!activeBanner) return;
     setIsLoadingBulk(true);
+    setIsShowingBonus(false);
     try {
       await openBlindBag({ bannerId: activeBanner.id, quantity: 10 }, {
         onSuccess: (data) => {
@@ -210,15 +212,27 @@ function CardCollectionContent() {
   const handleCloseBulk = () => {
     setIsOpeningBulk(false);
     if (bonusCards.length > 0) {
-      setOpenedCards(bonusCards);
-      setIsOpeningSingle(true);
-      setBonusCards([]);
+      setTimeout(() => {
+        setOpenedCards(bonusCards);
+        setIsOpeningBulk(true);
+        setIsShowingBonus(true);
+        setBonusCards([]);
+      }, 300);
+    }
+  };
+
+  const handleViewCollectionFromOverlay = () => {
+    if (bonusCards.length > 0) {
+      handleCloseBulk();
+    } else {
+      navigate('/collection');
     }
   };
 
   const handleSingleOpen = async () => {
     if (!activeBanner) return;
     setIsLoadingSingle(true);
+    setIsShowingBonus(false);
     try {
       await openBlindBag({ bannerId: activeBanner.id, quantity: 1 }, {
         onSuccess: (data) => {
@@ -242,9 +256,17 @@ function CardCollectionContent() {
   }
 
   const handleCloseSingle = () => {
-    setIsOpeningSingle(false);
-    setOpenedCards([]);
-    setBonusCards([]);
+    if (bonusCards.length > 0) {
+      setOpenedCards(bonusCards);
+      setIsOpeningBulk(true); // Switch to Bulk Overlay (Grid View)
+      setIsShowingBonus(true);
+      setIsOpeningSingle(false);
+      setBonusCards([]); // Clear so we don't loop
+    } else {
+      setIsOpeningSingle(false);
+      setOpenedCards([]);
+      setBonusCards([]);
+    }
   }
 
   // Use real ticket count from API (userInfo has the actual balance from database)
@@ -354,7 +376,7 @@ function CardCollectionContent() {
         </div>
       </div>
 
-      <BlindBagOpeningOverlay isOpen={isOpeningBulk} onSkip={handleCloseBulk} cards={openedCards} blindBagImage={activeBanner?.imageUrl} />
+      <BlindBagOpeningOverlay isOpen={isOpeningBulk} onSkip={handleCloseBulk} cards={openedCards} blindBagImage={activeBanner?.imageUrl} onViewCollection={handleViewCollectionFromOverlay} isBonus={isShowingBonus} />
       <SingleBlindBagOverlay isOpen={isOpeningSingle} onConfirm={() => handleCloseSingle()} card={openedCards[0]} />
       <TicketPurchaseOverlay
         isOpen={isBuyingTickets}
