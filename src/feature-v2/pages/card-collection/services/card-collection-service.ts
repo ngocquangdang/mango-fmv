@@ -177,8 +177,8 @@ export const CardCollectionService = {
     });
   },
 
-  mergeCards: async (cardIds: string[]): Promise<ApiResponse<{ resultCard: Card }>> => {
-    return apiClientVideoProgress.post<ApiResponse<{ resultCard: Card }>>("/gacha/merge", {
+  mergeCards: async (cardIds: string[]): Promise<ApiResponse<{ resultCard: Card; bonusRewards?: Card[] }>> => {
+    return apiClientVideoProgress.post<ApiResponse<{ resultCard: Card; bonusRewards?: Card[] }>>("/gacha/merge", {
       cardIds
     }, {
       "X-Ticket": getLocalParam("ticket") || "",

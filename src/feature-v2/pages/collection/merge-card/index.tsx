@@ -9,6 +9,7 @@ import SingleBlindBagOverlay from "../../card-collection/components/single-blind
 import { CardCollectionService, type Card } from "../../card-collection/services/card-collection-service";
 import MergeCardLeft from "./left";
 import MergeCardRight from "./right";
+import BlindBagOpeningOverlay from "../../card-collection/components/blind-bag-opening-overlay";
 
 export default function MergeCardPage() {
   // const { setType } = useVideoPlayerContext();
@@ -26,6 +27,8 @@ export default function MergeCardPage() {
   const [slots, setSlots] = useState<(CollectionItem | null)[]>([null, null, null]);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [resultCard, setResultCard] = useState<Card | null>(null);
+  const [bonusCards, setBonusCards] = useState<Card[]>([]);
+  const [isBonusOverlayOpen, setIsBonusOverlayOpen] = useState(false);
 
   const handleToggleItem = (item: CollectionItem) => {
     // Count how many of this item is currently in slots
@@ -89,6 +92,11 @@ export default function MergeCardPage() {
 
       if (response.data && response.data.resultCard) {
         setResultCard(response.data.resultCard);
+
+        if (response.data.bonusRewards && response.data.bonusRewards.length > 0) {
+          setBonusCards(response.data.bonusRewards);
+        }
+
         setIsOverlayOpen(true);
         // Clear slots on success
         setSlots([null, null, null]);
@@ -116,8 +124,20 @@ export default function MergeCardPage() {
 
   const handleCloseOverlay = () => {
     setIsOverlayOpen(false);
+
+    if (bonusCards.length > 0) {
+      setIsBonusOverlayOpen(true);
+    } else {
+      setResultCard(null);
+      setSlots([null, null, null]); // Always keep 3 slots
+    }
+  }
+
+  const handleCloseBonusOverlay = () => {
+    setIsBonusOverlayOpen(false);
+    setBonusCards([]);
     setResultCard(null);
-    setSlots([null, null, null]); // Always keep 3 slots
+    setSlots([null, null, null]);
   }
 
   // const handleTabChange = (id: string) => {
@@ -177,6 +197,18 @@ export default function MergeCardPage() {
         isOpen={isOverlayOpen}
         onConfirm={handleCloseOverlay}
         card={resultCard}
+      />
+
+      <BlindBagOpeningOverlay
+        isOpen={isBonusOverlayOpen}
+        onSkip={handleCloseBonusOverlay}
+        cards={bonusCards}
+        isBonus={true}
+        onViewCollection={() => {
+          handleCloseBonusOverlay();
+          navigate('/collection');
+        }}
+        blindBagImage="/images/collection/blind-bag.png"
       />
     </div>
   )
