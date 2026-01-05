@@ -30,6 +30,7 @@ const ChapterFlowV2 = () => {
     setReviewScene: videoPlayerContext.setReviewScene,
     showToast,
     audioRecordings,
+    setVersion: videoPlayerContext.setVersion
   });
 
   useEffect(() => {
@@ -42,6 +43,7 @@ const ChapterFlowV2 = () => {
       setReviewScene: videoPlayerContext.setReviewScene,
       showToast,
       audioRecordings,
+      setVersion: videoPlayerContext.setVersion
     };
   }, [
     data,
@@ -52,6 +54,7 @@ const ChapterFlowV2 = () => {
     videoPlayerContext.setReviewScene,
     showToast,
     audioRecordings,
+    videoPlayerContext.setVersion
   ]);
 
   // Prepare Data (Reuse layout logic from V1)
@@ -196,6 +199,7 @@ const ChapterFlowV2 = () => {
 
       setReviewScene(false);
       onPlayPlayer(nodeId, false);
+      clickContextRef.current.setVersion(Math.random());
     });
 
     lfRef.current = lf;

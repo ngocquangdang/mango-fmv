@@ -11,7 +11,7 @@ import ChapterFlow from './chapter-flow';
 import { useNavigate } from "react-router-dom";
 
 export default function ChapterPage() {
-  const { onPlayPlayer, setType } = useVideoPlayerContext();
+  const { onPlayPlayer, setType, setVersion } = useVideoPlayerContext();
   const { chapter, } = useUserContext();
   const navigate = useNavigate();
   const { progress } = chapter;
@@ -43,7 +43,7 @@ export default function ChapterPage() {
   const handlePlay = () => {
     const sceneId =
       progress?.currentScene?.sceneId || chapter.startSceneId;
-
+    setVersion(Math.random());
     onPlayPlayer(sceneId);
   };
 

@@ -35,6 +35,7 @@ const ChapterFlow = () => {
     onPlayPlayer,
     currentStatus,
     setReviewScene,
+    setVersion
   } = useVideoPlayerContext();
   const { showToast } = useToast();
 
@@ -135,6 +136,7 @@ const ChapterFlow = () => {
           //       .catch(err => console.error("Voice Polling Error:", err));
           //   }
           // }
+          setVersion(Math.random());
           onPlayPlayer(node.id);
         }}
         proOptions={{ hideAttribution: true }}
