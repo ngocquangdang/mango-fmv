@@ -360,6 +360,7 @@ const RightSide: React.FC<RightSideProps> = ({ renderItem, onCardClick, title })
           </div>
         </div>
 
+
         {/* Row 3: UR Tier (Orange/Special) */}
         {urGroup && (
           <div className="flex-shrink-0 w-[70%] mx-auto mt-3">
