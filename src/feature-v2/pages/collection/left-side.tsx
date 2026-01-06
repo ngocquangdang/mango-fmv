@@ -23,6 +23,11 @@ const LeftSide: React.FC = () => {
                   x{selectedCard.quantity}
                 </div>
               )}
+              {(selectedCard.serialNumber) && (
+                <div className="absolute bottom-1.5 right-1.5 bg-black/70 text-white rounded-full w-6 h-6 lg:w-9 lg:h-9 flex items-center justify-center font-bold text-sm">
+                  {selectedCard.serialNumber}
+                </div>
+              )}
             </div>
           </div>
         </div>
