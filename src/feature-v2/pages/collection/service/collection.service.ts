@@ -9,7 +9,7 @@ export interface CollectionCard {
   isOwned: boolean;
   imageUrl: string;
   imageBlurUrl?: string;
-  serialNumber?: number
+  serialNumbers?: number[];
 }
 
 export interface CollectionGroup {
