@@ -56,7 +56,7 @@ export const ItemCard = ({
           </div>
         )}
         {item.serialNumber !== undefined && (
-          <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] lg:text-xs font-bold px-1.5 py-0.5 rounded-full z-10">
+          <div className="absolute bottom-0 right-0 bg-[#feca59] text-[#7b3400] text-[8px] lg:text-[10px] font-bold px-2 py-0 rounded-sm z-10">
             {item.serialNumber}
           </div>
         )}
