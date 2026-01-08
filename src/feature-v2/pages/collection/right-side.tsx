@@ -8,6 +8,7 @@ export interface CollectionItem {
   isLocked: boolean;
   rank?: string;
   count?: number; // Add count to support quantity
+  serialNumber?: number;
 }
 
 export interface RightSideProps {
@@ -52,6 +53,11 @@ export const ItemCard = ({
         {isLocked && (
           <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
             <img src="/images/collection/lock-icon.png" alt="locked" className="w-1/3 opacity-80" />
+          </div>
+        )}
+        {item.serialNumber !== undefined && (
+          <div className="absolute bottom-0 right-0 bg-[#feca59] text-[#7b3400] text-[8px] lg:text-[10px] font-bold px-2 py-0 rounded-sm z-10">
+            {item.serialNumber}
           </div>
         )}
       </div>
@@ -256,7 +262,15 @@ const RightSide: React.FC<RightSideProps> = ({ renderItem, onCardClick, title })
       .find(c => c.id === item.id);
 
     if (cardData && cardData.isOwned) {
-      setSelectedCard(cardData);
+      const cardToSet = { ...cardData };
+
+      // If a specific serial number is selected (UR card split view)
+      if (item.serialNumber !== undefined) {
+        cardToSet.serialNumbers = [item.serialNumber];
+        cardToSet.quantity = 1; // Represents a single unique item
+      }
+
+      setSelectedCard(cardToSet);
     }
   };
 
@@ -360,11 +374,21 @@ const RightSide: React.FC<RightSideProps> = ({ renderItem, onCardClick, title })
           </div>
         </div>
 
+
         {/* Row 3: UR Tier (Orange/Special) */}
         {urGroup && (
           <div className="flex-shrink-0 w-[70%] mx-auto mt-3">
             <URCollectionFolder
-              items={urGroup.cards.map(c => mapCardToItem(c, 'UR'))}
+              items={urGroup.cards.flatMap(c => {
+                const baseItem = mapCardToItem(c, 'UR');
+                if (c.serialNumbers && c.serialNumbers.length > 0) {
+                  return c.serialNumbers.map((sn: number) => ({
+                    ...baseItem,
+                    serialNumber: sn
+                  }));
+                }
+                return [baseItem];
+              })}
               renderItem={renderItem}
               onCardClick={handleCardClick}
             />

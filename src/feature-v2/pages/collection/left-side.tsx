@@ -15,12 +15,21 @@ const LeftSide: React.FC = () => {
               <img
                 src={selectedCard.imageUrl}
                 alt={selectedCard.name}
-                className="w-full h-auto object-cover aspect-[3/4.5]"
+                className="w-full h-auto aspect-[3/4.5]"
               />
               {/* Quantity badge */}
               {selectedCard.quantity > 1 && (
                 <div className="absolute top-1.5 right-1.5 bg-black/70 text-white rounded-full w-6 h-6 lg:w-9 lg:h-9 flex items-center justify-center font-bold text-[10px] lg:text-sm">
                   x{selectedCard.quantity}
+                </div>
+              )}
+              {(selectedCard.serialNumbers && selectedCard.serialNumbers.length > 0) && (
+                <div className="absolute bottom-0 right-0 flex flex-row gap-1">
+                  {selectedCard.serialNumbers.map((sn) => (
+                    <div key={sn} className="bg-[#feca59] text-[#7b3400] rounded-lg w-7 h-4 lg:w-10 lg:h-7 flex items-center justify-center font-bold text-sm">
+                      {sn}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
