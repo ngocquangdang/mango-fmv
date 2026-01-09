@@ -1,5 +1,4 @@
 import React from "react";
-import { createPortal } from "react-dom";
 
 type ModalIntroProps = {
   isOpen: boolean;
@@ -16,7 +15,7 @@ const ModalIntro: React.FC<ModalIntroProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const content = (
+  return (
     <div className="game-modal-overlay">
       <div
         className="relative flex flex-col items-center pt-4 pb-8"
@@ -72,8 +71,6 @@ const ModalIntro: React.FC<ModalIntroProps> = ({
       </div>
     </div>
   );
-
-  return createPortal(content, document.body);
 };
 
 export default ModalIntro;
