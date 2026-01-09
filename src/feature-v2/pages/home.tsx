@@ -12,6 +12,9 @@ import { gtmEvent } from "../../lib/analytics";
 
 const IMAGE_VERSION = "1";
 
+import ModalIntro from "../components/ui/modal-intro";
+import IntroContent from "../components/intro-content";
+
 export default function Home() {
   const { setType, setCollectionItems, } = useVideoPlayerContext();
   const navigate = useNavigate();
@@ -19,6 +22,7 @@ export default function Home() {
   const { mutateAsync: restartChapter } = useRestartChapter();
   const [dialogName, setDialogName] = React.useState<string | null>(null);
   const [isVoiceOverlayOpen, setIsVoiceOverlayOpen] = React.useState(false);
+  const [isIntroOpen, setIsIntroOpen] = React.useState(false);
 
   const isPlaying = useMemo(() => {
     return Object.values(chapter?.progress?.scenes || {}).length > 1 || chapter.progress?.currentScene?.watchingSecond;
@@ -200,6 +204,26 @@ export default function Home() {
         onClose={() => setIsVoiceOverlayOpen(false)}
       />
 
+
+      <ModalIntro
+        isOpen={isIntroOpen}
+        onClose={() => setIsIntroOpen(false)}
+        title="Giới thiệu"
+      >
+        <IntroContent />
+      </ModalIntro>
+
+      {/* Intro Button - Top Right */}
+      <button
+        onClick={() => setIsIntroOpen(true)}
+        className="absolute top-6 right-6 z-50 w-10 h-10 hover:scale-105 transition-transform"
+      >
+        <img
+          src={`/images/ask-icon.png?v=${IMAGE_VERSION}`}
+          alt="Introduction"
+          className="w-full h-full object-contain"
+        />
+      </button>
 
     </div>
   );
