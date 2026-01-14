@@ -16,7 +16,7 @@ const ModalIntro: React.FC<ModalIntroProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="game-modal-overlay">
+    <div className="game-modal-overlay z-[1000]">
       <div
         className="relative flex flex-col items-center pt-4 pb-8"
         style={{
