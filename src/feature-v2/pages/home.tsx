@@ -216,7 +216,7 @@ export default function Home() {
       {/* Intro Button - Top Right */}
       <button
         onClick={() => setIsIntroOpen(true)}
-        className="absolute top-6 right-6 z-50 w-10 h-10 hover:scale-105 transition-transform"
+        className="absolute top-6 right-10 z-50 w-10 h-10 hover:scale-105 transition-transform"
       >
         <img
           src={`/images/ask-icon.png?v=${IMAGE_VERSION}`}
