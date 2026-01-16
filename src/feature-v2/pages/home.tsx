@@ -112,11 +112,11 @@ export default function Home() {
       label: "Xếp hạng",
       onClick: () => handleClick("ranking"),
     },
-    {
-      icon: `/images/home/collection.png?v=${IMAGE_VERSION}`,
-      label: "Bộ sưu tập",
-      onClick: () => handleClick("collection"),
-    },
+    // {
+    //   icon: `/images/home/collection.png?v=${IMAGE_VERSION}`,
+    //   label: "Bộ sưu tập",
+    //   onClick: () => handleClick("collection"),
+    // },
     ...(+(isPlaying || 0) > 0 ? [
       {
         icon: `/images/reload-icon.png?v=${IMAGE_VERSION}`,
@@ -216,7 +216,7 @@ export default function Home() {
       {/* Intro Button - Top Right */}
       <button
         onClick={() => setIsIntroOpen(true)}
-        className="absolute top-6 right-6 z-50 w-10 h-10 hover:scale-105 transition-transform"
+        className="absolute top-6 right-12 z-50 w-10 h-10 hover:scale-105 transition-transform"
       >
         <img
           src={`/images/ask-icon.png?v=${IMAGE_VERSION}`}
