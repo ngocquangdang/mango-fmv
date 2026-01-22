@@ -3,15 +3,19 @@ import { useEffect } from "react";
 import { useUserContext } from "../../../features/user/context";
 import { QrLoginOverlay } from "../../components/QrLoginOverlay";
 import { useInitQrSession } from "../../../features/user/hooks";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import LinkDnsePage from "../link-dnse";
 import { useToast } from "../../../components/ui/toast-v2/use-toast";
-import { saveLocalParams } from "../../../lib/api/storage";
+import { saveLocalParams, getLocalParam } from "../../../lib/api/storage";
 
 const QrLoginPage = () => {
   const { refetchProgress, refetchChapter, refetchCollectedRewards } = useUserContext();
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { mutate: initQrSession } = useInitQrSession();
+  const location = useLocation();
+  const isLinkDnse = location.pathname === "/link-dnse" || location.pathname === "/link-dnse/";
+  const [ticket, setTicket] = React.useState(getLocalParam("ticket"));
 
   const [qrSessionId, setQrSessionId] = React.useState<string | null>(null);
   const [qrUrl, setQrUrl] = React.useState<string>("");
@@ -19,6 +23,7 @@ const QrLoginPage = () => {
 
   // Initialize QR Session on mount
   useEffect(() => {
+    if (ticket && isLinkDnse) return;
     setLoading(true);
     initQrSession(undefined, {
       onSuccess: (response: any) => {
@@ -33,7 +38,7 @@ const QrLoginPage = () => {
         showToast({ description: "Không thể tạo mã QR. Vui lòng thử lại." });
       },
     });
-  }, [initQrSession, showToast]);
+  }, [initQrSession, showToast, ticket, isLinkDnse]);
 
   const handleSuccess = (ticket: string) => {
     saveLocalParams({ ticket });
@@ -45,6 +50,11 @@ const QrLoginPage = () => {
     refetchCollectedRewards();
 
     // Navigate to home or previous page
+    // Navigate to home or previous page
+    if (isLinkDnse) {
+      setTicket(ticket);
+      return;
+    }
     navigate("/");
   };
 
@@ -65,6 +75,10 @@ const QrLoginPage = () => {
       },
     });
   };
+
+  if (ticket && isLinkDnse) {
+    return <LinkDnsePage />;
+  }
 
   return (
     <div className="w-full h-screen bg-black/80 flex items-center justify-center">

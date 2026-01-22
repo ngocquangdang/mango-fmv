@@ -1,6 +1,6 @@
 import * as React from "react";
 import { UserContext } from ".";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   mapChapter,
   useChapter,
@@ -54,6 +54,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: userApiData, refetch: refetchUserInfo } = useUserInfo();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [userInfo, setUserInfo] = React.useState<Record<string, any>>({});
   const [qrSessionId, setQrSessionId] = React.useState<string | null>(null);
@@ -233,9 +234,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const hasLocalTicket = !!getLocalParam("ticket");
     // If we are in dev or mobile-like env and NO ticket, redirect to login page
     if ((import.meta.env.DEV || !isMobileLike) && !hasLocalTicket) {
-      navigate("/login-qr");
+      if (location.pathname !== "/login-qr" && location.pathname !== "/link-dnse") {
+        navigate("/login-qr");
+      }
     }
-  }, [mgApi, isPreview, navigate]);
+  }, [mgApi, isPreview, navigate, location]);
 
   const handleQrSuccess = React.useCallback((ticket: string) => {
     setTimeout(() => {

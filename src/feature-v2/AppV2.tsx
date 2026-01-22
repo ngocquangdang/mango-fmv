@@ -227,6 +227,7 @@ function AppV2() {
         <UserProvider>
           <VideoPlayerProvider>
             <Routes>
+              <Route path="/link-dnse" element={<QrLoginPage />} />
               <Route element={<LayoutWrapper />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/journal" element={<Journal />} />
