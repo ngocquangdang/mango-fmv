@@ -112,11 +112,11 @@ export default function Home() {
       label: "Xếp hạng",
       onClick: () => handleClick("ranking"),
     },
-    // {
-    //   icon: `/images/home/collection.png?v=${IMAGE_VERSION}`,
-    //   label: "Bộ sưu tập",
-    //   onClick: () => handleClick("collection"),
-    // },
+    {
+      icon: `/images/home/collection.png?v=${IMAGE_VERSION}`,
+      label: "Bộ sưu tập",
+      onClick: () => handleClick("collection"),
+    },
     ...(+(isPlaying || 0) > 0 ? [
       {
         icon: `/images/reload-icon.png?v=${IMAGE_VERSION}`,
